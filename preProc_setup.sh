@@ -78,7 +78,7 @@ echo "Extracting events" >>& $log
 foreach run ('EmptyRoom', 'SpontEyeOpen', 'Left', 'LeftDual', 'Right', 'RightDual')
 
 	if ( -e $1_{$run}_raw.fif ) then  
-            mne_process_raw --raw $1_{$run}_raw.fif --eventsout eve/$1_{$run}.eve >>& $log
+            mne_process_raw --raw $1_{$run}_raw.fif --eventsout eve/$1_{$run}.eve --digtrig STI014 >>& $log
         endif
 end
 echo "Extracted events saved in the /eve folder" >>& $log 
