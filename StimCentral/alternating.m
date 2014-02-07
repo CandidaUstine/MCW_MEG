@@ -2,6 +2,7 @@ function alternating(code1, code2, soa, numofstim, file1, file2, seqfile, progra
 
 % ALTERNATING Produces an alternating sequence (1, 2, 1, 2, 1, 2 etc)
 %
+%
 % ALTERNATING(code1, code2, soa, numofstim, file1, file2, seqfile, program)
 %    
 %    code1       trigger code for stimulus 1
