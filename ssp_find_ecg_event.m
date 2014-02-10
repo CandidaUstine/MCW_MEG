@@ -1,4 +1,4 @@
-% function ssp_find_ecg_event_cu(infif, inpath)
+% function ssp_find_ecg_event(infif, inpath)
 %Run this script for subjects that have a flat signal in their runs, as the python ecg event detector does not skip through this section in teh ssp script.  
 
 %input file
@@ -9,8 +9,8 @@
 % [name2, ~]=strtok(remain, '_');
 % eog_eventFileName = [inpath, name1,'_', name2, '_eog-eve.fif'];
 
-in_fif_File='/home/custine/MEG/data/msabri/mind004_050924_median01_raw.fif';
-ecg_eventFileName='/home/custine/MEG/data/msabri/mind004_050924_median01_ecg-eve.fif';
+in_fif_File='/home/custine/MEG/data/msabri/ac1/ac1_Left_raw.fif';
+ecg_eventFileName='/home/custine/MEG/data/msabri/ac1/ssp/ac1_Left_ecg-eve.fif';
 %eog_figfile='/autofs/cluster/kuperberg/SemPrMM/MEG/data/sc1/ssp/sc1_BaleenHPRun2_m2sd_eog.png';
 
 %reading eog channels from data files
@@ -26,7 +26,7 @@ end_samp = fiffsetup.last_samp;
 
 % Detecting Blinks
 filtecg = eegfilt(ecg, sampRate,0,100);
-ECG_type = 999;
+ECG_type = 402;
 firstSamp = fiffsetup.first_samp;
 temp = filtecg-mean(filtecg);
 
@@ -49,6 +49,6 @@ end
 %  plot(t(eog_events),filteog(eog_events),'r+')
 %  print( gcf, '-dpng', eog_figfile )
 
-ssp_writeEventFile(ecg_eventFileName, firstSamp, ecg_events, ECG_type);
+writeEventFile(ecg_eventFileName, firstSamp, ecg_events, ECG_type);
 
 %end
