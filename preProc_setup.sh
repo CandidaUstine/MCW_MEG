@@ -31,7 +31,7 @@ endif
 
 ## ## ## ## ## CHANGE HERE: edit this to the directory to where you have saved your raw data. 
 cd /home/custine/MEG/data/msabri/$1
-
+set subj_dir = '/home/custine/MEG/data/msabri/$1'
 date >>& $log
 
 mkdir eve -m g+rws
@@ -75,11 +75,11 @@ mv run03_dual_oddball_right_raw_sss_xtraClean_raw.fif $1_RightDual_raw.fif
 ##Extracting events read from .fif files into .eve text files
 
 echo "Extracting events" >>& $log
-foreach run ('EmptyRoom', 'SpontEyeOpen', 'Left', 'LeftDual', 'Right', 'RightDual')
-
-	if ( -e $1_{$run}_raw.fif ) then  
-            mne_process_raw --raw $1_{$run}_raw.fif --eventsout eve/$1_{$run}.eve --digtrig STI014 >>& $log
-        endif
+foreach run ('Left' 'LeftDual' 'Right' 'RightDual')
+        echo $run
+	#if ( -e $1_{$run}_raw.fif ) then  
+            mne_process_raw --raw $1_{$run}_raw.fif --eventsout {$subj_dir}/eve/$1_{$run}.eve --digtrig STI101 --digtrigmask 49407 >>& $log
+        #endif
 end
 echo "Extracted events saved in the /eve folder" >>& $log 
 
@@ -97,7 +97,7 @@ endif
 
 #############################################################
 echo
-date
+date >>& $log
 echo "Finished preProc - setup" >>& $log
 ################################################################
 
