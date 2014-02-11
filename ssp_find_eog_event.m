@@ -1,19 +1,16 @@
-function ssp_find_eog_event(subjID, exprum)
+function ssp_find_eog_event(subjID, infif)
 
-%input file
-%in_fif_File = infif;
-%EOG Event file
-%[~, name, ~] = fileparts(infif);
-% [name1, remain]= strtok(name, '_');
-% [name2, ~]=strtok(remain, '_');
-% eog_eventFileName = [inpath, name1,'_', name2, '_eog-eve.fif'];
+%%input file
+in_fif_File = infif;
+%%EOG Event file
+inpath = ['/home/custine/MEG/data/msabri/', subjID, '/'];
+[~, name, ~] = fileparts(infif);
+[name1, remain]= strtok(name, '_');
+[name2, ~]=strtok(remain, '_');
+eog_eventFileName = [inpath, 'ssp/' name1,'_', name2, '_eog-eve.fif'];
 
-
-inpath = '/home/custine/MEG/data/msabri/';
-
-in_fif_File = [inpath subjID '/' subjID '_' exprum,'_raw.fif'];
-%in_fif_File = [inpath '/data/' subjID '/' subjID '_ATLLoc_raw.fif'];
-eog_eventFileName = [inpath subjID '/ssp/' subjID '_' exprum,'_eog-eve.fif'];
+in_fif_File = [inpath, infif];
+%eog_eventFileName = [inpath subjID '/ssp/' subjID '_' exprum,'_eog-eve.fif'];
 
 %reading eog channels from data files
 [fiffsetup] = fiff_setup_read_raw(in_fif_File);
@@ -32,16 +29,13 @@ temp = filteog-mean(filteog);
  
 eog_std_dev_value=1; %Change according to the subject(Default 1) (Higher number- detect only distict narrow peaks) 
 
-if sum(temp>(mean(temp)+1*std(temp))) > sum(temp<(mean(temp)+1*std(temp)))
-    
+if sum(temp>(mean(temp)+1*std(temp))) > sum(temp<(mean(temp)+1*std(temp)))   
     eog_events = peakfinder((filteog),eog_std_dev_value*std(filteog),-1);
-
 else
     eog_events = peakfinder((filteog),eog_std_dev_value*std(filteog),1);
-
 end
 
-
 writeEventFile(eog_eventFileName, firstSamp, eog_events, EOG_type);
-
+disp('EOG event file saved as ')
+disp(eog_eventFileName)
 end
