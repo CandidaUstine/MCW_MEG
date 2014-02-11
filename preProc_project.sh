@@ -10,7 +10,7 @@
 ## EXAMPLE: ./preProc_project.sh ac1 ecgeog 1 1 1
 
 if ( $#argv == 0 ) then 
-    echo "NO ARGUMENT SPECIFIED: Format - subjID tag paradigm"
+    echo "Hey dummy! NO ARGUMENT SPECIFIED! Format - ./preProc_project.sh subjID tag nmag ngrad neeg"
     exit 1
 endif
 
@@ -20,15 +20,9 @@ set subj_dir =  /home/custine/MEG/data/msabri/$1
 set log = $subj_dir/logs/preProc_project.log
 
 ########## STEP 1: Detecting Events ##########  
-#foreach i ({$1}*_raw.fif) 
-#  if $2 == 'ecg' then 
-#    matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/scripts/ssp_find_ecg_event.m >>& $log 
-#  else if $2 == 'eog' then 
-#    matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/scripts/ssp_find_eog_event.m $1 $i >>& $log 
-#  else
-#    matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/scripts/ssp_find_ecg_event.m >>& $log 
-#    matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/scripts/ssp_find_eog_event.m >>& $log 
-#  endif
+echo "Creating the event files - -eve.fif"
+python /home/custine/MEG/scripts/helpers.py $1 $2
+matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/msabri/$1/ssp/ssp_event_creator.m >>& $log
 
 ######### STEP 2: Setting Parameters ##########
 ##Default Parameters
@@ -69,7 +63,7 @@ else if $2 == 'ecgeog' then
 endif 
 
 ######## STEP 3: Creating and Applying Projectors ##########
-
+cd /home/custine/MEG/data/msabri/$1
 foreach i ({$1}*ft_raw.fif)
     echo $i 
     echo 'Running the python script..... Please wait....'
