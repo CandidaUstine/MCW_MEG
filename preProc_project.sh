@@ -23,6 +23,7 @@ set log = $subj_dir/logs/preProc_project.log
 echo "Creating the event files - -eve.fif"
 python /home/custine/MEG/scripts/helpers.py $1 $2
 matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/msabri/$1/ssp/ssp_event_creator.m >>& $log
+echo "Created the event files - -eve.fif Look in your subject's ssp folder. ATTENTION: Check if your events are correct!!"
 
 ######### STEP 2: Setting Parameters ##########
 ##Default Parameters
@@ -64,7 +65,7 @@ endif
 
 ######## STEP 3: Creating and Applying Projectors ##########
 cd /home/custine/MEG/data/msabri/$1
-foreach i ({$1}*ft_raw.fif)
+foreach i ({$1}*_raw.fif)
     echo $i 
     echo 'Running the python script..... Please wait....'
     python  /home/custine/MEG/scripts/ssp_clean_ecgeogProj.py --in_path /home/custine/MEG/data/msabri/$1/ -i $i --e_tmin $e_tmin --e_tmax $e_tmax --h_tmin $h_tmin --h_tmax $h_tmax --l-freq $lfreq --h-freq $hfreq --rej-grad $gradrej --rej-mag $magrej --rej-eeg $eegrej --tag $2 -m $3 -g $4 -e $5										   
