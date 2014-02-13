@@ -7,13 +7,14 @@ import condCodes as cc
 
 def makeAveFiles(subjID, projType):
     
-    filePrefix = 'home/custine/MEG/data/msabri/' + subjID
+    filePrefix = '/home/custine/MEG/data/msabri/' + subjID
     
     gradRej = "2000e-13"
     magRej = "3000e-15"
     eegRej = "100e-6"
     magFlat = "1e-14"
     gradFlat = "1000e-15"
+    eegFlat = "0"
     
     expList = ['Left', 'LeftDual', 'Right', 'RightDual']
     condDict = cc.condLabels
@@ -27,21 +28,27 @@ def makeAveFiles(subjID, projType):
         
         myFile = open(filename, "a")
         myFile.write('average{\n')
-        myFile.write('\tname\t\"'+exp+'averages\"\n')
+        myFile.write('\tname\t\"'+exp+' Averages\"\n')
         myFile.write('\toutfile\t\t'+subjID+'_'+exp+'-ave.fif\n')
-        myFile.write('\t\tlogfile\t\t./logs/'+subjID+'_'+exp+'-ave.log\n')
-        myFile.write('\n')
+        myFile.write('\tlogfile\t\t./logs/'+subjID+'_'+exp+'-ave.log\n')
         
         if projType == 'projon':
-            myFile.write('\t\teventfile\t\t'+filePrefix+'/eve/'+subjID+'_mod.eve\n\n')
-            myFile.write('\tgradReject\t'+gradRej+'\n\n')
-            myFile.write('\tmagReject\t'+magRej+'\n\n')
-            myFile.write('\teegReject\t'+eegRej+'\n\n')
-            myFile.write('\tgradFlat\t'+gradFlat+'\n\n')
-            myFile.write('\tmagFlat\t'+magFlat+'\n\n')            
-            myFile.write('\teegFlat\t'+gradFlat+'\n\n')
+            myFile.write('\teventfile\t'+filePrefix+'/eve/'+subjID+'_mod.eve\n\n')
+            myFile.write('\tgradReject\t'+gradRej+'\n')
+            myFile.write('\tmagReject\t'+magRej+'\n')
+            myFile.write('\teegReject\t'+eegRej+'\n')
+            myFile.write('\tgradFlat\t'+gradFlat+'\n')
+            myFile.write('\tmagFlat\t'+magFlat+'\n')            
+            myFile.write('\teegFlat\t'+eegFlat+'\n\n')
             
+        for item in condDict[exp]:
+            myFile.write('\tcategory {\n')
+            myFile.write('\t\tname\t\"'+item[1]+'\"\n')
+            myFile.write('\t\tevent\t'+item[0]+ '\n')
+            myFile.write('\t\ttmin\t-0.1\n')
+            myFile.write('\t\ttmax\t'+epMaxDict[exp]+'\n\t}\n\n')
             
+        myFile.write('}\n')
             
         
     
