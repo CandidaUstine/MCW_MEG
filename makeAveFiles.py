@@ -3,6 +3,7 @@
 Created on Thu Feb 13 12:59:34 2014
 
 @author: custine
+Usage: python makeAveFiles.py subjID projon
 """
 
 
@@ -51,7 +52,7 @@ def makeAveFiles(subjID, projType):
             
         for item in condDict[exp]:
             myFile.write('\tcategory {\n')
-            myFile.write('\t\tname\t\"'+item[1]+'\"\n')
+            myFile.write('\t\tname\t'+item[1]+'\n')
             myFile.write('\t\tevent\t'+item[0]+ '\n')
             myFile.write('\t\ttmin\t-0.1\n')
             myFile.write('\t\ttmax\t'+epMaxDict[exp]+'\n\t}\n\n')
