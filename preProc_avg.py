@@ -42,8 +42,11 @@ lp_cutoff = 20
 ###EventLabels
 labelList = cc.condLabels[exp]
 event_id = {}
+condName = {}
 for row in labelList:
+    #print row[1]
     event_id[row[1]] = int(row[0])
+    condName[row[1]] = row[1]
 print event_id
 
 ###TimeWindow
@@ -92,7 +95,7 @@ for i in range(raw.info['nchan']):
     
 ##Read Epochs and compute Evoked :) 
 print 'Reading Epochs from raw file...'
-epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, name = None, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
+epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, name = condName, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
 print epochs
 evoked = [epochs[cond].average(picks =picks) for cond in event_id]
 
