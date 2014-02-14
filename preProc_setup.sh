@@ -31,7 +31,7 @@ endif
 
 ## ## ## ## ## CHANGE HERE: edit this to the directory to where you have saved your raw data. 
 cd /home/custine/MEG/data/msabri/$1
-set subj_dir = '/home/custine/MEG/data/msabri/$1'
+set subj_dir = '/home/custine/MEG/data/msabri/'$1
 date >>& $log
 
 mkdir eve -m g+rws
@@ -44,11 +44,6 @@ mkdir ave_projoff/logs -m g+rws
 mkdir ssp -m g+rws
 mkdir rej -m g+rws
 mkdir logs -m g+rws 
-
-#########################################################
-##Remove any existing *eve.fif files for internal consistency
-rm *raw-eve.fif
-#rm eve/*.eve
 
 ################################################################
 ##Save read-only copy of raw-files and make other ones writeable
@@ -64,12 +59,12 @@ chmod ug=rwx *.fif
 ################################################################
 ## ## ## ## ## CHANGE HERE:
 ##Change name of Backup runs
-mv run00_emptyroom_raw_sss.fif $1_EmptyRoom_raw.fif
-mv run01_sponteyesopen_raw_sss.fif $1_SpontEyeOpen_raw.fif
-mv run02_oddball_left_raw_sss_xtraClean_raw.fif $1_Left_raw.fif
-mv run03_dual_oddball_left_raw_sss_xtraClean_raw.fif $1_LeftDual_raw.fif
-mv run04_oddball_right_raw_sss.fif $1_Right_raw.fif 
-mv run03_dual_oddball_right_raw_sss_xtraClean_raw.fif $1_RightDual_raw.fif
+mv $subj_dir/raw_backup/run00_emptyroom_raw_sss.fif $1_EmptyRoom_raw.fif
+mv $subj_dir/raw_backup/run01_sponteyesopen_raw_sss.fif $1_SpontEyeOpen_raw.fif
+mv $subj_dir/raw_backup/run02_oddball_left_raw_sss_xtraClean_raw.fif $1_Left_raw.fif
+mv $subj_dir/raw_backup/run03_dual_oddball_left_raw_sss_xtraClean_raw.fif $1_LeftDual_raw.fif
+mv $subj_dir/raw_backup/run04_oddball_right_raw_sss.fif $1_Right_raw.fif 
+mv $subj_dir/raw_backup/run03_dual_oddball_right_raw_sss_xtraClean_raw.fif $1_RightDual_raw.fif
 
 #############################################################
 ##Extracting events read from .fif files into .eve text files
@@ -94,6 +89,11 @@ if ( -e $1_bad_chan.txt ) then
 		mne_mark_bad_channels --bad $1_bad_chan.txt $f >>& $log
 	end
 endif
+
+#########################################################
+##Remove any existing *eve.fif files for internal consistency
+rm *raw-eve.fif
+#rm eve/*.eve
 
 #############################################################
 echo
