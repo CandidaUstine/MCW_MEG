@@ -75,7 +75,7 @@ mv /home/custine/MEG/data/msabri/$1/{$1}*_eog_proj.fif /home/custine/MEG/data/ms
 mv /home/custine/MEG/data/msabri/$1/{$1}*_ecg_proj.fif /home/custine/MEG/data/msabri/$1/ssp/
 mv /home/custine/MEG/data/msabri/$1/{$1}*_ecgeog_proj.fif /home/custine/MEG/data/msabri/$1/ssp/
 rm *_raw-eve.fif
-echo 'Completed Jane!'
+echo 'Completed!'
 
 
 
