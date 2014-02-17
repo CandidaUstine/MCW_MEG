@@ -8,7 +8,8 @@ def ssp_event_creator(subjID, event):
 
  fiffs = []
  in_path = pj('/home/custine/MEG/data/msabri/', subjID)  ### TO CHANGE HERE
- fiffs = glob(pj('*_raw.fif'))
+ fiffs = glob(pj(in_path,'*_raw.fif'))
+ #print fiffs
  fiffs[:] = filter(lambda x: 'EmptyRoom' not in x and 'Spont' not in x, fiffs) ### TO Change here 
  fiffs.sort()
  cmd = ['warning off all']
@@ -25,6 +26,7 @@ def ssp_event_creator(subjID, event):
  ssp_dir = pj('/home/custine/MEG/data/msabri/', subjID, 'ssp')
  print ssp_dir
  write_file_with_list(pj(ssp_dir, 'ssp_event_creator.m'), cmd)
+ #sys.exit(cmd)
 
 
 def write_file_with_list(path,lines):
