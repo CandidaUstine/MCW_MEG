@@ -9,6 +9,8 @@ Example: python preProc_avg.py ac1 Left
 
 import mne
 from mne import fiff
+from mne import viz
+from mne.viz import plot_evoked
 import numpy
 import argparse
 import copy
@@ -104,6 +106,10 @@ print 'Writing Evoked data to -ave.fif file...'
 fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' +exp+'-ave.fif', evoked)
 
 print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
+
+##Show the Result - Plotting the evoked data
+#mne.viz.plot_evoked(evoked, exclude = [])
+
 
 
 
