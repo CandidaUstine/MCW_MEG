@@ -10,7 +10,6 @@ import sys
 sys.path.insert(0,'/home/custine/MEG/scripts/mne-python/')
 import argparse
 import mne
-import condCodes as cc
 import numpy as np
 import pylab as pl
 
@@ -33,12 +32,15 @@ set2 = args.set2
 condList = [args.set1, args.set2] ##If set1 and set2 are condition numbers 
 condName = [args.set1, args.set2] ##If set1 and set2 are condition names
 colorList = ['k', 'r'] ##First cond: Black, Second cond: Red
-
+ymin,ymax = [-.5,15]
+xmin,xmax = [-100,400]
 
 ####Setup Subject Speciifc Information
-data_path = '/home/custine/MEG/data/' +exp
-fname = data_path + '/'+subjID + '/ave_projon/' + subjID +'_' +par+'-ave.fif'
-print fname
+data_path = '/home/custine/MEG/data/' +exp+'/'+subjID + '/ave_projon/'
+results_path = data_path +'plots/' 
+fname = data_path + subjID +'_' +par+'-ave.fif'
+out_fname = results_path + subjID + '_' + par +'_'+set1+'-'+set2+'_meg_rms.png'
+print out_fname
 
 ####Reading the Evoked data structure
 for (c,l) in zip(condName, colorList):
@@ -49,11 +51,18 @@ for (c,l) in zip(condName, colorList):
     print c
     sel = mne.fiff.pick_types(evoked.info,meg=True, eeg=False, exclude = 'bads')
     data = evoked.data[sel]
-    times = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+    ###Computing the MEG RMS from the evoked data for the specified condition
     times = evoked.times*1000
     square = np.power(data, 2)
     meanSquare = np.mean(square, 0)
     rms = np.power(meanSquare, 0.5)
-    pl.plot(times, rms*1e13, color = l, linewidth=2, label = c)
-pl.show()
+    ###Plotting the MEG rms value for the current condition
+    pl.plot(times, rms*1e13, color = l, linewidth=2)
+    pl.ylim([ymin,ymax])
+    pl.xlim([xmin,xmax])
+    pl.yticks(np.array([0.,4.,8.,12.,16.]))
+    pl.xticks(np.array([0,100, 200, 300, 400]))    
+pl.savefig(out_fname)
+pl.show() 
+
 
