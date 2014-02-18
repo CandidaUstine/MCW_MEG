@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 """
 Clean a raw file from EOG and ECG artifacts with PCA (ie SSP)
+@author: custine
+INSTRUCTIONS
+This is the python script for creating and applying the SSP ecg and eog projectors using mne-py on the raw data. 
+Use this script with discretion. You can edit the number of Grad and Mag projectors you want to create for each event(ECG or EOG)  depending on the effect of the artifact. This script is usually run using a  wrapper script: preProc_project.sh.  
+Syntax: ./preProc_project.sh subjID tag nmag ngrad neeg
+Author: Candida Jane Maria Ustine, M.Eng. 
 """
 
-## INSTRUCTIONS
-#  This is the python script for creating and applying the SSP ecg and eog projectors using mne-py on the raw data. 
-#  Use this script with discretion. You can edit the number of Grad and Mag projectors you want to create for each event(ECG or EOG)  depending on the effect of the artifact. This script is usually run using a  wrapper script: preProc_project.sh.  
-#  Syntax: ./preProc_project.sh subjID tag nmag ngrad neeg
-## Author: Candida Jane Maria Ustine, M.Eng. 
 
 import os
 import sys
