@@ -38,9 +38,7 @@ condName = {}
 labels = cc.condLabels[par]
 for row in labels: 
 #    print row
-    event_id[row[1]] = int(row[0])
-  ##  condName = ''.join(['epochs_', row[1]])
-  ##  print 'Jane'    
+    event_id[row[1]] = int(row[0])   
     
 print event_id
 print 'Number of Conditions...'
