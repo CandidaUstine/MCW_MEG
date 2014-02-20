@@ -9,11 +9,9 @@ Example: python preProc_avg.py ac1 Left
 
 import mne
 from mne import fiff
-from mne import viz
-from mne.viz import plot_evoked
-import numpy
+#from mne import viz
+#from mne.viz import plot_evoked
 import argparse
-import copy
 import condCodes as cc
 
 
