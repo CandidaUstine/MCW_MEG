@@ -12,7 +12,7 @@ import argparse
 import mne
 import numpy as np
 import pylab as pl
-
+import readInput
 ###############################################################
 ### Get User Input 
 
@@ -39,29 +39,75 @@ xmin,xmax = [-100,400]
 data_path = '/home/custine/MEG/data/' +exp+'/'+subjID + '/ave_projon/'
 results_path = data_path +'plots/' 
 fname = data_path + subjID +'_' +par+'-ave.fif'
-out_fname = results_path + subjID + '_' + par +'_'+set1+'-'+set2+'_meg_rms.png'
+out_fname = results_path + subjID + '_' + par +'_'+set1+'-'+set2+'_meg_rms_topo.png'
+chan_path = '/home/custine/MEG/scripts/function_inputs/MEG_Chan_Names/'
 print out_fname
 
-####Reading the Evoked data structure
-for (c,l) in zip(condName, colorList):
-    print c
-    evoked = mne.fiff.Evoked(fname, setno = 'epochs_'+c , baseline = (None, 0))
-    #evoked = mne.fiff.Evoked(fname, setno = c , baseline = (None, 0)) ##Use this if you are using condition numbers
-    badChanSet = set(evoked.info['bads'])
-    print c
-    sel = mne.fiff.pick_types(evoked.info,meg=True, eeg=False, exclude = 'bads')
-    data = evoked.data[sel]
-    ###Computing the MEG RMS from the evoked data for the specified condition
-    times = evoked.times*1000
-    square = np.power(data, 2)
-    meanSquare = np.mean(square, 0)
-    rms = np.power(meanSquare, 0.5)
-    ###Plotting the MEG rms value for the current condition
-    pl.plot(times, rms*1e13, color = l, linewidth=2)
-    pl.ylim([ymin,ymax])
-    pl.xlim([xmin,xmax])
-    pl.yticks(np.array([0.,4.,8.,12.,16.]))
-    pl.xticks(np.array([0,100, 200, 300, 400]))    
+chan_groups = ['Frontal', 'Parietal', 'Temporal', 'Occipital']
+hem = ['L', 'R']
+
+for grp in chan_groups:
+    font = {'size': 10}
+    pl.rc('font', **font)
+
+    for h in hem : 
+        chan_list =[]
+        chan_fname = chan_path + 'chan_' + h + grp +'.txt'
+        chan_names = readInput.readList(chan_fname)
+        for item in chan_names:
+            chan_list.append('MEG'+item)
+
+        #print chan_list
+        if h == 'L':
+            if grp == 'Frontal':
+                pl.subplot(3,4,2)
+                pl.title('Left Frontal')
+            elif grp == 'Temporal':
+                pl.subplot(3,4,5)
+                pl.title('Left Temporal')
+            elif grp == 'Parietal':
+                pl.subplot(3,4,6)
+                pl.title('Left Parietal')
+            elif grp == 'Occipital':
+                pl.subplot(3,4,10)
+                pl.title('Left Occipital')
+                
+        else:
+            if grp == 'Frontal':
+                pl.subplot(3,4,3)
+                pl.title('Right Frontal')
+            elif grp == 'Temporal':
+                pl.subplot(3,4,8)
+                pl.title('Right Temporal')
+            elif grp == 'Parietal':
+                pl.subplot(3,4,7)
+                pl.title('Right Parietal')
+            elif grp == 'Occipital':
+                pl.subplot(3,4,11)            
+                pl.title('Right Occipital')               
+                
+        ####Reading the Evoked data structure
+        for (c,l) in zip(condName, colorList):
+            evoked = mne.fiff.Evoked(fname, setno = 'epochs_'+c , baseline = (None, 0))
+            #evoked = mne.fiff.Evoked(fname, setno = c , baseline = (None, 0)) ##Use this if you are using condition numbers
+            badChanSet = set(evoked.info['bads'])
+            print c
+            good_chan=list(set(chan_list))
+            sel = mne.fiff.pick_types(evoked.info,meg=False, eeg=False, include = good_chan)
+            data = evoked.data[sel]
+            ###Computing the MEG RMS from the evoked data for the specified condition
+            times = evoked.times*1000
+            square = np.power(data, 2)
+            meanSquare = np.mean(square, 0)
+            rms = np.power(meanSquare, 0.5)
+            ###Plotting the MEG rms value for the current condition
+            pl.plot(times, rms*1e13, color = l, linewidth=2)
+            pl.ylim([ymin,ymax])
+            pl.xlim([xmin,xmax])
+            pl.box('off')
+            pl.tick_params(axis='both',right='off',top='off') 
+            pl.yticks(np.array([0.,4.,8.,12.,16.]))
+            pl.xticks(np.array([0,100, 200, 300, 400]))    
 pl.savefig(out_fname)
 pl.show() 
 
