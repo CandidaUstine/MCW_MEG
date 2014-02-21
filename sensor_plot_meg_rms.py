@@ -47,9 +47,10 @@ chan_groups = ['Frontal', 'Parietal', 'Temporal', 'Occipital']
 hem = ['L', 'R']
 
 for grp in chan_groups:
-    font = {'size': 10}
+    font = {'size': 8}
     pl.rc('font', **font)
-
+    pl.subplots_adjust(hspace=0.5, wspace =0.5) 
+    #pl.axes(frameon=False)
     for h in hem : 
         chan_list =[]
         chan_fname = chan_path + 'chan_' + h + grp +'.txt'
@@ -61,31 +62,33 @@ for grp in chan_groups:
         if h == 'L':
             if grp == 'Frontal':
                 pl.subplot(3,4,2)
-                pl.title('Left Frontal')
+                pl.title('Left Frontal', fontsize = 'large')
             elif grp == 'Temporal':
                 pl.subplot(3,4,5)
-                pl.title('Left Temporal')
+                pl.title('Left Temporal', fontsize = 'large')
             elif grp == 'Parietal':
                 pl.subplot(3,4,6)
-                pl.title('Left Parietal')
+                #pl.title()
+                pl.title('Left Parietal', fontsize = 'large')
             elif grp == 'Occipital':
                 pl.subplot(3,4,10)
-                pl.title('Left Occipital')
+                pl.title('Left Occipital', fontsize = 'large')
+               # pl.text(10,20,'Left Frontal')
                 
         else:
             if grp == 'Frontal':
                 pl.subplot(3,4,3)
-                pl.title('Right Frontal')
+                pl.title('Right Frontal', fontsize = 'large')
             elif grp == 'Temporal':
                 pl.subplot(3,4,8)
-                pl.title('Right Temporal')
+                pl.title('Right Temporal', fontsize = 'large')
             elif grp == 'Parietal':
                 pl.subplot(3,4,7)
-                pl.title('Right Parietal')
+                pl.title('Right Parietal', fontsize = 'large')
             elif grp == 'Occipital':
                 pl.subplot(3,4,11)            
-                pl.title('Right Occipital')               
-                
+                pl.title('Right Occipital', fontsize = 'large')               
+              
         ####Reading the Evoked data structure
         for (c,l) in zip(condName, colorList):
             evoked = mne.fiff.Evoked(fname, setno = 'epochs_'+c , baseline = (None, 0))
