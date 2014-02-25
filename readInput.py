@@ -26,7 +26,7 @@ def readList(filename):
 		temp = myFile.readline()
 		temp = temp.strip()
 		if temp:
-			dataList.append(temp)
+			dataList.append((temp))
 	myFile.close()
 
 	return dataList
