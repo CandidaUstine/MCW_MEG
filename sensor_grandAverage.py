@@ -28,16 +28,15 @@ par = args.par ##Left Right etc.,
 
 
 ####Setup Subject Speciifc Information
-data_path = '/home/custine/MEG/data/msabri/'
+data_path = '/home/custine/MEG/data/' + exp
 subjList = readInput.readList('/home/custine/MEG/scripts/function_inputs/'+exp+'_subjList.txt')
-result_path = '/home/custine/MEG/results/sensor_level/' + exp + '/'
+result_path = '/home/custine/MEG/results/sensor_level/ga_fif/' 
 print subjList
 
 event_id ={}
 condName = {}
 labels = cc.condLabels[par]
 for row in labels: 
-#    print row
     event_id[row[1]] = int(row[0])   
     
 print event_id
