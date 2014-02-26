@@ -3,6 +3,7 @@
 Created on Wed Feb 19 16:54:10 2014
 
 @author: custine
+Individual subject: plot MEG evoked data for all MEG channels as a heat map. 
 """
 
 import sys
