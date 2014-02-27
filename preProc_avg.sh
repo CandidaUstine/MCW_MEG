@@ -23,7 +23,7 @@ if ( $#argv == 4) then
 endif
 
 echo $3
-foreach proj ('projon') ##Enter projoff here if needed! :) 
+foreach proj ('projon') ##Enter projoff here if needed!
         echo $3
 
         echo "Making Average Parameter files -.ave" >>& /home/custine/MEG/data/{$1}/{$2}/ave_projon/logs/preProc_avg.log
