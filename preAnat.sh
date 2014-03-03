@@ -4,11 +4,13 @@
 #@author: custine
 #Usage: ./preAnat.sh exp subjID
 
+date
 
 setenv SUBJECT $2
 set BEM_METHOD = WATER 
+set subj_dir = /home/custine/MRI/structurals/subjects/$2/
 
-remove teh existing log file
+##remove the existing log file
 if ( -e /home/custine/MEG/data/{$1}/{$2}/logs/preAnat.log ) then
     rm /home/custine/MEG/data/{$1}/{$2}/logs/preAnat.log
 endif
@@ -40,6 +42,9 @@ ln -s ./watershed/$2_outer_skull_surface outer_skull.surf
 ln -s ./watershed/$2_inner_skull_surface inner_skull.surf
 #mv $SUBJECTS_DIR/$1/bem/$1-bem.fif $SUBJECTS_DIR/$1/bem/$1-orig-bem.fif
 
-#Setting up the BEM 
-mne_setup_forward_model --surf --ico 4  >>& /home/custine/MEG/data/{$1}/{$2}/logs/preAnat.log
+#Setting up the BEM surfaces for viewing 
+mne_setup_forward_model --surf --ico 4  >>& /home/custine/MEG/data/{$1}/{$2}/logs/preAnat.log ##IF surfaces are not contained within each other in the proper manner then use the --innershift and --outershift tags in order to modify the surfaces while creating the forward model. 
+mne_make_scalp_surfaces >>& /home/custine/MEG/data/{$1}/{$2}/logs/preAnat.log
+mv /home/custine/MRI/structurals/subjects/$2/$2-head.fif /home/custine/MRI/structurals/subjects/$2/$2-head-old.fif 
+ln /home/custine/MRI/structurals/subjects/$2/$2-head-medium.fif /home/custine/MRI/structurals/subjects/$2/$2-head.fif
  
