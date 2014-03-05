@@ -14,11 +14,6 @@ if ( $#argv == 0 ) then
     exit 1
 endif
 
-if ( $#argv == 1 ) then
-    set log='./preProc_setup.log'
-    echo "Logging to default log..." >>& $log
-endif
-
 if ( $#argv == 2) then
     set log=$2
 endif
@@ -30,9 +25,9 @@ endif
 
 
 ## ## ## ## ## CHANGE HERE: edit this to the directory to where you have saved your raw data. 
-cd /home/custine/MEG/data/msabri/$1
-set subj_dir = '/home/custine/MEG/data/msabri/'$1
-date >>& $log
+cd /home/custine/MEG/data/$1/$2
+set subj_dir = '/home/custine/MEG/data/'$1'/'$2
+
 
 mkdir eve -m g+rws
 mkdir ave -m g+rws
@@ -47,55 +42,55 @@ mkdir ssp -m g+rws
 mkdir rej -m g+rws
 mkdir logs -m g+rws 
 
+set log = $subj_dir/logs/$2_preProc_setup.log
+date >>& $log
+
 ################################################################
 ##Save read-only copy of raw-files and make other ones writeable
 if ( ! -d "raw_backup" ) then
 	mkdir raw_backup
 	mv *.fif raw_backup
 	cp raw_backup/*.fif .
+	chmod ug=rwx *.fif
 endif
 
-
-chmod ug=rwx *.fif
-
-################################################################
+##############################################################
 ## ## ## ## ## CHANGE HERE:
-##Change name of Backup runs
-mv $subj_dir/raw_backup/run00_emptyroom_raw_sss.fif $1_EmptyRoom_raw.fif
-mv $subj_dir/raw_backup/run01_sponteyesopen_raw_sss.fif $1_SpontEyeOpen_raw.fif
-mv $subj_dir/raw_backup/run02_oddball_left_raw_sss_xtraClean_raw.fif $1_Left_raw.fif
-mv $subj_dir/raw_backup/run03_dual_oddball_left_raw_sss_xtraClean_raw.fif $1_LeftDual_raw.fif
-mv $subj_dir/raw_backup/run04_oddball_right_raw_sss.fif $1_Right_raw.fif 
-mv $subj_dir/raw_backup/run05_dual_oddball_right_raw_sss_xtraClean_raw.fif $1_RightDual_raw.fif
+###Change name of Backup runs
+mv $2_EmptyRoom_raw_sss.fif $2_EmptyRoom_raw.fif
+mv $2_AudioRun1_raw_sss.fif $2_AudioRun1_raw.fif
+mv $2_AudioRun2_raw_sss.fif $2_AudioRun2_raw.fif
+mv $2_VisualRun1_raw_sss.fif $2_VisualRun1_raw.fif
+mv $2_VisualRun2_raw_sss.fif $2_VisualRun2_raw.fif
+mv $2_VisualRun3_raw_sss.fif $2_VisualRun3_raw.fif
 
 #############################################################
-##Extracting events read from .fif files into .eve text files
-
+###Extracting events read from .fif files into .eve text files
+cd /home/custine/MEG/data/$1/$2
 echo "Extracting events" >>& $log
-foreach run ('Left' 'LeftDual' 'Right' 'RightDual')
+foreach run ('AudioRun1' 'AudioRun2' 'VisualRun1' 'VisualRun2' 'VisualRun3') 
         echo $run
-	#if ( -e $1_{$run}_raw.fif ) then  
-            mne_process_raw --raw $1_{$run}_raw.fif --eventsout {$subj_dir}/eve/$1_{$run}.eve --digtrig STI101 --digtrigmask 49407 >>& $log
-        #endif
+	if ( -e $2_{$run}_raw.fif ) then  
+            mne_process_raw --raw $2_{$run}_raw.fif --eventsout {$subj_dir}/eve/$2_{$run}.eve --digtrig STI101 --digtrigmask 49407 >>& $log
+        endif
 end
 echo "Extracted events saved in the /eve folder" >>& $log 
-
-#############################################################
-###Marking bad channels
-
-echo
-echo "Marking bad channels" >>& $log
-
-if ( -e $1_bad_chan.txt ) then
-	foreach f ( *_raw.fif )
-		mne_mark_bad_channels --bad $1_bad_chan.txt $f >>& $log
-	end
-endif
 
 #########################################################
 ##Remove any existing *eve.fif files for internal consistency
 rm *raw-eve.fif
 #rm eve/*.eve
+
+
+#############################################################
+###Marking bad channels
+echo
+echo "Marking bad channels" >>& $log
+if ( -e $2_bad_chan.txt ) then
+	foreach f ( *_raw.fif )
+		mne_mark_bad_channels --bad $2_bad_chan.txt $f >>& $log
+	end
+endif
 
 #############################################################
 echo
@@ -103,4 +98,22 @@ date >>& $log
 echo "Finished preProc - setup" >>& $log
 ################################################################
 
-mv /home/custine/MEG/data/msabri/$1/preProc_setup.log /home/custine/MEG/data/msabri/$1/logs/preProc_setup.log
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
