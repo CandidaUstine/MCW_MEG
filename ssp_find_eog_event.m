@@ -1,16 +1,14 @@
-function ssp_find_eog_event(subjID, infif)
+function ssp_find_eog_event(exp,subjID, infif)
 
 %%input file
-in_fif_File = infif;
+%in_fif_File = infif;
 %%EOG Event file
-inpath = ['/home/custine/MEG/data/msabri/', subjID, '/'];
+inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/'];
 [~, name, ~] = fileparts(infif);
 [name1, remain]= strtok(name, '_');
 [name2, ~]=strtok(remain, '_');
 eog_eventFileName = [inpath, 'ssp/' name1,'_', name2, '_eog-eve.fif'];
-
-in_fif_File = [inpath, infif];
-%eog_eventFileName = [inpath subjID '/ssp/' subjID '_' exprum,'_eog-eve.fif'];
+in_fif_File = infif;
 
 %reading eog channels from data files
 [fiffsetup] = fiff_setup_read_raw(in_fif_File);
