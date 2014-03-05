@@ -4,26 +4,26 @@ import sys
 from glob import glob
 
 
-def ssp_event_creator(subjID, event):
+def ssp_event_creator(exp, subjID, event):
 
  fiffs = []
- in_path = pj('/home/custine/MEG/data/msabri/', subjID)  ### TO CHANGE HERE
+ in_path = '/home/custine/MEG/data/'+exp+'/'+ subjID  ### TO CHANGE HERE
  fiffs = glob(pj(in_path,'*_raw.fif'))
  #print fiffs
- fiffs[:] = filter(lambda x: 'EmptyRoom' not in x and 'Spont' not in x, fiffs) ### TO Change here 
+ fiffs[:] = filter(lambda x: 'EmptyRoom' not in x and 'VisualRun2' not in x and 'Spont' not in x, fiffs) ### TO Change here 
  fiffs.sort()
  cmd = ['warning off all']
  line = "addpath('/home/custine/MEG/scripts/');"
  cmd.append(line)
  if event == 'ecg': 
-   mlab = "ssp_find_ecg_event( '%s','%s');"
+   mlab = "ssp_find_ecg_event('%s', '%s', '%s');"
  elif event == 'eog':
-   mlab = "ssp_find_eog_event('%s', '%s');"
+   mlab = "ssp_find_eog_event('%s', '%s', '%s');"
 
  for fif in fiffs:
-     cmd.append(mlab % (subjID, fif))
+     cmd.append(mlab % (exp, subjID, fif))
  cmd.append('exit;')
- ssp_dir = pj('/home/custine/MEG/data/msabri/', subjID, 'ssp')
+ ssp_dir = '/home/custine/MEG/data/'+exp+'/'+ subjID+'/ssp/'
  print ssp_dir
  write_file_with_list(pj(ssp_dir, 'ssp_event_creator.m'), cmd)
  #sys.exit(cmd)
@@ -43,6 +43,7 @@ def write_file_with_list(path,lines):
 
 
 if __name__ == '__main__':
-    subjID = sys.argv[1]
-    event = sys.argv[2]
-    ssp_event_creator(subjID, event)
+    exp = sys.argv[1]
+    subjID = sys.argv[2]
+    event = sys.argv[3]
+    ssp_event_creator(exp, subjID, event)
