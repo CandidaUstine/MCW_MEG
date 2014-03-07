@@ -6,8 +6,8 @@
 # 2) Creating projectors a) ECG projector b) EOG projector. 
 # 3) Applying projectors and creating the final projected fif file. 
 #
-## USAGE: ./preProc_project.sh subjID tag nmag ngrad neeg 
-## EXAMPLE: ./preProc_project.sh ac1 ecgeog 1 1 1
+## USAGE: ./preProc_project.sh exp subjID tag nmag ngrad neeg 
+## EXAMPLE: ./preProc_project.sh custine ac1 ecgeog 1 1 1
 
 if ( $#argv == 0 ) then 
     echo "Hey dummy! NO ARGUMENT SPECIFIED! Format - ./preProc_project.sh subjID tag nmag ngrad neeg"
@@ -15,46 +15,54 @@ if ( $#argv == 0 ) then
 endif
 
 ## ## ## ## ## CHANGE HERE: edit this to the directory to where you have saved your raw data. 
-cd /home/custine/MEG/data/msabri/$1
-set subj_dir =  /home/custine/MEG/data/msabri/$1
+cd /home/custine/MEG/data/$1/$2
+set subj_dir =  /home/custine/MEG/data/$1/$2
 set log = $subj_dir/logs/preProc_project.log
 
-########## STEP 1: Detecting Events ##########  
+#if log exists, delete
+if ( -e $log ) then
+    rm $log
+endif
+
+########## STEP 1: Detecting Events ########## 
 echo "Creating the event files - -eve.fif"
-python /home/custine/MEG/scripts/helpers.py $1 $2
-matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/msabri/$1/ssp/ssp_event_creator.m >>& $log
-echo "Created the event files - -eve.fif Look in your subject's ssp folder. ATTENTION: Check if your events are correct!!"
+if $3 == 'ecgeog' then
+	python /home/custine/MEG/scripts/helpers.py $1 $2 ecg
+	matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/$1/$2/ssp/ssp_event_creator.m >>& $log
+	python /home/custine/MEG/scripts/helpers.py $1 $2 eog
+	matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/$1/$2/ssp/ssp_event_creator.m >>& $log
+else then
+	python /home/custine/MEG/scripts/helpers.py $1 $2 $3
+	matlab -nosplash -nodesktop -nodisplay < /home/custine/MEG/data/$1/$2/ssp/ssp_event_creator.m >>& $log
+endif
+echo 'Event files created , check your ssp folder'
 
 ######### STEP 2: Setting Parameters ##########
 ##Default Parameters
 set magrej = 4000
 set gradrej = 3000
 set eegrej = 500
-if $2 == 'ecg' then 
+if $3 == 'ecg' then 
     set lfreq = 35
     set hfreq = 5
-    set projtmin = -0.08
-    set projtmax = 0.08
     set ngrad = 1
     set nmag = 1 
     set neeg = 0
-    set e_tmin = -0.2
-    set e_tmax = 0.2
-    set h_tmin = -0.08
-    set h_tmax = 0.08
-else if $2 == 'eog' then
+    set e_tmin = -0.25
+    set e_tmax = 0.25
+    set h_tmin = -0.1
+    set h_tmax = 0.1
+else if $3 == 'eog' then
     set lfreq = 35
     set hfreq = 0.3 
-    set projtmin = -0.2
-    set projtmax = 0.2
     set ngrad = 1 
     set nmag = 1
     set neeg = 1 
-    set e_tmin = -0.02
-    set e_tmax = 0.02
-    set h_tmin = -0.08
-    set h_tmax = 0.08
-else if $2 == 'ecgeog' then
+    set e_tmin = -0.25
+    set e_tmax = 0.25
+    set h_tmin = -0.1
+    set h_tmax = 0.1
+else if $3 == 'ecgeog' then
     set lfreq = 35
     set hfreq = 0.3 
     set e_tmin = -0.2
@@ -64,18 +72,23 @@ else if $2 == 'ecgeog' then
 endif 
 
 ######## STEP 3: Creating and Applying Projectors ##########
-cd /home/custine/MEG/data/msabri/$1
-foreach i ({$1}*_raw.fif)
+cd /home/custine/MEG/data/$1/$2/
+pwd
+foreach i ({$2}_AudioRun1_raw.fif)
     echo $i 
-    echo 'Running the python script..... Please wait....'
-    python  /home/custine/MEG/scripts/ssp_clean_ecgeogProj.py --in_path /home/custine/MEG/data/msabri/$1/ -i $i --e_tmin $e_tmin --e_tmax $e_tmax --h_tmin $h_tmin --h_tmax $h_tmax --l-freq $lfreq --h-freq $hfreq --rej-grad $gradrej --rej-mag $magrej --rej-eeg $eegrej --tag $2 -m $3 -g $4 -e $5										   
+    echo 'Running the python script... Please wait...'
+    python  /home/custine/MEG/scripts/ssp_clean_ecgeogProj.py --in_path /home/custine/MEG/data/$1/$2/ -i $i --e_tmin $e_tmin --e_tmax $e_tmax --h_tmin $h_tmin --h_tmax $h_tmax --l-freq $lfreq --h-freq $hfreq --rej-grad $gradrej --rej-mag $magrej --rej-eeg $eegrej --tag $3 -m $4 -g $5 -e $6										   
 end
 
-mv /home/custine/MEG/data/msabri/$1/{$1}*_eog_proj.fif /home/custine/MEG/data/msabri/$1/ssp/
-mv /home/custine/MEG/data/msabri/$1/{$1}*_ecg_proj.fif /home/custine/MEG/data/msabri/$1/ssp/
-mv /home/custine/MEG/data/msabri/$1/{$1}*_ecgeog_proj.fif /home/custine/MEG/data/msabri/$1/ssp/
+mv /home/custine/MEG/data/$1/$2/{$2}*_eog_proj.fif /home/custine/MEG/data/$1/$2/ssp/
+mv /home/custine/MEG/data/$1/$2/{$2}*_ecg_proj.fif /home/custine/MEG/data/$1/$2/ssp/
+mv /home/custine/MEG/data/$1/$2/{$2}*_ecgeog_proj.fif /home/custine/MEG/data/$1/$2/ssp/
 rm *_raw-eve.fif
 echo 'Completed!'
 
-
+#########################################################
+##Remove any existing *eve.fif files for internal consistency
+cd /home/custine/MEG/data/$1/$2/ssp/
+rm *raw-eve.fif
+#rm eve/*.eve
 
