@@ -20,23 +20,18 @@ start_samp = fiffsetup.first_samp;
 end_samp = fiffsetup.last_samp;
 [ecg] = fiff_read_raw_segment(fiffsetup, start_samp ,end_samp, ch_ECG(2));
 
-
-
 % Detecting Blinks
 filtecg = eegfilt(ecg, sampRate,0,100);
 ECG_type = 402;
 firstSamp = fiffsetup.first_samp;
 temp = filtecg-mean(filtecg);
 
-ecg_std_dev_value=1; %tried 1.75, 1.5, 2 and higher - 2 works best for sc4LP2-flat channels, and 1 works best for s3LP4. 
+ecg_std_dev_value=1; %tried 1.75, 1.5, 2 and higher - 2 works best for flat channels
 
 if sum(temp>(mean(temp)+2*std(temp))) > sum(temp<(mean(temp)+2*std(temp)))
-    
     ecg_events = peakfinder((filtecg),ecg_std_dev_value*std(filtecg),-1);
-
 else
     ecg_events = peakfinder((filtecg),ecg_std_dev_value*std(filtecg),1);
-
 end
 
 %  t=1:length(filteog);
