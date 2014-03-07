@@ -18,7 +18,7 @@ from mne import fiff
 
 ########################################################################################################
 ########### MAKING ECG PROJECTOR ##########
-def compute_proj_ecg(in_path, in_fif_fname, h_tmin, h_tmax, n_grad, n_mag, n_eeg, l_freq, h_freq, filter_length, n_jobs, ch_name, reject, avg_ref):
+def compute_proj_ecg(in_path, in_fif_fname, h_tmin, h_tmax, n_grad, n_mag, n_eeg, l_freq, h_freq, filter_length, n_jobs, reject, avg_ref):
 
 ## Reading input fif File
     raw_in = fiff.Raw(in_fif_fname)
@@ -30,25 +30,24 @@ def compute_proj_ecg(in_path, in_fif_fname, h_tmin, h_tmax, n_grad, n_mag, n_eeg
     out_fif_fname = in_path + 'ssp/' + prefix + '_clean_ecg_raw.fif'
     ecg_proj_fname = in_path  + prefix + '_ecg_proj.fif'
     ecg_event_fname = in_path + 'ssp/' + prefix + '_ecg-eve.fif'        
-    flag = 0
     
-    print 'Implementing ECG artifact rejection on data'
-    ecg_events, _, _ = mne.artifacts.find_ecg_events(raw_in)
-    if not len(ecg_events) < 30:
-           # print ecg_event_fname
-           print "Writing ECG events in %s" % ecg_event_fname
-           mne.write_events(ecg_event_fname, ecg_events)
+#    print 'Implementing ECG artifact rejection on data'
+#    ecg_events, _, _ = mne.artifacts.find_ecg_events(raw_in)
+#    if not len(ecg_events) < 30:
+#           # print ecg_event_fname
+#           print "Writing ECG events in %s" % ecg_event_fname
+#           mne.write_events(ecg_event_fname, ecg_events)
         
 ## Making ECG projector
     print 'Computing ECG projector'
     print out_path
     #os.getcwd()
-    command = ('mne_process_raw --cd %s --raw %s --events %s --makeproj '
-                       '--projtmin -0.2 --projtmax 0.2 --saveprojtag _ecg_proj '
-                       '--projnmag 1 --projngrad 1 --projneeg 0 --projevent 999 --highpass 5 '
-                       '--lowpass 35 --projmagrej 8000 --projgradrej 5000 --projeegrej 600'
+    command = ('mne_process_raw --cd %s --raw %s --events %s --digtrig STI101 --makeproj '
+                       '--projtmin -0.1 --projtmax 0.1 --saveprojtag _ecg_proj '
+                       '--projnmag 1 --projngrad 1 --projevent 402 --highpass 5 '
+                       '--lowpass 35 --projmagrej 5000 --projgradrej 4000'
                        % (in_path, in_fif_fname, ecg_event_fname))
-    
+    print command
     st = os.system(command)
     if st != 0:
             print "Error while running : %s" % command
@@ -61,23 +60,20 @@ def compute_proj_ecg(in_path, in_fif_fname, h_tmin, h_tmax, n_grad, n_mag, n_eeg
 def compute_proj_eog(in_path, in_fif_fname, e_tmin, e_tmax, n_grad, n_mag, n_eeg, l_freq, h_freq, filter_length, n_jobs, reject, avg_ref):
 
 
-    raw_in = fiff.Raw(in_fif_fname)
     prefix = in_fif_fname[:-8]
     print prefix
     in_fif_fname = in_path + in_fif_fname
     print in_fif_fname
-    out_path = os.path.join(in_path + 'ssp/')
 
     out_fif_fname = in_path + 'ssp/' + prefix + '_clean_eog_raw.fif'
     eog_proj_fname = in_path + prefix + '_eog_proj.fif' 
     eog_event_fname = in_path + 'ssp/' + prefix + '_eog-eve.fif'
-    flag=0
     
     print "Computing the EOG projector"
-    command = ('mne_process_raw --cd %s --raw %s --events %s --makeproj '
+    command = ('mne_process_raw --cd %s --raw %s --events %s --digtrig STI101 --makeproj '
                                '--projtmin %s --projtmax %s --saveprojtag _eog_proj '
                                '--projnmag %s --projngrad %s --projevent 202 --highpass 0.3 '
-                               '--lowpass 35 --filtersize 8192 --projmagrej 8000 --projgradrej 7000'  ###projeegrej 500 by default
+                               '--lowpass 35 --filtersize 8192 --projmagrej 5000 --projgradrej 4000'  ###projeegrej 500 by default
                                % (in_path, in_fif_fname, eog_event_fname, e_tmin, e_tmax, n_mag, n_grad))
     st = os.system(command)
     if st != 0:
@@ -197,8 +193,8 @@ if __name__ == '__main__':
     if (tag == "ecg"):
             in_fif_fname, ecg_proj_fname, ecg_events, out_fif_fname = compute_proj_ecg(in_path, raw_in, h_tmin, h_tmax, n_grad, n_mag, n_eeg, l_freq, h_freq, filter_length, n_jobs, reject, avg_ref)
             print 'Applying ECG projector'
-            command = ('mne_process_raw --cd %s --raw %s --proj %s --proj %s --projoff --save %s --filteroff'
-                       % (out_path, in_fif_fname, ecg_proj_fname, in_fif_fname, out_fif_fname))
+            command = ('mne_process_raw --cd %s --raw %s --proj %s --projoff --save %s --filteroff'
+                       % (out_path, in_fif_fname, ecg_proj_fname, out_fif_fname))
             print 'Command executed: %s' % command
             st = os.system(command)
             if st != 0:
@@ -211,8 +207,8 @@ if __name__ == '__main__':
             in_fif_fname, eog_proj_fname, eog_events, out_fif_fname = compute_proj_eog(in_path, raw_in, e_tmin, e_tmax, n_grad, n_mag, n_eeg, l_freq, h_freq, filter_length, n_jobs, reject, avg_ref)
             print eog_proj_fname
             print 'Applying EOG projector'
-            command = ('mne_process_raw --cd %s --raw %s --proj %s --proj %s --projoff --save %s --filteroff'
-                       % (in_path, in_fif_fname, eog_proj_fname, in_fif_fname, out_fif_fname))
+            command = ('mne_process_raw --cd %s --raw %s --proj %s --projoff --save %s --digtrig STI101 --filteroff'
+                       % (in_path, in_fif_fname, eog_proj_fname, out_fif_fname))
             print 'Command executed: %s' % command
             st = os.system(command)
             if st != 0:
@@ -229,8 +225,8 @@ if __name__ == '__main__':
             out_fname = in_path + 'ssp/' + prefix + '_clean_ecgeog_raw.fif' 
 
             print 'Applying ECG and EOG projector'
-            command = ('mne_process_raw --cd %s --raw %s --proj %s --proj %s --proj %s --projoff --save %s --filteroff'
-                       % (in_path, in_fif_fname, ecg_proj_fname, eog_proj_fname, in_fif_fname,
+            command = ('mne_process_raw --cd %s --raw %s --proj %s --proj %s --projoff --save %s --filteroff'
+                       % (in_path, in_fif_fname, ecg_proj_fname, eog_proj_fname,
                        out_fname))
             print 'Command executed: %s' % command
             st = os.system(command)

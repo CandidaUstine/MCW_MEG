@@ -74,7 +74,7 @@ endif
 ######## STEP 3: Creating and Applying Projectors ##########
 cd /home/custine/MEG/data/$1/$2/
 pwd
-foreach i ({$2}_AudioRun1_raw.fif)
+foreach i ({$2}_*Run*_raw.fif)
     echo $i 
     echo 'Running the python script... Please wait...'
     python  /home/custine/MEG/scripts/ssp_clean_ecgeogProj.py --in_path /home/custine/MEG/data/$1/$2/ -i $i --e_tmin $e_tmin --e_tmax $e_tmax --h_tmin $h_tmin --h_tmax $h_tmax --l-freq $lfreq --h-freq $hfreq --rej-grad $gradrej --rej-mag $magrej --rej-eeg $eegrej --tag $3 -m $4 -g $5 -e $6										   
