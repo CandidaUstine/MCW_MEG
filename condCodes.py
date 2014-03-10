@@ -40,7 +40,11 @@ condLabels = {'Left':
                      ['64', 'dev_detected'],
                      ['128', 'std_detected']]
                     }
-            
+                    
+                    
+runDict = {'Audio':['Run1', 'Run2']}
+
+
 epMax = {'Left': '.4',
          'Right': '.4',
          'LeftDual': '.4',
