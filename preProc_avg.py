@@ -13,7 +13,8 @@ from mne import fiff
 #from mne.viz import plot_evoked
 import argparse
 import condCodes as cc
-
+import copy
+import numpy
 
 #######Get Input ##
 
@@ -48,7 +49,6 @@ labelList = cc.condLabels[par]
 event_id = {}
 condName = {}
 for row in labelList:
-    #print row[1]
     event_id[row[1]] = int(row[0])
     condName[row[1]] = row[1]
 print event_id
@@ -71,7 +71,7 @@ gradFlat = 1000e-15
 
 evoked=[]
 evokedRuns =[]
-#print ev 
+ 
 for run in runs:
         print run
         ##Setup Subject Speciifc Information
@@ -80,7 +80,7 @@ for run in runs:
         print event_file
         
         raw_file = data_path +'/'+ subjID +'_' +par+run + '_raw.fif' ##Change this suffix if you are using SSP 
-        avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + exp + '_py-ave.log'
+        avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + par + '_py-ave.log'
         print raw_file, avgLog_file
         
         ##Setup Reading fiff data structure
@@ -107,24 +107,38 @@ for run in runs:
         
         ##Write Evoked 
         print 'Writing Evoked data to -ave.fif file...' 
-        fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' +exp+'-ave.fif', evoked)
+        fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' + par + run +'-ave.fif', evoked)
         evokedRuns.append(evoked)
         print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
 
 ##Show the Result - Plotting the evoked data
 #mne.viz.plot_evoked(evoked, exclude = [])
 
-print len(evokedRuns)
+#print len(evokedRuns)
 
+##Make the Final Grand average of all the runs
+runData = []
+runNave = []
+newEvoked = copy.deepcopy(evokedRuns[0])
+print newEvoked 
+count = 0 
+numCond = len(evokedRuns)
 
-
-
-
-
-
-
-
-
+for c in range(numCond):
+    for evRun in evokedRuns:
+        runData.append(evRun[c].data)
+        runNave.append(evRun[c].nave)
+    gaveData = numpy.mean(runData,0)
+    gaveNave = numpy.sum(runNave)
+    
+    newEvoked[c].data = gaveData
+    newEvoked[c].Nave = gaveNave
+    
+    runData = []
+    runNave = []
+    
+##Write Grand average Evoked     
+fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' +par+'_All-ave.fif', newEvoked)
 
 
 
