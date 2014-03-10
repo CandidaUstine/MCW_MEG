@@ -42,7 +42,7 @@ condLabels = {'Left':
                     }
                     
                     
-runDict = {'Audio':['Run1', 'Run2']}
+runDict = {'Audio':['Run1', 'Run2'], 'Left':[''], 'Right':[''], 'LeftDual':[''], 'RightDual':['']}
 
 
 epMax = {'Left': '.4',
