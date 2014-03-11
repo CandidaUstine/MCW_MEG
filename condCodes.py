@@ -49,5 +49,5 @@ epMax = {'Left': '.4',
          'Right': '.4',
          'LeftDual': '.4',
          'RightDual': '.4',
-         'Audio': '0.4'
+         'Audio': '0.55'
         }
