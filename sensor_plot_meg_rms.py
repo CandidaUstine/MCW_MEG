@@ -32,13 +32,13 @@ set2 = args.set2
 condList = [args.set1, args.set2] ##If set1 and set2 are condition numbers 
 condName = [args.set1, args.set2] ##If set1 and set2 are condition names
 colorList = ['k', 'r'] ##First cond: Black, Second cond: Red
-ymin,ymax = [-.5,15]
-xmin,xmax = [-100,400]
+ymin,ymax = [-.5,36]
+xmin,xmax = [-100,600]
 
 ####Setup Subject Speciifc Information
 data_path = '/home/custine/MEG/data/' +exp+'/'+subjID + '/ave_projon/'
 results_path = data_path +'plots/' 
-fname = data_path + subjID +'_' +par+'-ave.fif'
+fname = data_path + subjID +'_' +par+'_All-ave.fif' ##Change according to your interest
 out_fname = results_path + subjID + '_' + par +'_'+set1+'-'+set2+'_meg_rms_topo.png'
 chan_path = '/home/custine/MEG/scripts/function_inputs/MEG_Chan_Names/'
 print out_fname
@@ -109,8 +109,8 @@ for grp in chan_groups:
             pl.xlim([xmin,xmax])
             pl.box('off')
             pl.tick_params(axis='both',right='off',top='off') 
-            pl.yticks(np.array([0.,4.,8.,12.,16.]))
-            pl.xticks(np.array([0,100, 200, 300, 400]))    
+            pl.yticks(np.array([0.,4.,8.,12.,16.,20.,24.,28.,32.]))
+            pl.xticks(np.array([0, 200, 400, 600]))    
 pl.savefig(out_fname)
 pl.show() 
 
