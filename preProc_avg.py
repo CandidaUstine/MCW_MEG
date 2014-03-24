@@ -122,7 +122,7 @@ runNave = []
 newEvoked = copy.deepcopy(evokedRuns[0])
 print newEvoked 
 count = 0 
-numCond = len(evokedRuns)
+numCond = len(newEvoked)
 
 for c in range(numCond):
     for evRun in evokedRuns:
