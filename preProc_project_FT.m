@@ -1,4 +1,4 @@
-function preProc_project_FT(exp, subjID, paradigmName, run, triggerNum)
+function [data, cfg] = preProc_project_FT(exp, subjID, paradigmName, run, condNum)
 
 %Wrapper Script to run the ICA analysis on the Neuromag Raw.fif input file.
 %Computes the first 20 ICA componenets of teh specified input and plots the
@@ -17,6 +17,7 @@ ft_defaults
 %% Initialise Subject Specific Defaults  
 inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/'];
 fiff = strcat(inpath, subjID,'_',paradigmName,run, '_raw.fif')
+comp_file = strcat(inpath, subjID,'_',run, '_comp.mat')
 
 %% Detect ECG Artifacts 
 Fevents = ft_read_event(fiff);
@@ -24,7 +25,7 @@ Fevents = ft_read_event(fiff);
 F = [];
 endS = []
 for i = 1:len
-    if Fevents(i).value == triggerNum %%(1 for Standard tone event code value, 2 for DEVIANT tone event code  value)  %enter trigger number/value of the interested event
+    if Fevents(i).value == condNum %%(1 for Standard tone event code value, 2 for DEVIANT tone event code  value)  %enter trigger number/value of the interested event
        F = [F, Fevents(i).sample];
     end
 end
@@ -42,13 +43,6 @@ samples = horzcat(begS, endS', offset')
 dat = ft_read_data(fiff);
 hdr = ft_read_header(fiff);
 cfg = []
-cfg.artfctdef.ecg.channel = 'ECG'
-cfg.artfctdef.ecg.pretim = 0.05
-cfg.artfctdef.ecg.psttim = 0.1
-cfg.artfctdef.ecg.method = 'zvalue'
-cfg.artfctdef.ecg.cutfof = 3
-cfg.artfctdef.ecg.inspect = 'E0G062'
-cfg.artfctdef.ecg.channel = 'EOG062'
 cfg.trl = samples
 cfg.trialdef.prestim = -0.1
 cfg.trialdef.poststim = 3
@@ -57,11 +51,8 @@ cfg.headerfile = fiff
 cfg.inputfile = fiff
 cfg.trl.dataset = fiff
 cfg.dataset = fiff
-% cfg.trialdef.poststim = 0.2
 cfg = ft_definetrial(cfg)
-%samples = samples(1:5, 1:3)
 cfg.trl = samples
-%[cfg, artifact] = ft_artifact_ecg(cfg)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Reject Artifacts
@@ -73,6 +64,8 @@ cfg.trialdef.eventtype = 'deviant'
 
 %remove all jump and muscle artifacts before running your ICA
 cfg = ft_artifact_jump(cfg)
+
+
 [meg] = ft_channelselection('MEGMAG', hdr.label)
 cfg.channel = meg
 cfg.layout    = 'neuromag306mag.lay'
@@ -102,10 +95,12 @@ comp           = ft_componentanalysis(cfg, data);
 
 %% Plot the ICA Components 
 %Look at the topography of the components. http://fieldtrip.fcdonders.nl/template/layout
+
 cfg = [];
 cfg.component = [1:20];       % specify the component(s) that should be plotted
 cfg.layout    = 'neuromag306mag.lay'; % specify the layout file that should be used for plotting: mag/planar/all
 cfg.comment   = 'no';
+figure
 [cfg] = ft_topoplotIC(cfg, comp)
 
 %Look at their time courses
@@ -113,6 +108,7 @@ cfg = []
 cfg.channel = [1:20]
 cfg.viewmode = 'component'
 cfg.layout = 'neuromag306mag.lay'
+figure
 ft_databrowser(cfg, comp)
 
 %%decompose the original data as it was prior to downsampling to 150Hz
@@ -120,6 +116,8 @@ cfg = [];
 cfg.unmixing  = comp.unmixing;
 cfg.topolabel = comp.topolabel;
 comp_orig     = ft_componentanalysis(cfg, data); %using the sampled data :) 
+
+save(comp_file, 'cfg', 'data', 'comp_orig', 'meg')
 
 % the original data can now be reconstructed, excluding those components
 cfg = [];
@@ -138,19 +136,7 @@ cfg.layout = 'neuromag306mag.lay'
 cfg.xlim = [0 0.5]
 figure
 ft_multiplotER(cfg, tl)
-% % ft_topoplotER(cfg, tl)
- 
-
-%% Rough column 
-% cfg = []
-% cfg.headerfile = 'cu1_AudioRun1_raw.fif'
-% cfg.inputfile = 'cu1_AudioRun1_raw.fif'
-% cfg.datafile = 'cu1_AudioRun1_raw.fif'
-% cfg.headerformat = 'neuromag_fif'
-% cfg.dataformat = 'neuromag_fif'
-% [cfg, artifact] = ft_artifact_zvalue(cfg)
-
-
-
+figure
+ft_topoplotER(cfg, tl)
 
 end
