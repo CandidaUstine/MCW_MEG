@@ -27,6 +27,7 @@ hdr = ft_read_header(fiff);
 run1 = load(run1)
 run2 = load(run2)
 
+%compute the averages 
 cfg = []
 cfg.channel = meg
 cfg.vartrllength = 1
@@ -47,7 +48,10 @@ cfg.showoutline = 'yes'
 cfg.layout = 'neuromag306mag.lay'
 cfg.xlim = [0.0 0.5]
 ft_multiplotER(cfg, tl_all)
+figure
+ft_topoplotER(cfg, tl)
 
+%Plot the runs 
 figure;
 ft_multiplotER(cfg, tl_run1)
 figure;
