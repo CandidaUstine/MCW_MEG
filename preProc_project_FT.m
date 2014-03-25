@@ -1,4 +1,4 @@
-function [data, cfg] = preProc_project_FT(exp, subjID, paradigmName, run, condNum)
+function preProc_project_FT(exp, subjID, paradigmName, run, condNum)
 
 %Wrapper Script to run the ICA analysis on the Neuromag Raw.fif input file.
 %Computes the first 20 ICA componenets of teh specified input and plots the
@@ -19,7 +19,9 @@ inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/'];
 fiff = strcat(inpath, subjID,'_',paradigmName,run, '_raw.fif')
 comp_file = strcat(inpath, subjID,'_',run, '_comp.mat')
 
-%% Detect ECG Artifacts 
+%r = genvarname(run) 
+
+% Detect ECG Artifacts 
 Fevents = ft_read_event(fiff);
 [len, ~] = size(Fevents);
 F = [];
@@ -54,17 +56,16 @@ cfg.dataset = fiff
 cfg = ft_definetrial(cfg)
 cfg.trl = samples
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Reject Artifacts
-%cfg = ft_rejectartifact(cfg)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reject Artifacts
+cfg = ft_rejectartifact(cfg)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% ICA To Remove ECG Artifacts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ICA To Remove ECG Artifacts
 cfg.trialdef.eventtype = 'deviant'
 
 %remove all jump and muscle artifacts before running your ICA
 cfg = ft_artifact_jump(cfg)
-
 
 [meg] = ft_channelselection('MEGMAG', hdr.label)
 cfg.channel = meg
@@ -72,6 +73,7 @@ cfg.layout    = 'neuromag306mag.lay'
 
 %You can now preprocess the data:
 data = ft_preprocessing(cfg)
+
 
 % %Reject Visual Trials and see the epoched response: (Optional) 
 % data_clean   = ft_rejectvisual(cfg, data);
@@ -84,7 +86,26 @@ data = ft_preprocessing(cfg)
 % data = ft_resampledata(cfg, data)
 
 %% Set the ICA method 
-cfg            = [];
+cfg            = [];% the original data can now be reconstructed, excluding those components
+cfg = [];
+cfg.component = [1 2 3];
+data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
+
+%% Sensor Level analysis 
+cfg = []
+cfg.channel = meg
+cfg.vartrllength = 1
+tl = ft_timelockanalysis(cfg, data_clean)
+cfg = []
+cfg.showlabels = 'yes'
+cfg.showoutline = 'yes'
+cfg.layout = 'neuromag306mag.lay'
+cfg.xlim = [0 0.5]
+figure
+ft_multiplotER(cfg, tl)
+figure
+ft_topoplotER(cfg, tl)
+
 cfg.method = 'runica';
 %cfg.channel = {'all', '-refchan'};
 [meg] = ft_channelselection('MEGMAG', hdr.label)
@@ -116,27 +137,12 @@ cfg = [];
 cfg.unmixing  = comp.unmixing;
 cfg.topolabel = comp.topolabel;
 comp_orig     = ft_componentanalysis(cfg, data); %using the sampled data :) 
-
-save(comp_file, 'cfg', 'data', 'comp_orig', 'meg')
+ 
+save(comp_file, 'cfg', 'data', 'meg')
 
 % the original data can now be reconstructed, excluding those components
 cfg = [];
 cfg.component = [1 2 3];
 data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
-
-%% Sensor Level analysis 
-cfg = []
-cfg.channel = meg
-cfg.vartrllength = 1
-tl = ft_timelockanalysis(cfg, data_clean)
-cfg = []
-cfg.showlabels = 'yes'
-cfg.showoutline = 'yes'
-cfg.layout = 'neuromag306mag.lay'
-cfg.xlim = [0 0.5]
-figure
-ft_multiplotER(cfg, tl)
-figure
-ft_topoplotER(cfg, tl)
 
 end
