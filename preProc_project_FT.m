@@ -57,8 +57,8 @@ cfg = ft_definetrial(cfg)
 cfg.trl = samples
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reject Artifacts
-cfg = ft_rejectartifact(cfg)
+% % % Reject Artifacts
+% % cfg = ft_rejectartifact(cfg)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ICA To Remove ECG Artifacts
@@ -66,53 +66,33 @@ cfg.trialdef.eventtype = 'deviant'
 
 %remove all jump and muscle artifacts before running your ICA
 cfg = ft_artifact_jump(cfg)
-
-[meg] = ft_channelselection('MEGMAG', hdr.label)
+[meg] = ft_channelselection('all', hdr.label) %% NOTE: MUST BE ALL CHANNELS FOR THE FT_PREPROCESSING STEP AND THEN WHEN YOU ARE DOING THE ICA YOU CAN JUST COMPUTE ON THE MAGNETOMETERS OR ALL MEG CHANNELS… :) IMPORTANT!!! 
+cfg.channel = {'all', '-refchan'};
 cfg.channel = meg
 cfg.layout    = 'neuromag306mag.lay'
 
 %You can now preprocess the data:
 data = ft_preprocessing(cfg)
 
-
 % %Reject Visual Trials and see the epoched response: (Optional) 
 % data_clean   = ft_rejectvisual(cfg, data);
 
 %you should downsample your data before continuing, otherwise ICA decomposition will take too long
-% data_orig = data
-% cfg = []
-% cfg.resamplefs = 300
-% cfg.detrend = 'no'
-% data = ft_resampledata(cfg, data)
+data_orig = data
+cfg = []
+cfg.resamplefs = 300
+cfg.detrend = 'no'
+data = ft_resampledata(cfg, data)
 
 %% Set the ICA method 
 cfg            = [];% the original data can now be reconstructed, excluding those components
-cfg = [];
-cfg.component = [1 2 3];
-data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
-
-%% Sensor Level analysis 
-cfg = []
-cfg.channel = meg
-cfg.vartrllength = 1
-tl = ft_timelockanalysis(cfg, data_clean)
-cfg = []
-cfg.showlabels = 'yes'
-cfg.showoutline = 'yes'
-cfg.layout = 'neuromag306mag.lay'
-cfg.xlim = [0 0.5]
-figure
-ft_multiplotER(cfg, tl)
-figure
-ft_topoplotER(cfg, tl)
-
-cfg.method = 'runica';
+cfg.method = 'fastica';
 %cfg.channel = {'all', '-refchan'};
-[meg] = ft_channelselection('MEGMAG', hdr.label)
+[meg] = ft_channelselection('MEG', hdr.label)
 %[meg] = ft_channelselection('MEGGRAD', hdr.label)
 cfg.channel = [meg]
-cfg.runica.pca = 101 % number of magnetometers -1
-comp           = ft_componentanalysis(cfg, data);
+%cfg.runica.pca = 101 % number of magnetometers -1
+comp = ft_componentanalysis(cfg, data);
 
 %% Plot the ICA Components 
 %Look at the topography of the components. http://fieldtrip.fcdonders.nl/template/layout
@@ -121,7 +101,6 @@ cfg = [];
 cfg.component = [1:20];       % specify the component(s) that should be plotted
 cfg.layout    = 'neuromag306mag.lay'; % specify the layout file that should be used for plotting: mag/planar/all
 cfg.comment   = 'no';
-figure
 [cfg] = ft_topoplotIC(cfg, comp)
 
 %Look at their time courses
@@ -131,18 +110,12 @@ cfg.viewmode = 'component'
 cfg.layout = 'neuromag306mag.lay'
 figure
 ft_databrowser(cfg, comp)
-
-%%decompose the original data as it was prior to downsampling to 150Hz
-cfg = [];
-cfg.unmixing  = comp.unmixing;
-cfg.topolabel = comp.topolabel;
-comp_orig     = ft_componentanalysis(cfg, data); %using the sampled data :) 
  
-save(comp_file, 'cfg', 'data', 'meg')
+save(comp_file, 'cfg', 'data', 'comp')
 
-% the original data can now be reconstructed, excluding those components
-cfg = [];
-cfg.component = [1 2 3];
-data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
+% % the original data can now be reconstructed, excluding those components
+% cfg = [];
+% cfg.component = [1 2 3];
+% data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
 
 end
