@@ -30,7 +30,7 @@ run2 = load(run2)
 %compute the averages 
 cfg = []
 cfg.channel = meg
-cfg.vartrllength = 1
+cfg.vartrllength = 1 % Accept variable length trials
 tl_run1 = ft_timelockanalysis(cfg, run1.data)
 tl_run2 = ft_timelockanalysis(cfg, run2.data)
 
