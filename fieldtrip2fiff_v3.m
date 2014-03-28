@@ -32,7 +32,7 @@ end
 % info.nchan    = numel(data.label);
 
 [outfid, cals] = fiff_start_writing_raw(fifffile, info);
-fiff_write_raw_buffer(outfid, data.trial{1}, cals);
+fiff_write_raw_buffer(outfid, data.trial, cals);
 fiff_finish_writing_raw(outfid);
 
 end
