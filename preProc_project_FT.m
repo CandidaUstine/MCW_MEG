@@ -19,21 +19,20 @@ inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/'];
 fiff = strcat(inpath, subjID,'_',paradigmName,run, '_raw.fif')
 comp_file = strcat(inpath, subjID,'_',run, '_comp.mat')
 
-%r = genvarname(run) 
-
-% Detect ECG Artifacts 
 Fevents = ft_read_event(fiff);
 [len, ~] = size(Fevents);
 F = [];
 endS = []
 for i = 1:len
-    if Fevents(i).value == condNum %%(1 for Standard tone event code value, 2 for DEVIANT tone event code  value)  %enter trigger number/value of the interested event
+    %if Fevents(i).value == condNum %%(1 for Standard tone event code value, 2 for DEVIANT tone event code  value)  %enter trigger number/value of the interested event
        F = [F, Fevents(i).sample];
-    end
+    %end
 end
 disp(F);
 F = F';
 [len, ~] = size(F);
+
+%% OPTION 1: IF you are proceeding with Averaging after ICA analysis. 
 begS = F(:,1);
 begS = begS(1:len-1);
 for i = 1:size(begS);
@@ -42,13 +41,20 @@ end
 offset = zeros(1,len-1);
 samples = horzcat(begS, endS', offset')
 
+%% OPTION 2: If you are writing the data structure after ICA analysis back to a fiff file
+begSt = F(1) 
+endSt = F(len)
+offsett = 0
+samples = horzcat(begSt, endSt, offsett)
+
+%% Define Trials 
 dat = ft_read_data(fiff);
 hdr = ft_read_header(fiff);
 cfg = []
 cfg.trl = samples
-cfg.trialdef.prestim = -0.1
-cfg.trialdef.poststim = 3
-cfg.trialdef.eventvalue = 1 % Standard trigger value
+% cfg.trialdef.prestim = -0.1
+% cfg.trialdef.poststim = 3
+% cfg.trialdef.eventvalue = 1 % Standard trigger value
 cfg.headerfile = fiff
 cfg.inputfile = fiff
 cfg.trl.dataset = fiff
@@ -71,18 +77,18 @@ cfg.channel = {'all', '-refchan'};
 cfg.channel = meg
 cfg.layout    = 'neuromag306mag.lay'
 
-%You can now preprocess the data:
+% You can now preprocess the data:
 data = ft_preprocessing(cfg)
 
 % %Reject Visual Trials and see the epoched response: (Optional) 
 % data_clean   = ft_rejectvisual(cfg, data);
 
-%you should downsample your data before continuing, otherwise ICA decomposition will take too long
-data_orig = data
-cfg = []
-cfg.resamplefs = 300
-cfg.detrend = 'no'
-data = ft_resampledata(cfg, data)
+% %you should downsample your data before continuing, otherwise ICA decomposition will take too long
+% data_orig = data
+% cfg = []
+% cfg.resamplefs = 300
+% cfg.detrend = 'no'
+% data = ft_resampledata(cfg, data)
 
 %% Set the ICA method 
 cfg            = [];% the original data can now be reconstructed, excluding those components
@@ -115,7 +121,7 @@ save(comp_file, 'cfg', 'data', 'comp')
 
 % % the original data can now be reconstructed, excluding those components
 % cfg = [];
-% cfg.component = [1 2 3];
+% cfg.component = [1 2 4];
 % data_clean = ft_rejectcomponent(cfg, comp_orig,data); %using the sampled data :) 
 
 end
