@@ -17,6 +17,7 @@ run1 = strcat(inpath,'/ssp/fieldtrip/', subjID,'_Run1_', int2str(condNum), '_com
 run2 = strcat(inpath,'/ssp/fieldtrip/', subjID,'_Run2_', int2str(condNum), '_comp.mat')
 topoplot_fig = strcat(inpath, '/ave_projon/plots/fieldtrip/Topoplot_Event-', condName,'_Grandavg')
 multiplot_fig = strcat(inpath, '/ave_projon/plots/fieldtrip/Multiplot_Event-', condName,'_Grandavg')
+avg_file =  strcat(inpath, '/ave_projon/', subjID, '_', condName,'_ft_avg.mat')
 
 %% Compute Individual Run averages 
 
@@ -64,5 +65,5 @@ ft_multiplotER(cfg, tl_run1)
 
 figure;
 ft_multiplotER(cfg, tl_run2)
-
+save(avg_file, 'tl_all', 'tl_run1', 'tl_run2', 'cfg', 'meg', 'hdr')
 end
