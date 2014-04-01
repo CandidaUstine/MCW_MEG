@@ -77,9 +77,10 @@ for run in runs:
         ##Setup Subject Speciifc Information
         data_path = '/home/custine/MEG/data/'+exp+'/' +subjID
         event_file = data_path + '/eve/' + subjID + '_'+ par +run+ evSuffix
+       ## event_file = data_path + '/ssp/fieldtrip/' + subjID + '_' + par + run + '_clean_comp_raw-eve.fif' #Reading fiff after Fieldtrip ICA analysis 
         print event_file
         
-        raw_file = data_path +'/'+ subjID +'_' +par+run + '_raw.fif' ##Change this suffix if you are using SSP 
+        raw_file = data_path +'/ssp/mne/'+ subjID + '_' + par + run + '_clean_ecgeog_raw.fif' ##Change this suffix if you are using SSP 
         avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + par + '_py-ave.log'
         print raw_file, avgLog_file
         
