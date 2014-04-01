@@ -26,7 +26,7 @@ endS = []
 
 %% OPTION 1: Keep this (and comment out OPTION 2) IF you are proceeding with Averaging after ICA analysis. 
 for i = 1:len
-   if Fevents(i).value == 1 %%(1 for Standard Trigger value, 2 for DEVIANT trigger value)  %enter trigger number/value of the interested event
+   if Fevents(i).value == condNum %%(1 for Standard Trigger value, 2 for DEVIANT trigger value)  %enter trigger number/value of the interested event
        F = [F, Fevents(i).sample];
    end
 end
@@ -121,11 +121,11 @@ cfg.layout = 'neuromag306mag.lay'
 ft_databrowser(cfg, comp)
  
 save(comp_file, 'cfg', 'data', 'comp','comp_file')
-
-% the original data can now be reconstructed, excluding those components
-cfg = [];
-cfg.component = [1 2 4];
-data_clean = ft_rejectcomponent(cfg, comp,data); %using the sampled data :) 
-save(comp_file, 'data_clean', 'comp')
+% 
+% % the original data can now be reconstructed, excluding those components
+% cfg = [];
+% cfg.component = [1 4];
+% data_clean = ft_rejectcomponent(cfg, comp,data); %using the sampled data :) 
+% save(comp_file, 'data_clean', 'comp')
 
 end
