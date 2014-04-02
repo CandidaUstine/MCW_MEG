@@ -1,5 +1,7 @@
 #!/bin/csh -f
 
+##Created on Wed Jan 29 2014
+##@author: custine
 #usage: preProc_avg exp subjID par log-optional
 
 if ( $#argv == 0 ) then 
