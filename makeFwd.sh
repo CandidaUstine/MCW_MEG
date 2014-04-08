@@ -38,3 +38,4 @@ foreach m ('meg')
 	mne_average_forward_solutions --fwd $2_AudioRun1-ave-7-$m-fwd.fif --fwd $2_AudioRun2-ave-7-$m-fwd.fif --out $2_Audio_All-ave-7-$m-fwd.fif >>&log
 end
 
+echo "Finished. Please see results in subject's ave_projon sfolder"
