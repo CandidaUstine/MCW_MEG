@@ -80,7 +80,7 @@ for run in runs:
        ## event_file = data_path + '/ssp/fieldtrip/' + subjID + '_' + par + run + '_clean_comp_raw-eve.fif' #Reading fiff after Fieldtrip ICA analysis 
         print event_file
         
-        raw_file = data_path +'/ssp/mne/'+ subjID + '_' + par + run + '_clean_ecgeog_raw.fif' ##Change this suffix if you are using SSP 
+        raw_file = data_path + '/' + subjID + '_' + par + run + '_raw.fif' ##Change this suffix if you are using SSP 
         avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + par + '_py-ave.log'
         print raw_file, avgLog_file
         
@@ -120,24 +120,26 @@ for run in runs:
 ##Make the Final Grand average of all the runs
 runData = []
 runNave = []
-newEvoked = copy.deepcopy(evokedRuns[0])
-print newEvoked 
+newEvokeds = []
+newEvoked = copy.deepcopy(evoked)
 count = 0 
 numCond = len(newEvoked)
-
+print 'Length', numCond
 for c in range(numCond):
     for evRun in evokedRuns:
         runData.append(evRun[c].data)
         runNave.append(evRun[c].nave)
+    print 'Jane Here', c, runNave    
     gaveData = numpy.mean(runData,0)
     gaveNave = numpy.sum(runNave)
-    
+    print 'Sum', sum(runNave)
+
     newEvoked[c].data = gaveData
-    newEvoked[c].Nave = gaveNave
+    newEvoked[c].nave = gaveNave
     
     runData = []
     runNave = []
-    
+
 ##Write Grand average Evoked     
 fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' +par+'_All-ave.fif', newEvoked)
 
