@@ -25,8 +25,10 @@ date >>&$log
 
 mne_process_raw --raw ../$2_AudioRun1_raw.fif --raw ../$2_AudioRun2_raw.fif --digtrig STI101 --cov ../cov/$2_AudioRun1.cov --cov ../cov/$2_AudioRun2.cov --gcov $2_Audio_All-cov.fif --projon --lowpass 30 >>&$log 
 
+#mne_process_raw --raw ../$2_Left_raw.fif --digtrig STI101 --cov ../cov/$2_Left.cov --gcov $2_Left-cov.fif --projon --lowpass 30 >>&$log 
+
 date >>&$log 
 echo "Finished" >>&$log 
 
-echo "Finished. Please see results in subject's covariance folder"
+echo "Finished. Please see results in subject's ave_projon folder"
 
