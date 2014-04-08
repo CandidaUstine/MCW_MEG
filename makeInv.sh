@@ -2,8 +2,8 @@
 
 ##Created on Wed Apr  2 14:45:27 2014
 ##author: custine
-##Usage: ./makeInv.sh exp subjID 
-##Ex: ./makeInv.sh custine cu1 
+##Usage: ./makeInv.sh exp subjID par
+##Ex: ./makeInv.sh custine cu1 Audio_All
 
 setenv SUBJECT $2
 set subj_dir = /home/custine/MEG/data/$1/$2
@@ -25,7 +25,7 @@ setenv SUBJECT $2
 
 ##Create Inverse Solutions 
 foreach t ('meg')
-	mne_do_inverse_operator --fwd $2_Audio_All-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov $2_Audio_All-cov.fif --inv $2_Audio_All-ave-7-$t-inv.fif >>&$log 
+	mne_do_inverse_operator --fwd $2_$3-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov $2_$3-cov.fif --inv $2_$3-ave-7-$t-inv.fif >>&$log 
 end 
 
 ##Create Morph maps between the subject space and fsaverage 
