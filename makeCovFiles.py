@@ -24,6 +24,7 @@ def makeCovFiles(exp, subjID):
     
     if exp == 'msabri':    
         parList = ['Left', 'LeftDual', 'Right', 'RightDual']
+        runDict = {'Left':[]}
     elif exp == 'custine':
         parList = ['Audio']
         runDict = {'Audio':['Run1', 'Run2']}
