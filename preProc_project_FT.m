@@ -8,9 +8,8 @@ function preProc_project_FT(exp, subjID, paradigmName, run, condNum)
 %artifacts. 
 
 %Author: Candida Jane Maria Ustine, custine@mcw.edu
-%Created on 03/24/2014 
-%Usage: preProc_project_FT('custine', 'cu1', 'Audio', 'Run1', 1)
-%Usage: preProc_project_FT('krns_kr3', '9444_1', 'KR3_9444_s1', 'run1', )
+%Modified for krns_kr3 study on 07/29/2014 
+%Usage: preProc_project_FT('krns_kr3', '9444', 's1', 'run1', 100)
 
 %% Initialise Fieldtrip Defaults 
 ft_defaults
@@ -27,7 +26,7 @@ endS = []
 
 %% OPTION 1: Keep this (and comment out OPTION 2) IF you are proceeding with Averaging after ICA analysis. 
 for i = 1:len
-   if Fevents(i).value == condNum %%(1 for Standard Trigger value, 2 for DEVIANT trigger value)  %enter trigger number/value of the interested event
+   if Fevents(i).value == condNum %% Enter trigger number/value of the interested event
        F = [F, Fevents(i).sample];
    end
 end
