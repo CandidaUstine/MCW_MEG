@@ -1,7 +1,6 @@
 function preProc_setup_FT(exp, subjID) %, paradigmName, run, condNum)
 
-% 
-
+%
 %Author: Candida Jane Maria Ustine, custine@mcw.edu
 %Modified for krns study 
 %Usage: preProc_setup_FT('custine', 'cu1')
@@ -23,10 +22,12 @@ mkdir('ave_projon', 'plots')
 mkdir('ave_projoff')
 mkdir('ave_projoff', 'logs')
 mkdir('ave_projoff', 'plots')
-mkdir('ica')
 mkdir('rej')
 mkdir('logs')
 mkdir('raw_backup')
+mkdir('ssp')
+mkdir('ssp', 'fieldtrip') 
+mkdir('ssp', 'mne')
 
 %% Backup Raw files 
 movefile('*.fif', 'raw_backup')
