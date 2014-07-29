@@ -9,14 +9,15 @@ function preProc_project_FT(exp, subjID, paradigmName, run, condNum)
 
 %Author: Candida Jane Maria Ustine, custine@mcw.edu
 %Created on 03/24/2014 
-%Usage: preProc_project_FT('custine', 'cu1', 'Audio', 'Run1')
+%Usage: preProc_project_FT('custine', 'cu1', 'Audio', 'Run1', 1)
+%Usage: preProc_project_FT('krns_kr3', '9444_1', 'KR3_9444_s1', 'run1', )
 
 %% Initialise Fieldtrip Defaults 
 ft_defaults
 
 %% Initialise Subject Specific Defaults  
 inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/'];
-fiff = strcat(inpath, subjID,'_',paradigmName,run, '_raw.fif')
+fiff = strcat(inpath, subjID,'_',paradigmName, '_', run, '_raw.fif')
 comp_file = strcat(inpath,'ssp/fieldtrip/', subjID,'_',run,'_',int2str(condNum), '_comp.mat')
 
 Fevents = ft_read_event(fiff);
@@ -35,7 +36,7 @@ F = F';
 begS = F(:,1);
 begS = begS(1:len-1);
 for i = 1:size(begS);
-    endS(i) = (begS(i)+ 1000);
+    endS(i) = (begS(i)+ 1000); %%1118 samples
 end
 offset = zeros(1,len-1);
 samples = horzcat(begS, endS', offset')
