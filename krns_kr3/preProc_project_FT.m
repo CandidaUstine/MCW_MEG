@@ -88,11 +88,11 @@ data = ft_preprocessing(cfg)
 % data_clean   = ft_rejectvisual(cfg, data);
 
 % %you should downsample your data before continuing, otherwise ICA decomposition will take too long
-% data_orig = data
-% cfg = []
-% cfg.resamplefs = 300
-% cfg.detrend = 'no'
-% data = ft_resampledata(cfg, data)
+data_orig = data
+cfg = []
+cfg.resamplefs = 300
+cfg.detrend = 'no'
+data = ft_resampledata(cfg, data)
 
 %% Set the ICA method 
 cfg            = []; % the original data can now be reconstructed, excluding those components
@@ -121,10 +121,11 @@ cfg.layout = 'neuromag306mag.lay'
 ft_databrowser(cfg, comp)
  
 save(comp_file, 'cfg', 'data', 'comp','comp_file')
+
 % 
 % % the original data can now be reconstructed, excluding those components
 % cfg = [];
-% cfg.component = [1 4];
+% cfg.component = [3 6];
 % data_clean = ft_rejectcomponent(cfg, comp,data); %using the sampled data :) 
 % save(comp_file, 'data_clean', 'comp')
 
