@@ -32,7 +32,7 @@ mkdir('ssp', 'mne')
 %% Backup Raw files 
 movefile('*.fif', 'raw_backup')
 copyfile('raw_backup/*.fif')
-
+% 
 % files = dir('raw_backup/*.fif');
 % for file = files'
 % [pathstr,name,ext] = fileparts(file.name);
