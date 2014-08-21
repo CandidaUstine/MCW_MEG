@@ -6,7 +6,10 @@
 
 
 echo  $1 $2 $3
-
+#cd /home/custine/MEG/data/krns_kr3/
+#if ( ! -d $1  ) then 
+#	mkdir $1
+#endif
 
 
 cd /mnt/yak/binder_data/krns/kr3/$1/$3/*/sss/
@@ -14,6 +17,8 @@ cd /mnt/yak/binder_data/krns/kr3/$1/$3/*/sss/
 ls
 
 pwd
+
+
 cd $1_$2_run1
 pwd
 rsync -a *_sss.fif /home/custine/MEG/data/krns_kr3/$1/$2/
