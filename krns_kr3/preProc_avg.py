@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 12 15:57:12 2014
-
-@author: custine
-"""
 
 # -*- coding: utf-8 -*-
 """
