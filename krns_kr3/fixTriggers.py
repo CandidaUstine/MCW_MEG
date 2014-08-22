@@ -69,7 +69,7 @@ if os.path.exists(eprime_file):
         if len(lineTemp) > 55:
             sent_tags.append('111')
         sent_tags.append('110')
-#        sent_line.append(sent_tags)
+        sent_line.append(sent_tags)
 
 error = 0   
 if os.path.exists(eprime_file):    
