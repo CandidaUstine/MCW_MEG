@@ -7,12 +7,8 @@ Usage: fixTriggers.py subjID sessID runID
 Example: fixTriggers.py 9367 5 1
 """
 
-import sys
 import os 
 import os.path
-import readInput
-import mne
-from mne import fiff
 import argparse
 
 ####### Get Input ########
@@ -75,17 +71,6 @@ if os.path.exists(eprime_file):
         sent_tags.append('110')
 #        sent_line.append(sent_tags)
 
-#print len(sent_tags)
-#j=0 
-#leng = 0        
-#for i in range(33):
-#    print len(sent_line[i]) #this will give the tags for each sentence- use 0- 32 
-#    print 
-#    j = len(sent_line[i])
-#    leng = leng + j
-#    
-#print leng 
-# 
 error = 0   
 if os.path.exists(eprime_file):    
     myFile2 = open(eve_file, "r")
@@ -116,9 +101,6 @@ if os.path.exists(eprime_file):
         else:
             myFile3.write(sent_tags[ii])
             error = error + 1 
-#            print lineTemp[3]
-#            print sent_tags[ii]
-#            print
         myFile3.write("\n")
         ii = ii + 1
         
