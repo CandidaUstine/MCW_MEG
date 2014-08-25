@@ -92,7 +92,7 @@ if os.path.exists(eprime_file):
         lineTemp = (dataTable2[i])
         wordID_tags.append(lineTemp[0])
         word_tags.append(lineTemp[1])   
-        
+#    print (wordID_tags) ##NOTE: word 'Used' is coded as the same 93 tag for both the verb and adverb!!! :) 
 ############################################# 
 #Sentence List
     while tempC:
@@ -112,7 +112,7 @@ if os.path.exists(eprime_file):
 #        print lineTemp[leng-1]
         for jj in range(0, leng-1):
             sentWord_tags.append(lineTemp[jj])
-        sentWord_tags.append(lineTemp[leng-1].split('.')[0]) ##To remove the full stop at the end of teh sentence. 
+        sentWord_tags.append(lineTemp[leng-1].split('.')[0]) ##To remove the full stop at the end of the sentence. 
         sentWordLine_tags.append(sentWord_tags)
 
     myFile4.write('0')
@@ -122,35 +122,33 @@ if os.path.exists(eprime_file):
     for ii in range(0, len(sentID)): #len(sentID)):
          x = int(sentID[ii])
          new = []
-         #l = 0 ##Test for the Number of word items in a sentence 
+         #l = 0 ##Test for the Number of word items in a sentence  
          new = sentWordLine_tags[x-1] 
-         #print new
+         print new
          for jj in range(1, 10): #not including the sent ID - starting with [1]
              if jj < len(new):
-                 #print new[jj]
                  if new[jj] in word_tags:
-                        #l = l +1
-                        wordID = int(word_tags.index(new[jj]))
+                        lineNum = int(word_tags.index(new[jj]))  
+                        wordID = wordID_tags[lineNum]
+                        print new[jj]
+                        print wordID
                         sentwordID = str(sentID[ii]).zfill(3) + str(wordID).zfill(3)
                         myFile4.write(str(sentwordID))
                         myFile4.write("\t")
                         myFile4.write(new[jj])
                         myFile4.write("\n")
-    #                 print new[jj]
     #                 print int(word_tags.index(new[jj]))
-                 elif (new[jj] == 'the') or (new[jj] == 'The') or (new[jj] == 'was') or (new[jj] == 'a'): ##For the words that have no tags ##the and 
+                 elif (new[jj] == 'the') or (new[jj] == 'The') or (new[jj] == 'was') or (new[jj] == 'a'): ##For the words that have no tags ##the and ##was                        
                         sentwordID = str(sentID[ii]).zfill(3) + str('999').zfill(3)
                         myFile4.write(str(sentwordID))
                         myFile4.write("\t")
                         myFile4.write(new[jj])
                         myFile4.write("\n")
-                        #l = l+1
              else:
                  myFile4.write('100') ##Fixation - fillers
                  myFile4.write("\t")
                  myFile4.write('+')
                  myFile4.write("\n")
-                 #l = l+1
          if probeID[ii] == '1': ##Probe words (3 in a run)
             myFile4.write('111')
             myFile4.write("\t")
@@ -160,4 +158,3 @@ if os.path.exists(eprime_file):
          myFile4.write("\t")             
          myFile4.write('RESET')
          myFile4.write("\n")
-         #print l 
