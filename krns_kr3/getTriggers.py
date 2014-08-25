@@ -170,6 +170,9 @@ def Words(subjID, sessID, runID):
     tempB = 1
     lineTemp = []
     word_tags = []
+    wordID_tags = []
+    sentword = []
+    sentwordID = []
     
     if os.path.exists(sent_file):
         ##Sent File:
@@ -187,8 +190,9 @@ def Words(subjID, sessID, runID):
         myFile1.close()
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
-            word_tags.append(lineTemp[0]) ##Word IDs
-        print len(word_tags)
+            wordID_tags.append(lineTemp[0]) ##Word IDs
+            word_tags.append(lineTemp[1])
+        print len(wordID_tags)
         print word_tags
         ii = 0
         ##Mod Eve File : 
@@ -202,10 +206,13 @@ def Words(subjID, sessID, runID):
         dataTable2.append(['0', '0', '0', '0']) ## to account for the lineTemp_next line :/ 
         for i in range(0, len(dataTable2)-1):
             lineTemp = (dataTable2[i])        
-            sentwordID = word_tags[ii]
-            print sentwordID
+            sentwordID = wordID_tags[ii]
+            sentword = word_tags[ii]
+            print sentword
             if (lineTemp[3] == '100' or lineTemp[3] == '110' or lineTemp[3] == '111' or lineTemp[3] == '0'):
                 ii = ii+1
+            elif (sentword == 'The' or sentword == 'the' or sentword == 'was' or sentword == 'a'):
+                ii = ii +1
             else:
                 ii = ii+1
                 myFile3.write(lineTemp[0])
