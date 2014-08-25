@@ -124,14 +124,14 @@ if os.path.exists(eprime_file):
          new = []
          #l = 0 ##Test for the Number of word items in a sentence  
          new = sentWordLine_tags[x-1] 
-         print new
+         #print new
          for jj in range(1, 10): #not including the sent ID - starting with [1]
              if jj < len(new):
                  if new[jj] in word_tags:
                         lineNum = int(word_tags.index(new[jj]))  
                         wordID = wordID_tags[lineNum]
-                        print new[jj]
-                        print wordID
+                        #print new[jj]
+                        #print wordID
                         sentwordID = str(sentID[ii]).zfill(3) + str(wordID).zfill(3)
                         myFile4.write(str(sentwordID))
                         myFile4.write("\t")
