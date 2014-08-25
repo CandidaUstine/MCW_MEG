@@ -160,6 +160,7 @@ def Words(subjID, sessID, runID):
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
     trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-Triggers.eve'
     dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/'+'/' + 'word_sentences0' + runID + '.txt'
+    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -180,6 +181,7 @@ def Words(subjID, sessID, runID):
         myFile1 = open(dataWord_file, "r")
         myFile2 = open(Modeve_file, "r")
         myFile3 = open(trigger_file, "w")
+        myFile4 = open(Modtrigger_file, "w")
         
         while tempA: 
             tempA = myFile1.readline()
@@ -223,6 +225,14 @@ def Words(subjID, sessID, runID):
                 myFile3.write("\t")
                 myFile3.write(str(sentwordID))
                 myFile3.write("\n")
+                myFile4.write(lineTemp[0])
+                myFile4.write("\t")
+                myFile4.write(lineTemp[1])
+                myFile4.write("\t")
+                myFile4.write(lineTemp[2])
+                myFile4.write("\t")
+                myFile4.write(str(1))
+                myFile4.write("\n")
             
     print "Done! See resulting file in " + trigger_file
     
