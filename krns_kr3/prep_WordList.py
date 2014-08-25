@@ -122,11 +122,14 @@ if os.path.exists(eprime_file):
     for ii in range(0, len(sentID)): #len(sentID)):
          x = int(sentID[ii])
          new = []
+         #l = 0 ##Test for the Number of word items in a sentence 
          new = sentWordLine_tags[x-1] 
-         print new
+         #print new
          for jj in range(1, 10): #not including the sent ID - starting with [1]
              if jj < len(new):
+                 #print new[jj]
                  if new[jj] in word_tags:
+                        #l = l +1
                         wordID = int(word_tags.index(new[jj]))
                         sentwordID = str(sentID[ii]).zfill(3) + str(wordID).zfill(3)
                         myFile4.write(str(sentwordID))
@@ -135,17 +138,19 @@ if os.path.exists(eprime_file):
                         myFile4.write("\n")
     #                 print new[jj]
     #                 print int(word_tags.index(new[jj]))
-                 elif (new[jj] == 'the') or (new[jj] == 'The') or (new[jj] == 'was'): ##For the words that have no tags ##the and 
+                 elif (new[jj] == 'the') or (new[jj] == 'The') or (new[jj] == 'was') or (new[jj] == 'a'): ##For the words that have no tags ##the and 
                         sentwordID = str(sentID[ii]).zfill(3) + str('999').zfill(3)
                         myFile4.write(str(sentwordID))
                         myFile4.write("\t")
                         myFile4.write(new[jj])
                         myFile4.write("\n")
+                        #l = l+1
              else:
                  myFile4.write('100') ##Fixation - fillers
                  myFile4.write("\t")
                  myFile4.write('+')
                  myFile4.write("\n")
+                 #l = l+1
          if probeID[ii] == '1': ##Probe words (3 in a run)
             myFile4.write('111')
             myFile4.write("\t")
@@ -155,3 +160,4 @@ if os.path.exists(eprime_file):
          myFile4.write("\t")             
          myFile4.write('RESET')
          myFile4.write("\n")
+         #print l 
