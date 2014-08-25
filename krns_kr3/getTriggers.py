@@ -3,8 +3,8 @@
 Created on Tue Aug 19 13:46:04 2014
 
 @author: custine
-Usage: getTriggers.py subjID sessID runID
-Example: getTriggers.py 9367 5 1
+Usage: getTriggers.py subjID sessID runID TriggerType(Enter 'Sentence' or 'Word')
+Example: getTriggers.py 9367 5 1 Word/Sentence
 """
 
 import sys
@@ -189,7 +189,7 @@ def Words(subjID, sessID, runID):
             lineTemp = (dataTable1[i])
             word_tags.append(lineTemp[0]) ##Word IDs
         print len(word_tags)
-        
+        print word_tags
         ii = 0
         ##Mod Eve File : 
         #### Sent Onset Time point (in samples)
@@ -203,7 +203,7 @@ def Words(subjID, sessID, runID):
         for i in range(0, len(dataTable2)-1):
             lineTemp = (dataTable2[i])        
             sentwordID = word_tags[ii]
-            #print lineTemp
+            print sentwordID
             if (lineTemp[3] == '100' or lineTemp[3] == '110' or lineTemp[3] == '111' or lineTemp[3] == '0'):
                 ii = ii+1
             else:
