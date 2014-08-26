@@ -20,15 +20,19 @@ args=parser.parse_args()
 subjID = args.subj
 sessID = args.sess
 runID = args.run
-print subjID
-print sessID
-print runID
+runID = runID.zfill(2)
+
+print 
+print "Subject ID:" + subjID
+print "Sess ID:" + sessID 
+print "Run Number:" + runID
+print 
 
 data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
-sent_file = data_path + 'data_sentences0' + runID + '.txt'
-eprime_file = sent_file = data_path + 'eprime_run0' + runID + '.txt'
+sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
+eprime_file = data_path + 'eprime_run' + runID + '.txt'
 eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
+Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
 
 tempA = 1
 tempB = 1
@@ -84,7 +88,6 @@ if os.path.exists(eprime_file):
             temp2 = temp1.split()
             dataTable2.append(temp2)
     dataTable2.append(['0', '0', '0', '0']) ## to account for the lineTemp_next line :/
-   
     ii = 0
     
     for i in range(0, len(dataTable2)-1):
@@ -104,10 +107,9 @@ if os.path.exists(eprime_file):
         myFile3.write("\n")
         ii = ii + 1
         
-        
-print error        
-        
-        
+    print "Number of errors = " + str(error)                
+            
+    print "Done! See resulting file in " + Modeve_file      
         
         
         
