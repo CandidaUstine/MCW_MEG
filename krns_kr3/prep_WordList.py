@@ -20,6 +20,8 @@ args=parser.parse_args()
 subjID = args.subj
 sessID = args.sess
 runID = args.run
+runID = runID.zfill(2)
+
 print 
 print "Subject ID:" + subjID
 print "Sess ID:" + sessID 
@@ -29,11 +31,11 @@ print
 data_path = '/mnt/file1/binder/KRNS/' #kr3/' + subjID + '/' + sessID + '/eprime/'
 sentList_file = data_path + 'info/krns_sentence_list.txt'
 wordList_file = data_path + 'info/krns_word_list.txt'
-eprime_file =  data_path + 'kr3/' + subjID + '/' + sessID + '/eprime/eprime_run0' + runID + '.txt'
+eprime_file =  data_path + 'kr3/' + subjID + '/' + sessID + '/eprime/eprime_run' + runID + '.txt'
 eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
 Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
 #dataWord_file =  data_path + 'kr3/' + subjID + '/' + 'word_sentences0' + runID + '.txt'
-dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/'+'/' + 'word_sentences0' + runID + '.txt'
+dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + 'word_sentences' + runID + '.txt'
 print wordList_file
 
 tempA = 1
@@ -158,3 +160,5 @@ if os.path.exists(eprime_file):
          myFile4.write("\t")             
          myFile4.write('RESET')
          myFile4.write("\n")
+
+print "Done! See resulting file in " + dataWord_file 
