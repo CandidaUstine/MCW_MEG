@@ -10,17 +10,16 @@ Example: getTriggers.py 9367 5 1 Word/Sentence
 import sys
 import os 
 import os.path
-import argparse
 
 def Sentences(subjID, sessID, runID):
 
 
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
-    sent_file = data_path + 'data_sentences0' + runID + '.txt'
+#    sent_file = data_path + 'data_sentences0' + runID + '.txt'
     eprime_file = data_path + 'eprime_run0' + runID + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
-    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -33,7 +32,7 @@ def Sentences(subjID, sessID, runID):
     lineTemp_next = []
     sent_tags = []
     
-    if os.path.exists(sent_file):
+    if os.path.exists(Modeve_file):
         ##Sent File:
         #### SentID Onset and Offset Tags
         myFile1 = open(eprime_file, "r")
@@ -154,13 +153,13 @@ def Words(subjID, sessID, runID):
     #print "Under construction.. :)"
     
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
-    sent_file = data_path + 'data_sentences0' + runID + '.txt'
+#    sent_file = data_path + 'data_sentences0' + runID + '.txt'
     dataWord_file = data_path + 'eprime_run0' + runID + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
-    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-Triggers.eve'
-    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/'+'/' + 'word_sentences0' + runID + '.txt'
-    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-Triggers.eve'
+    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
+    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -175,7 +174,7 @@ def Words(subjID, sessID, runID):
     sentword = []
     sentwordID = []
     
-    if os.path.exists(sent_file):
+    if os.path.exists(Modeve_file):
         ##Sent File:
         #### SentID Onset and Offset Tags
         myFile1 = open(dataWord_file, "r")
@@ -195,7 +194,7 @@ def Words(subjID, sessID, runID):
             wordID_tags.append(lineTemp[0]) ##Word IDs
             word_tags.append(lineTemp[1])
         print len(wordID_tags)
-        print word_tags
+        #print word_tags
         ii = 0
         ##Mod Eve File : 
         #### Sent Onset Time point (in samples)
@@ -210,7 +209,7 @@ def Words(subjID, sessID, runID):
             lineTemp = (dataTable2[i])        
             sentwordID = wordID_tags[ii]
             sentword = word_tags[ii]
-            print sentword
+            #print sentword
             if (lineTemp[3] == '100' or lineTemp[3] == '110' or lineTemp[3] == '111' or lineTemp[3] == '0'):
                 ii = ii+1
             elif (sentword == 'The' or sentword == 'the' or sentword == 'was' or sentword == 'a'):
@@ -225,6 +224,7 @@ def Words(subjID, sessID, runID):
                 myFile3.write("\t")
                 myFile3.write(str(sentwordID))
                 myFile3.write("\n")
+    ##Write the Mod Word Trigger File as well... 
                 myFile4.write(lineTemp[0])
                 myFile4.write("\t")
                 myFile4.write(lineTemp[1])
@@ -234,7 +234,7 @@ def Words(subjID, sessID, runID):
                 myFile4.write(str(1))
                 myFile4.write("\n")
             
-    print "Done! See resulting file in " + trigger_file
+    print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
     
 if __name__ == "__main__":
     ####### Get Input ########
