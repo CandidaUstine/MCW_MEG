@@ -7,14 +7,14 @@
 ## 2) removes an inconsistent -eve files from teh current directory 
 ## 3) renames files - IF NECESSARY
 ##
-## usage: preProc_setup.sh subjID sessID logfile
+## usage: preProc_setup.sh subjID sessID new logFile
 
 if ( $#argv == 0 ) then 
     echo "NO SUBJECT ARGUMENT"
     exit 1
 endif
 
-if ( $#argv == 3) then
+if ( $#argv == 4) then
     set log=$3
 endif
 
@@ -25,11 +25,13 @@ endif
 
 
 ## ## ## ## ## CHANGE HERE: edit this to the directory to where you have saved your raw data. 
-cd /home/custine/MEG/data/krns_kr3/$1/$2
-set subj_dir = '/home/custine/MEG/data/krns_kr3/'$1'/'$2'/'
+cd /home/custine/MEG/data/krns_kr3/$1/$3
+set subj_dir = '/home/custine/MEG/data/krns_kr3/'$1'/'$3'/'
 
 
 mkdir eve -m g+rws
+mkdir eve/mod -m g+rws
+mkdir eve/triggers -m g+rws
 mkdir ave -m g+rws
 mkdir cov -m g+rws
 mkdir ave_projon -m g+rws
@@ -62,28 +64,42 @@ date >>& $log
 ##############################################################
 ## ## ## ## ## CHANGE HERE:
 ###Change name of Backup runs
-mv $1_$2_emptyroom_raw_sss.fif $2_emptyroom_raw.fif
-mv $1_$2_run1_raw_sss.fif $1_$2_run1_raw.fif 
-mv $1_$2_run2_raw_sss.fif $1_$2_run2_raw.fif 
-mv $1_$2_run3_raw_sss.fif $1_$2_run3_raw.fif 
-mv $1_$2_run4_raw_sss.fif $1_$2_run4_raw.fif 
-mv $1_$2_run5_raw_sss.fif $1_$2_run5_raw.fif 
-mv $1_$2_run6_raw_sss.fif $1_$2_run6_raw.fif 
-mv $1_$2_run7_raw_sss.fif $1_$2_run7_raw.fif 
-mv $1_$2_run8_raw_sss.fif $1_$2_run8_raw.fif 
-mv $1_$2_run9_raw_sss.fif $1_$2_run9_raw.fif 
-mv $1_$2_run10_raw_sss.fif $1_$2_run10_raw.fif 
-mv $1_$2_run11_raw_sss.fif $1_$2_run11_raw.fif 
-mv $1_$2_run12_raw_sss.fif $1_$2_run12_raw.fif 
+mv $1_$2_emptyroom_raw.fif $2_emptyroom_raw.fif
+mv $1_$2_run1_raw.fif $1_$3_run1_raw.fif 
+mv $1_$2_run2_raw.fif $1_$3_run2_raw.fif 
+mv $1_$2_run3_raw.fif $1_$3_run3_raw.fif 
+mv $1_$2_run4_raw.fif $1_$3_run4_raw.fif 
+mv $1_$2_run5_raw.fif $1_$3_run5_raw.fif 
+mv $1_$2_run6_raw.fif $1_$3_run6_raw.fif 
+mv $1_$2_run7_raw.fif $1_$3_run7_raw.fif 
+mv $1_$2_run8_raw.fif $1_$3_run8_raw.fif 
+mv $1_$2_run9_raw.fif $1_$3_run9_raw.fif 
+mv $1_$2_run10_raw.fif $1_$3_run10_raw.fif 
+mv $1_$2_run11_raw.fif $1_$3_run11_raw.fif 
+mv $1_$2_run12_raw.fif $1_$3_run12_raw.fif 
+##
+mv $1_$2_emptyroom_raw_sss.fif $1_$3_emptyroom_raw.fif
+mv $1_$2_run1_raw_sss.fif $1_$3_run1_raw.fif 
+mv $1_$2_run2_raw_sss.fif $1_$3_run2_raw.fif 
+mv $1_$2_run3_raw_sss.fif $1_$3_run3_raw.fif 
+mv $1_$2_run4_raw_sss.fif $1_$3_run4_raw.fif 
+mv $1_$2_run5_raw_sss.fif $1_$3_run5_raw.fif 
+mv $1_$2_run6_raw_sss.fif $1_$3_run6_raw.fif 
+mv $1_$2_run7_raw_sss.fif $1_$3_run7_raw.fif 
+mv $1_$2_run8_raw_sss.fif $1_$3_run8_raw.fif 
+mv $1_$2_run9_raw_sss.fif $1_$3_run9_raw.fif 
+mv $1_$2_run10_raw_sss.fif $1_$3_run10_raw.fif 
+mv $1_$2_run11_raw_sss.fif $1_$3_run11_raw.fif 
+mv $1_$2_run12_raw_sss.fif $1_$3_run12_raw.fif 
 
 #############################################################
 ###Extracting events read from .fif files into .eve text files
-cd /home/custine/MEG/data/krns_kr3/$1/$2
+cd /home/custine/MEG/data/krns_kr3/$1/$3
 echo "Extracting events" >>& $log
 foreach run ('run1' 'run2' 'run3' 'run4' 'run5' 'run6' 'run7' 'run8' 'run9' 'run10' 'run11' 'run12') 
         echo $run
 	if ( -e $1_$2_{$run}_raw.fif ) then  
-            mne_process_raw --raw $1_$2_{$run}_raw.fif --eventsout {$subj_dir}/eve/$1_$2_{$run}.eve --digtrig STI102 >>& $log
+            mne_process_raw --raw $1_$3_{$run}_raw.fif --eventsout {$subj_dir}/eve/$1_$3_{$run}.eve --digtrig STI102 >>& $log
         endif
 end
 echo "Extracted events saved in the /eve folder" >>& $log 
@@ -98,9 +114,9 @@ rm *raw-eve.fif
 ###Marking bad channels
 echo
 echo "Marking bad channels" >>& $log
-if ( -e $1_$2_bad_chan.txt ) then
+if ( -e $1_$3_bad_chan.txt ) then
 	foreach f ( *_raw.fif )
-		mne_mark_bad_channels --bad $1_$2_bad_chan.txt $f >>& $log
+		mne_mark_bad_channels --bad $1_$3_bad_chan.txt $f >>& $log
 	end
 endif
 
