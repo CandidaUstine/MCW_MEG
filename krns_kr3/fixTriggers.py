@@ -20,7 +20,7 @@ args=parser.parse_args()
 subjID = args.subj
 sessID = args.sess
 runID = args.run
-runID = runID.zfill(2)
+#runID = runID.zfill(2)
 
 print 
 print "Subject ID:" + subjID
@@ -30,9 +30,10 @@ print
 
 data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
 sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
-eprime_file = data_path + 'eprime_run' + runID + '.txt'
+eprime_file = data_path + 'eprime_run' +  runID.zfill(2) + '.txt'
 eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
 Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
+tempModeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_tempMod.eve'
 
 tempA = 1
 tempB = 1
@@ -79,6 +80,7 @@ error = 0
 if os.path.exists(eprime_file):    
     myFile2 = open(eve_file, "r")
     myFile3 = open(Modeve_file, "w")
+    myFile4 = open(tempModeve_file, "w")
     
     ##Eve File : 
     while tempB:
@@ -106,6 +108,15 @@ if os.path.exists(eprime_file):
             error = error + 1 
         myFile3.write("\n")
         ii = ii + 1
+        ##Write the Mod Word Trigger File as well...
+        myFile4.write(lineTemp[0])
+        myFile4.write("\t")
+        myFile4.write(lineTemp[1])
+        myFile4.write("\t")
+        myFile4.write(lineTemp[2])
+        myFile4.write("\t")
+        myFile4.write(str(1))
+        myFile4.write("\n")
         
     print "Number of errors = " + str(error)                
             
