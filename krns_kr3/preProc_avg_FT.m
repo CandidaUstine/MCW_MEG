@@ -14,7 +14,7 @@ ft_defaults
 %% Initialise Subject Specific Defaults  
 inpath = ['/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID];
 fiff = strcat(inpath, '/', subjID,'_',sessID, '_', runNum, '_raw.fif') %Uses the first run of the experiment to collect header information. 
-run1 = strcat(inpath,'/ssp/fieldtrip/',  subjID,'_',sessID, '_', runNum, '_allC_comp.mat')
+run1 = strcat(inpath,'/ssp/fieldtrip/',  subjID,'_',sessID, '_', runNum, '_comp.mat')
 %run2 = strcat(inpath,'/ssp/fieldtrip/', subjID,'_Run2_', int2str(condNum), '_comp.mat')
 topoplot_fig = strcat(inpath, '/ave_projon/plots/fieldtrip/Topoplot_', subjID, '_',sessID, '_', runNum, '_clean-ave')
 multiplot_fig = strcat(inpath, '/ave_projon/plots/fieldtrip/Multiplot_', subjID, '_',sessID, '_', runNum, '_clean-ave')
@@ -26,7 +26,8 @@ avg_file =  strcat(inpath, '/ave_projon/', subjID,'_',sessID, '_', runNum, '_cle
 cfg = []
 hdr = ft_read_header(fiff);
 hdr = ft_read_header(fiff);
-[meg] = ft_channelselection('MEGMAG', hdr.label)
+[meg] = ft_channelselection('MEG', hdr.label)
+[mag] = ft_channelselection('MEGMAG', hdr.label)
 
 %Load the Individual Runs mat files 
 run1 = load(run1)
@@ -34,7 +35,7 @@ run1 = load(run1)
 
 %compute the averages 
 cfg = [] 
-cfg.channel = meg
+cfg.channel = mag
 cfg.vartrllength = 1 % Accept variable length trials
 tl_run1 = ft_timelockanalysis(cfg, run1.data_clean)
 %tl_run2 = ft_timelockanalysis(cfg, run2.data_clean)
@@ -53,6 +54,7 @@ cfg.showoutline = 'yes'
 cfg.layout = 'neuromag306mag.lay'
 cfg.xlim = [0.0 1]
 cfg.parameter = 'avg'
+figure
 ft_multiplotER(cfg, tl_run1) %%modify to be tl_run1 or tl_all
 %set(gcf, 'Position',[0 0 560 420])
 print('-dpng', multiplot_fig)
