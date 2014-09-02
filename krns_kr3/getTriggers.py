@@ -4,7 +4,7 @@ Created on Tue Aug 19 13:46:04 2014
 
 @author: custine
 Usage: getTriggers.py subjID sessID runID TriggerType(Enter 'Sentence' or 'Word')
-Example: getTriggers.py 9367 5 1 Word/Sentence
+Example: getTriggers.py 9367 5 1 Word/Sentence/Category (if Category - specify 'Noun' verb etc.,) 
 """
 
 import sys
@@ -16,10 +16,10 @@ def Sentences(subjID, sessID, runID):
 
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
 #    sent_file = data_path + 'data_sentences0' + runID + '.txt'
-    eprime_file = data_path + 'eprime_run0' + runID + '.txt'
+    eprime_file = data_path + 'eprime_run' + runID.zfill(2) + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
-    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -150,16 +150,15 @@ def Sentences(subjID, sessID, runID):
     print "Done! See resulting file in " + trigger_file
 
 def Words(subjID, sessID, runID):
-    #print "Under construction.. :)"
     
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
 #    sent_file = data_path + 'data_sentences0' + runID + '.txt'
     dataWord_file = data_path + 'eprime_run0' + runID + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
-    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-Triggers.eve'
-    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
-    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-Triggers.eve'
+    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
+    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -235,12 +234,84 @@ def Words(subjID, sessID, runID):
                 myFile4.write("\n")
             
     print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
+
+def Category(subjID, sessID, runID, Category):
+    print "Under construction.. :)"
+    
+    data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/' + sessID
+    wordTrigger_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_run' +runID + '_Word-Triggers.eve'
+    wordCategory_file = '/home/custine/MEG/scripts/krns_kr3/Info/WordCategory_' + Category + '.txt' 
+    ModTrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_' + Category + '-TriggersMod.eve'
+
+    print "Using Word Trigger Eve file: " + wordTrigger_file
+    print 
+    print "Creating the " + Category + ' word trigger file for the selected subject, session'
+    print 
+    tempA = 1
+    dataTable1 = []
+    dataTable2 = []
+    tempB = 1
+    lineTemp = []
+    word_tags = []
+    jane = []
+    categorywords = []
+    ii = 0
+    
+    if os.path.exists(wordTrigger_file):
+        ##Sent File:
+        #### SentID Onset and Offset Tags
+        myFile1 = open(wordTrigger_file, "r")
+        myFile2 = open(ModTrigger_file, "w")
+        myFile3 = open(wordCategory_file, "r")
+        
+        #######################################################################
+        ##Category Word file         
+        while tempB: 
+            tempB = myFile3.readline()
+            temp1 = tempB.strip('\t')
+            if temp1:
+                temp2 = temp1.split( )
+                dataTable2.append(temp2)
+        myFile3.close()
+        for i in range(0, len(dataTable2)): 
+            lineTemp = (dataTable2[i])
+            categorywords.append(lineTemp[0])
+        #######################################################################
+        ## Word Trigger eve file 
+        while tempA: 
+            tempA = myFile1.readline()
+            temp1 = tempA.strip('\t')
+            if temp1:
+                temp2 = temp1.split( )
+                dataTable1.append(temp2)
+        myFile1.close()
+        for i in range(0, len(dataTable1)): 
+            lineTemp = (dataTable1[i])
+            jane = lineTemp[3]
+            jane = str(int(jane[3:]))
+            word_tags.append(jane)
+            if jane in (categorywords):
+                ii = ii +1
+                myFile2.write(lineTemp[0])
+                myFile2.write("\t")
+                myFile2.write(lineTemp[1])
+                myFile2.write("\t")
+                myFile2.write(lineTemp[2])
+                myFile2.write("\t")
+                myFile2.write('1')
+                myFile2.write("\n")
+
+        print 'Total number of tagged words in the run are ' + str(len(word_tags))
+        print 'Number of ' + Category + ' words found are ' + str(ii)
+        print 
+        print 'Noun Word tags IDs in the list are below: '
+        print word_tags       
     
 if __name__ == "__main__":
     ####### Get Input ########
-    subjID = sys.argv[1]
-    sessID = sys.argv[2]
-    runID = sys.argv[3]
+    subjID = sys.argv[1] ##9367 
+    sessID = sys.argv[2] ##s5
+    runID = sys.argv[3]  ##1 
     Trig_type = sys.argv[4] ##"Sent" or "Word"
     print 
     print "Subject ID:" + subjID
@@ -251,5 +322,9 @@ if __name__ == "__main__":
     if Trig_type == "Sentence":
         Sentences(subjID, sessID, runID)
         
-    else:
+    elif Trig_type == 'Words':
         Words(subjID, sessID, runID)
+    else:
+        Type = sys.argv[5]
+        Category(subjID, sessID, runID, Type)
+        
