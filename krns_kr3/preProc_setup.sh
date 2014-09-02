@@ -38,6 +38,7 @@ mkdir ave_projon -m g+rws
 mkdir ave_projoff -m g+rws
 mkdir ave_projon/logs -m g+rws
 mkdir ave_projon/plots -m g+rws
+mkdir ave_projon/stc -m g+rws
 mkdir ave_projoff/logs -m g+rws
 mkdir ave_projoff/plots -m g+rws
 mkdir ave_projoff/plots/fieldtrip -m g+rws
