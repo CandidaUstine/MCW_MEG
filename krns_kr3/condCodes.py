@@ -1,5 +1,6 @@
 codes = {
          'Word': ('1'),
+         'AllItems': ('1'),
          'run1': ('1'),
          'run2': ('1'),
          'run3': ('1'),
@@ -16,6 +17,8 @@ codes = {
 
 
 condLabels = {'Word':
+                    [['1', 'TaggedWord']],
+              'AllItems':
                     [['1', 'TaggedWord']],
                'run1':
                     [['1', 'TaggedWord']],
@@ -44,10 +47,13 @@ condLabels = {'Word':
                     }
                     
                     
-runDict = {'Word':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],'run1':[''], 'run2':[''], 'run3':[''], 'run4':[''], 'run5':[''], 'run6':[''],'run7':[''], 'run8':[''],'run9':[''], 'run10':[''],'run11':[''], 'run12':['']}
+runDict = {'Word':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'AllItems':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'run1':[''], 'run2':[''], 'run3':[''], 'run4':[''], 'run5':[''], 'run6':[''],'run7':[''], 'run8':[''],'run9':[''], 'run10':[''],'run11':[''], 'run12':['']}
 
 
 epMax = {'Word': '0.6',
+         'AllItems': '0.8',
          'run1': '.6',
          'run2': '.6',
          'run3': '.6',
