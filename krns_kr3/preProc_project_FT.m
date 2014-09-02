@@ -1,4 +1,4 @@
-function preProc_project_FT(exp, subjID, sessID, run, condNum)
+function preProc_project_FT(exp, subjID, sessID, run)
 
 %Wrapper Script to run the ICA analysis on the Neuromag Raw.fif input file.
 %Computes the first 20 ICA componenets of the specified input and plots the
@@ -9,7 +9,7 @@ function preProc_project_FT(exp, subjID, sessID, run, condNum)
 
 %Author: Candida Jane Maria Ustine, custine@mcw.edu
 %Modified for krns_kr3 study on 07/29/2014 
-%Usage: preProc_project_FT('krns_kr3', '9444', 's1', 'run1', 100)
+%Usage: preProc_project_FT('krns_kr3', '9444', 's1', 'run1')
 
 %% Initialise Fieldtrip Defaults 
 ft_defaults
@@ -17,40 +17,25 @@ ft_defaults
 %% Initialise Subject Specific Defaults  
 inpath = ['/home/custine/MEG/data/',exp,'/', subjID, '/', sessID, '/'];
 fiff = strcat(inpath, subjID,'_',sessID, '_', run, '_raw.fif')
-comp_file = strcat(inpath,'ssp/fieldtrip/', subjID,'_',run,'_',int2str(condNum), '_comp.mat')
+eve_file = strcat(inpath, 'eve/', subjID, '_', sessID, '_', run, '.eve')  % _Word-TriggersMod
+comp_file = strcat(inpath,'ssp/fieldtrip/', subjID,'_', sessID,'_',run,'_All-comp.mat')
 
-Fevents = ft_read_event(fiff);
+% Fevents = ft_read_event(fiff);
+Fevents = load(eve_file)
 [len, ~] = size(Fevents);
 F = [];
 endS = []
+disp(Fevents)
 
-%% OPTION 1: Keep this (and comment out OPTION 2) IF you are proceeding with Averaging after ICA analysis. 
-for i = 1:len
-   if Fevents(i).value == condNum %% Enter trigger number/value of the interested event
-       F = [F, Fevents(i).sample];
-   end
-end
-F = F';
-[len, ~] = size(F);
-begS = F(:,1);
-begS = begS(1:len-1);
+%% DEFINE The Samples
+begS = Fevents(:,1);
+begS = begS(1:len);
 for i = 1:size(begS);
-    endS(i) = (begS(i)+ 1000); %%1118 samples
+    endS(i) = (begS(i)+ 1200); %%2200 samples collected per second. So the words are presented for 500 ms - hence about 1200 samples each. 
 end
-offset = zeros(1,len-1);
+offset = zeros(1,len);
 samples = horzcat(begS, endS', offset')
-
-% %% OPTION 2: Keep this (and comment out OPTION 1) If you are writing the data structure after ICA analysis back to a fiff file
-% for i = 1:len
-%        F = [F, Fevents(i).sample];
-% end
-% F = F';
-% [len, ~] = size(F);
-% begSt = F(1) 
-% endSt = F(len)
-% offsett = 0
-% samples = horzcat(begSt, endSt, offsett)
-
+% 
 %% Define Trials 
 dat = ft_read_data(fiff);
 hdr = ft_read_header(fiff);
@@ -122,11 +107,12 @@ ft_databrowser(cfg, comp)
  
 save(comp_file, 'cfg', 'data', 'comp','comp_file')
 
-% 
-% % the original data can now be reconstructed, excluding those components
+% % % 
+% % % % the original data can now be reconstructed, excluding those components
+% % % load(comp_file)
 % cfg = [];
-% cfg.component = [3 6];
-% data_clean = ft_rejectcomponent(cfg, comp,data); %using the sampled data :) 
-% save(comp_file, 'data_clean', 'comp')
+% cfg.component = [5];
+% data_clean = ft_rejectcomponent(cfg, comp, data); %using the sampled data :) 
+% save(comp_file, 'data_clean', 'comp', 'data')
 
 end
