@@ -123,10 +123,10 @@ print('Simulating data for %d subjects.' % n_subjects)
 
 #    Let's make sure our results replicate, so set the seed.
 np.random.seed(0)
-X = randn(n_vertices_sample, n_times, n_subjects, 2) * 10
+X = randn(n_vertices_sample, n_times, 2) * 10
 print X.shape 
-X[:, :, :, 0] += condition1.data[:, :, np.newaxis]
-X[:, :, :, 1] += condition2.data[:, :, np.newaxis]
+X[:, :, 0] += condition1.data[:, :, np.newaxis]
+X[:, :, 1] += condition2.data[:, :, np.newaxis]
 
 #    It's a good idea to spatially smooth the data, and for visualization
 #    purposes, let's morph these to fsaverage, which is a grade 5 source space
@@ -137,71 +137,72 @@ X[:, :, :, 1] += condition2.data[:, :, np.newaxis]
 fsave_vertices = [np.arange(10242), np.arange(10242)]
 morph_mat = compute_morph_matrix('9367', 'fsaverage', sample_vertices,
                                  fsave_vertices, 20, subjects_dir)
-n_vertices_fsave = morph_mat.shape[0]
+print morph_mat.shape
+#n_vertices_fsave = morph_mat.shape[0]
+#
+##    We have to change the shape for the dot() to work properly
+#X = X.reshape(n_vertices_sample, n_times * n_subjects * 2)
+#
+#
+#print('Morphing data.')
+#X = morph_mat.dot(X)  # morph_mat is a sparse matrix
+#X = X.reshape(n_vertices_fsave, n_times, n_subjects, 2)
+#
+##    Finally, we want to compare the overall activity levels in each condition,
+##    the diff is taken along the last axis (condition). The negative sign makes
+##    it so condition1 > condition2 shows up as "red blobs" (instead of blue).
+#X = np.abs(X)  # only magnitude
+#X = X[:, :, :, 0] - X[:, :, :, 1]  # make paired contrast
 
-#    We have to change the shape for the dot() to work properly
-X = X.reshape(n_vertices_sample, n_times * n_subjects * 2)
-
-
-print('Morphing data.')
-X = morph_mat.dot(X)  # morph_mat is a sparse matrix
-X = X.reshape(n_vertices_fsave, n_times, n_subjects, 2)
-
-#    Finally, we want to compare the overall activity levels in each condition,
-#    the diff is taken along the last axis (condition). The negative sign makes
-#    it so condition1 > condition2 shows up as "red blobs" (instead of blue).
-X = np.abs(X)  # only magnitude
-X = X[:, :, :, 0] - X[:, :, :, 1]  # make paired contrast
-
-
-################################################################################
-# Compute statistic
-
-#    To use an algorithm optimized for spatio-temporal clustering, we
-#    just pass the spatial connectivity matrix (instead of spatio-temporal)
-print('Computing connectivity.')
-connectivity = spatial_tris_connectivity(grade_to_tris(5))
-
-#    Note that X needs to be a multi-dimensional array of shape
-#    samples (subjects) x time x space, so we permute dimensions
-X = np.transpose(X, [2, 1, 0])
-
-#    Now let's actually do the clustering. This can take a long time...
-#    Here we set the threshold quite high to reduce computation.
-p_threshold = 0.01
-t_threshold = -stats.distributions.t.ppf(p_threshold / 2., n_subjects - 1)
-print('Clustering.')
-T_obs, clusters, cluster_p_values, H0 = clu = \
-    spatio_temporal_cluster_1samp_test(X, connectivity=connectivity, n_jobs=2,
-                                       threshold=t_threshold)
-#    Now select the clusters that are sig. at p < 0.05 (note that this value
-#    is multiple-comparisons corrected).
-good_cluster_inds = np.where(cluster_p_values < 0.05)[0]
-
-################################################################################
-# Visualize the clusters
-
-print('Visualizing clusters.')
-import os
-os.environ["SUBJECTS_DIR"] = "/mnt/file1/binder/KRNS/anatomies/surfaces/"
-os.environ["subjects_dir"] = "/mnt/file1/binder/KRNS/anatomies/surfaces/"
-
-#    Now let's build a convenient representation of each cluster, where each
-#    cluster becomes a "time point" in the SourceEstimate
-stc_all_cluster_vis = summarize_clusters_stc(clu, tstep=tstep,
-                                             vertno=fsave_vertices,
-                                             subject='fsaverage')
-
-#    Let's actually plot the first "time point" in the SourceEstimate, which
-#    shows all the clusters, weighted by duration
-colormap = mne_analyze_colormap(limits=[0, 10, 50])
-#subjects_dir = op.join(data_path, 'subjects')
-# blue blobs are for condition A < condition B, red for A > B
-brain = stc_all_cluster_vis.plot('fsaverage', 'inflated', 'lh', colormap,
-                                 time_label='Duration significant (ms)', time_viewer = True)
-brain.set_data_time_index(0)
-# The colormap requires brain data to be scaled -fmax -> fmax
-brain.scale_data_colormap(fmin=-50, fmid=0, fmax=50, transparent=False)
-brain.show_view('lateral')
-brain.save_image('clusters.png')
-
+#
+#################################################################################
+## Compute statistic
+#
+##    To use an algorithm optimized for spatio-temporal clustering, we
+##    just pass the spatial connectivity matrix (instead of spatio-temporal)
+#print('Computing connectivity.')
+#connectivity = spatial_tris_connectivity(grade_to_tris(5))
+#
+##    Note that X needs to be a multi-dimensional array of shape
+##    samples (subjects) x time x space, so we permute dimensions
+#X = np.transpose(X, [2, 1, 0])
+#
+##    Now let's actually do the clustering. This can take a long time...
+##    Here we set the threshold quite high to reduce computation.
+#p_threshold = 0.01
+#t_threshold = -stats.distributions.t.ppf(p_threshold / 2., n_subjects - 1)
+#print('Clustering.')
+#T_obs, clusters, cluster_p_values, H0 = clu = \
+#    spatio_temporal_cluster_1samp_test(X, connectivity=connectivity, n_jobs=2,
+#                                       threshold=t_threshold)
+##    Now select the clusters that are sig. at p < 0.05 (note that this value
+##    is multiple-comparisons corrected).
+#good_cluster_inds = np.where(cluster_p_values < 0.05)[0]
+#
+#################################################################################
+## Visualize the clusters
+#
+#print('Visualizing clusters.')
+#import os
+#os.environ["SUBJECTS_DIR"] = "/mnt/file1/binder/KRNS/anatomies/surfaces/"
+#os.environ["subjects_dir"] = "/mnt/file1/binder/KRNS/anatomies/surfaces/"
+#
+##    Now let's build a convenient representation of each cluster, where each
+##    cluster becomes a "time point" in the SourceEstimate
+#stc_all_cluster_vis = summarize_clusters_stc(clu, tstep=tstep,
+#                                             vertno=fsave_vertices,
+#                                             subject='fsaverage')
+#
+##    Let's actually plot the first "time point" in the SourceEstimate, which
+##    shows all the clusters, weighted by duration
+#colormap = mne_analyze_colormap(limits=[0, 10, 50])
+##subjects_dir = op.join(data_path, 'subjects')
+## blue blobs are for condition A < condition B, red for A > B
+#brain = stc_all_cluster_vis.plot('fsaverage', 'inflated', 'lh', colormap,
+#                                 time_label='Duration significant (ms)', time_viewer = True)
+#brain.set_data_time_index(0)
+## The colormap requires brain data to be scaled -fmax -> fmax
+#brain.scale_data_colormap(fmin=-50, fmid=0, fmax=50, transparent=False)
+#brain.show_view('lateral')
+#brain.save_image('clusters.png')
+#
