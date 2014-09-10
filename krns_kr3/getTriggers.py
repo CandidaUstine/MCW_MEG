@@ -160,8 +160,7 @@ def Words(subjID, sessID, runID):
     dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
     Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
     
-    print "Using Modified Eve file: " + Modeve_file
-    print 
+
     
     tempA = 1
     dataTable1 = []
@@ -174,6 +173,8 @@ def Words(subjID, sessID, runID):
     sentwordID = []
     
     if os.path.exists(Modeve_file):
+        print "Using Modified Eve file: " + Modeve_file
+        print 
         ##Sent File:
         #### SentID Onset and Offset Tags
         myFile1 = open(dataWord_file, "r")
@@ -233,20 +234,19 @@ def Words(subjID, sessID, runID):
                 myFile4.write(str(1))
                 myFile4.write("\n")
             
-    print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
+        print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
+    else:
+        print "File not found.... Check your inputs!!"
 
 def Category(subjID, sessID, runID, Category):
-    print "Under construction.. :)"
+    #print "Under construction.. :)"
     
     data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/' + sessID
     wordTrigger_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_run' +runID + '_Word-Triggers.eve'
     wordCategory_file = '/home/custine/MEG/scripts/krns_kr3/Info/WordCategory_' + Category + '.txt' 
     ModTrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_' + Category + '-TriggersMod.eve'
+    
 
-    print "Using Word Trigger Eve file: " + wordTrigger_file
-    print 
-    print "Creating the " + Category + ' word trigger file for the selected subject, session'
-    print 
     tempA = 1
     dataTable1 = []
     dataTable2 = []
@@ -258,12 +258,16 @@ def Category(subjID, sessID, runID, Category):
     ii = 0
     
     if os.path.exists(wordTrigger_file):
+        print "Using Word Trigger Eve file: " + wordTrigger_file
+        print 
+        print "Creating the " + Category + ' word trigger file for the selected subject, session'
+        print 
         ##Sent File:
         #### SentID Onset and Offset Tags
         myFile1 = open(wordTrigger_file, "r")
         myFile2 = open(ModTrigger_file, "w")
         myFile3 = open(wordCategory_file, "r")
-        
+        print wordCategory_file
         #######################################################################
         ##Category Word file         
         while tempB: 
@@ -275,6 +279,7 @@ def Category(subjID, sessID, runID, Category):
         myFile3.close()
         for i in range(0, len(dataTable2)): 
             lineTemp = (dataTable2[i])
+            #print lineTemp
             categorywords.append(lineTemp[0])
         #######################################################################
         ## Word Trigger eve file 
@@ -304,27 +309,30 @@ def Category(subjID, sessID, runID, Category):
         print 'Total number of tagged words in the run are ' + str(len(word_tags))
         print 'Number of ' + Category + ' words found are ' + str(ii)
         print 
-        print 'Noun Word tags IDs in the list are below: '
-        print word_tags       
+#        print 'Word tags IDs in the list are below: '
+#        print word_tags       
     
 if __name__ == "__main__":
     ####### Get Input ########
     subjID = sys.argv[1] ##9367 
     sessID = sys.argv[2] ##s5
-    runID = sys.argv[3]  ##1 
-    Trig_type = sys.argv[4] ##"Sent" or "Word"
-    print 
-    print "Subject ID:" + subjID
-    print "Sess ID:" + sessID 
-    print "Run Number:" + runID
-    print "Asking for " + Trig_type + " Triggers..."
-    
-    if Trig_type == "Sentence":
-        Sentences(subjID, sessID, runID)
+    runs = ['1', '2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
+    Trig_type = sys.argv[3]
+
+    for runID in runs: 
+         ##"Sent" or "Word" or "Category"
+        print 
+        print "Subject ID:" + subjID
+        print "Sess ID:" + sessID 
+        print "Run Number:" + runID
+        print "Asking for " + Trig_type + " Triggers..."
         
-    elif Trig_type == 'Words':
-        Words(subjID, sessID, runID)
-    else:
-        Type = sys.argv[5]
-        Category(subjID, sessID, runID, Type)
+        if Trig_type == "Sentence":
+            Sentences(subjID, sessID, runID)
+            
+        elif Trig_type == 'Words':
+            Words(subjID, sessID, runID)
+        else:
+            Type = sys.argv[4]
+            Category(subjID, sessID, runID, Type)
         
