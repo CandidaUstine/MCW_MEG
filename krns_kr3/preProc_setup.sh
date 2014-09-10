@@ -7,7 +7,7 @@
 ## 2) removes an inconsistent -eve files from teh current directory 
 ## 3) renames files - IF NECESSARY
 ##
-## usage: preProc_setup.sh subjID sessID new logFile
+## usage: preProc_setup.sh subjID sessID newID logFile
 
 if ( $#argv == 0 ) then 
     echo "NO SUBJECT ARGUMENT"
@@ -34,6 +34,7 @@ mkdir eve/mod -m g+rws
 mkdir eve/triggers -m g+rws
 mkdir ave -m g+rws
 mkdir cov -m g+rws
+mkdir cov/logs -m g+rws
 mkdir ave_projon -m g+rws
 mkdir ave_projoff -m g+rws
 mkdir ave_projon/logs -m g+rws
@@ -99,7 +100,7 @@ cd /home/custine/MEG/data/krns_kr3/$1/$3
 echo "Extracting events" >>& $log
 foreach run ('run1' 'run2' 'run3' 'run4' 'run5' 'run6' 'run7' 'run8' 'run9' 'run10' 'run11' 'run12') 
         echo $run
-	if ( -e $1_$2_{$run}_raw.fif ) then  
+	if ( -e $1_$3_{$run}_raw.fif ) then  
             mne_process_raw --raw $1_$3_{$run}_raw.fif --eventsout {$subj_dir}/eve/$1_$3_{$run}.eve --digtrig STI102 >>& $log
         endif
 end
