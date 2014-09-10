@@ -29,6 +29,10 @@ if ($par == 'AllItems') then
    set condList = ( 1 )
 else if ($par == 'Word') then
    set condList = (1) 
+else if ($par == 'Noun') then
+   set condList = (1) 
+else 
+   set condList = (1)
 endif 
 
 set runList = (run1 run2 run3 run4 run5 run6 run7 run8 run9 run10 run11 run12) 
