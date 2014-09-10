@@ -1,11 +1,12 @@
 codes = {
          'Word': ('1'),
          'AllItems': ('1'),
-         'run1': ('1'),
-         'run2': ('1'),
-         'run3': ('1'),
-         'run4': ('1'),
-         'run5': ('1'),
+         'Noun': ('1'),
+         'Verb': ('1'),
+         'Prep': ('1'),
+         'Adverb': ('1'),
+         'Noun_People': ('1'),
+         'Noun_Place': ('1'),
          'run6': ('1'),
          'run7': ('1'),
          'run8': ('1'),
@@ -20,15 +21,17 @@ condLabels = {'Word':
                     [['1', 'TaggedWord']],
               'AllItems':
                     [['1', 'TaggedWord']],
-               'run1':
+              'Noun':
                     [['1', 'TaggedWord']],
-               'run2':
+              'Verb':
                     [['1', 'TaggedWord']],
-               'run3':
+              'Prep':
                     [['1', 'TaggedWord']],
-               'run4':
+              'Adverb':
                     [['1', 'TaggedWord']],
-               'run5':
+               'Noun_People':
+                    [['1', 'TaggedWord']],
+               'Noun_Place':
                     [['1', 'TaggedWord']],
                'run6':
                     [['1', 'TaggedWord']],
@@ -49,16 +52,23 @@ condLabels = {'Word':
                     
 runDict = {'Word':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
            'AllItems':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Noun':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Verb':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Prep':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Adverb':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Noun_People':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
+           'Noun_Place':['run1', 'run2', 'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'],
            'run1':[''], 'run2':[''], 'run3':[''], 'run4':[''], 'run5':[''], 'run6':[''],'run7':[''], 'run8':[''],'run9':[''], 'run10':[''],'run11':[''], 'run12':['']}
 
 
 epMax = {'Word': '0.6',
          'AllItems': '0.8',
-         'run1': '.6',
-         'run2': '.6',
-         'run3': '.6',
-         'run4': '.6',
-         'run5': '.6',
+         'Noun': '0.6',
+         'Verb': '.6',
+         'Prep': '.6',
+         'Adverb': '.6',
+         'Noun_People': '.6',
+         'Noun_Place': '.6',
          'run6': '.6',
          'run7': '.6',
          'run8': '.6',
@@ -67,4 +77,3 @@ epMax = {'Word': '0.6',
          'run11': '.6',
          'run12': '.6'
         }
-##,'run3', 'run4','run5', 'run6','run7', 'run8','run9', 'run10','run11', 'run12'
