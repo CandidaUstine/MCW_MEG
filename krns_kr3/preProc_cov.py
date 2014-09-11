@@ -59,12 +59,13 @@ for runID in runs:
         covLog_file = data_path + '/cov/logs/' +subjID + '_' + sessID+ '_'+runID + '_cov.log'
         event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
         mne.set_log_file(fname = covLog_file, overwrite = True)
-        tmin, tmax = -0.2, 0.6
         print covLog_file
         print 'Reading Raw data... '
         raw = io.Raw(fname)
         if runID == "emptyroom":
-            cov = mne.compute_raw_data_covariance(raw) #, tmin = None, tmax = 0) #, reject = None, picks = picks)
+            tmin = 0
+            tmax = 2
+            cov = mne.compute_raw_data_covariance(raw, tmin = tmin, tmax = tmax) #, tmin = None, tmax = 0) #, reject = None, picks = picks)
             print cov
         else:
             
