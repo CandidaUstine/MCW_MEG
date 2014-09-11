@@ -3,8 +3,8 @@
 Created on Thu Aug 21 10:50:57 2014
 
 @author: custine
-Usage: fixTriggers.py subjID sessID runID
-Example: fixTriggers.py 9367 5 1
+Usage: fixTriggers.py subjID sessID
+Example: fixTriggers.py 9367 5 
 """
 
 import os 
