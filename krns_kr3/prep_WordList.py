@@ -3,8 +3,8 @@
 Created on Fri Aug 22 09:53:50 2014
 
 @author: custine
-Usage: prep_WordList.py subjID sessID runID
-Example: prep_WordList.py 9367 5 1
+Usage: prep_WordList.py subjID sessID
+Example: prep_WordList.py 9367 5
 """
 
 import os 
