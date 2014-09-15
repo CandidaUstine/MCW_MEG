@@ -63,7 +63,7 @@ for runID in runs:
                 temp2 = temp1.split('\t')
                 dataTable1.append(temp2)
         myFile1.close()
-        sent_tags.append('0')
+        #sent_tags.append('0') #####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
         for i in range(1, len(dataTable1)): #Neglecting the first row - titles 
             lineTemp = (dataTable1[i])
             #print lineTemp #total 58 items (including the 3 probe items for each sentence)
@@ -105,10 +105,10 @@ for runID in runs:
             myFile3.write("\t")
             myFile3.write(lineTemp[1])
             myFile3.write("\t")
-            myFile3.write(lineTemp[2])
-            myFile3.write("\t")
-            if lineTemp[3] == sent_tags[ii]:
-                myFile3.write(str(lineTemp[3]))
+#            myFile3.write(lineTemp[2]) #####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+#            myFile3.write("\t")
+            if lineTemp[2] == sent_tags[ii]:
+                myFile3.write(str(lineTemp[2]))
             else:
                 myFile3.write(sent_tags[ii])
                 error = error + 1 
@@ -119,8 +119,8 @@ for runID in runs:
             myFile4.write("\t")
             myFile4.write(lineTemp[1])
             myFile4.write("\t")
-            myFile4.write(lineTemp[2])
-            myFile4.write("\t")
+#            myFile4.write(lineTemp[2]) #####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+#            myFile4.write("\t")
             myFile4.write(str(1))
             myFile4.write("\n")
             
