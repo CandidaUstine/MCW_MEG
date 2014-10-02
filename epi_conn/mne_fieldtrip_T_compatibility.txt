@@ -1,0 +1,134 @@
+mri = ft_read_mri('T1.mgz')
+mri_cor = ft_read_mri('COR-custine-140925-091140.fif')
+mri_cor = ft_convert_units(mri_cor, 'mm')
+mri = 
+
+          dim: [256 256 256]
+      anatomy: [256x256x256 double]
+          hdr: [1x1 struct]
+    transform: [4x4 double]
+         unit: 'mm'
+
+mri_cor = 
+
+         unit: 'mm'
+          dim: [256 256 256]
+      anatomy: [256x256x256 uint8]
+          hdr: [1x1 struct]
+    transform: [4x4 double]
+     coordsys: 'neuromag'
+
+>> mri.transform
+
+ans =
+
+   -1.0000         0         0  128.5312
+         0         0    1.0000 -110.8750
+         0   -1.0000         0  151.5310
+         0         0         0    1.0000
+
+>> mri_cor.transform
+
+ans =
+
+   -0.9968   -0.0439    0.0661  126.1748
+    0.0710   -0.1198    0.9903 -107.6031
+    0.0355   -0.9918   -0.1225  187.7950
+         0         0         0    1.0000
+
+>> mri_cor.hdr
+
+ans = 
+
+             id: [1x1 struct]
+          trans: [1x1 struct]
+      ras_trans: [1x1 struct]
+    voxel_trans: [1x1 struct]
+         nslice: 256
+         slices: [1x256 struct]
+
+>> mri_new.hdr
+
+ans = 
+
+       srcbext: ''
+    analyzehdr: []
+          bhdr: []
+         fspec: 'T1.mgz'
+           pwd: '/home/custine/MRI/structurals/subjects/EP4/mri'
+    flip_angle: 0
+            tr: 0
+            te: 0
+            ti: 0
+      vox2ras0: [4x4 double]
+       volsize: [256 256 256]
+        height: 256
+         width: 256
+         depth: 256
+       nframes: 1
+       vox2ras: [4x4 double]
+       nvoxels: 16777216
+         xsize: 1
+         ysize: 1
+         zsize: 1
+           x_r: -1
+           x_a: 0
+           x_s: 0
+           y_r: 0
+           y_a: 0
+           y_s: -1
+           z_r: 0
+           z_a: 1
+           z_s: 0
+           c_r: -0.4688
+           c_a: 18.1250
+           c_s: 22.5310
+      vox2ras1: [4x4 double]
+           Mdc: [3x3 double]
+        volres: [1 1 1]
+    tkrvox2ras: [4x4 double]
+
+>>
+mri_cor = ft_convert_units(mri_cor, 'mm')
+mri_new = mri
+mri_new.transform = mri_cor.transform
+mri_new.coordsys = 'neuromag'
+
+cfg = []
+cfg.output = {'brain', 'tpm', 'skull', 'scalp'}
+seg = ft_volumesegment(cfg, mri_new)
+
+cfg = []
+cfg.method = 'singleshell'
+vol = ft_prepare_headmodel(cfg, seg)
+ft_plot_vol(vol, 'facecolor', 'red'); alpha 0.5
+bnd = ft_read_headshape('EP4-ico-4-src.fif', 'format', 'mne_source')
+ft_plot_mesh(bnd, 'edgecolor', 'none'); camlight
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+
+NO USE :/ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
+
+cfg = []
+cfg.method = 'interactive'
+mri = ft_volumerealign(cfg, mri)
+cfg = []
+cfg.coordsys = 'neuromag'
+mri = ft_determine_coordsys(mri)
+y
+r
+a
+s
+i
+mri = ft_volumerealign(cfg, mri)
+cfg = []
+cfg.output = {'brain', 'tpm', 'skull', 'scalp'}
+seg_T1 = ft_volumesegment(cfg, mri)
+cfg = []
+cfg.method = 'singleshell'
+vol_T1 = ft_prepare_headmodel(cfg, seg_T1)
+vol_T1 = ft_convert_units(vol_T1, 'cm')
+figure
+ft_plot_vol(vol_T1, 'facecolor', 'red'); alpha 0.5
+ft_plot_mesh(shape, 'edgecolor', 'none'); camlight
