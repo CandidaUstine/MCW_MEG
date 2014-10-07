@@ -37,7 +37,7 @@ label_name_lh = 'lh.frontalpole' #label name
 fname_label_lh = subjects_dir + 'labels/%s.label' % label_name_lh 
 
 
-tmin = -0.1
+tmin = 0
 tmax = 2.0  # Use a lower tmax to reduce multiple comparisons
 gradRej = 2000e-13
 magRej = 3000e-15
@@ -48,7 +48,9 @@ gradFlat = 1000e-15
 event_id = None
 ##
 fname_inv = data_path + 'ave_projon/EP1_run1-ave-7-meg-inv.fif'
+fname_fwd = data_path + 'ave_projon/EP1_run1-ave-7-meg-fwd.fif'
 evoked_fname = data_path + 'ave_projon/EP1_run1_All-ave.fif'
+cov_fname = data_path + 'cov/emptyroom-cov.fif'
 raw_file = data_path + 'run1_raw.fif'
 cohLog_file = data_path + 'logs/EP1_coherence.log'
 event_file = data_path + 'eve/run1.eve'
@@ -71,13 +73,23 @@ label_lh = mne.read_label(fname_label_lh)
 # Read epochs
 epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0),proj = True, preload = True, name = 'rest', flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
 print epochs
+evoked = epochs.average()
 #
+######################################################################################################33
+## ##Make Inverse operator in mne-python 
+# Read forward solution 
+forward = mne.read_forward_solution(fname_fwd, surf_ori=True)
+# Read noise covariance matrix
+cov = mne.read_cov(cov_fname)
+cov = mne.cov.regularize(cov, evoked.info)
+inverse_operator = mne.minimum_norm.make_inverse_operator(evoked.info, forward, cov, loose= 0.5, depth = 0.8, fixed = False)
+
 #######################################################################################################
 # First, we find the most active vertex in the left auditory cortex, which
 # we will later use as seed for the connectivity computation
 snr = 3.0
-lambda2 = 1.0 / snr ** 2
-evoked = epochs.average()
+lambda2 = 1.0 / snr ** 2s
+
 method = "dSPM"  # use dSPM method (could also be MNE or sLORETA)
 sample_vertices = [s['vertno'] for s in inverse_operator['src']]
 
@@ -173,20 +185,20 @@ import os
 os.environ["subjects_dir"] = "/home/custine/MRI/structurals/subjects/"
 
 # Now we can visualize the coherence using the plot method
-brain = coh_stc.plot('EP1', 'inflated', 'rh', fmin=0.25, fmid=0.4,
+brainR = coh_stc.plot('EP1', 'inflated', 'rh', fmin=0.25, fmid=0.4,
                      fmax=0.65, time_label='Coherence %0.1f Hz',
                      subjects_dir=subjects_dir)
-brain.set_data_time_index(0)
-brain.show_view('lateral')
-brain.save_image(Rbrain_image)
+brainR.set_data_time_index(0)
+brainR.show_view('lateral')
+brainR.save_image(Rbrain_image)
 
 # Now we can visualize the coherence using the plot method
-brain = coh_stc.plot('EP1', 'inflated', 'lh', fmin=0.25, fmid=0.4,
+brainL = coh_stc.plot('EP1', 'inflated', 'lh', fmin=0.25, fmid=0.4,
                      fmax=0.65, time_label='Coherence %0.1f Hz',
                      subjects_dir=subjects_dir)
-brain.set_data_time_index(0)
-brain.show_view('lateral')
-brain.save_image(Lbrain_image)
+brainL.set_data_time_index(0)
+brainL.show_view('lateral')
+brainL.save_image(Lbrain_image)
 
 ## use peak getter to move vizualization to the time point of the peak
 #vertno_max, time_idx = coh_stc.get_peak(hemi='rh', time_as_index=True)
@@ -194,75 +206,75 @@ brain.save_image(Lbrain_image)
 
 
 #
-###################################################################################3
-#
-#coh, freqs, times, n_epochs, n_tapers = spectral_connectivity(stcs, method='coh', mode='fourier', indices=indices, sfreq=sfreq, 
-#                                                              fmin=fmin, fmax=fmax, faverage=True, n_jobs=2)
-#print coh    
-#print freqs
-#print n_epochs
-#print n_tapers
-#print 
-#    
-#np.savetxt('/home/custine/MEG/data/epi_conn/EP1/coh/coherence.txt', coh, delimiter = ' ')
-#    
-########################################################################################3
-########Connectivity Circle Plotting############
-#from mne.viz import circular_layout, plot_connectivity_circle
+####################################################################################3
 ##
-### con is a 3D array, get the connectivity for the first (and only) freq. band
-### for each method
-##con_res = dict()
-##con_res= con[:, :, 0]
-#
-## Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels/hemi
-#labels, label_colors = mne.labels_from_parc('EP1', parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
-#src = inverse_operator['src']
-#label_ts = mne.extract_label_time_course(stcs, src, labels, mode = 'mean', return_generator=True)
-##print labels
-#
-##### Now, we visualize the connectivity using a circular graph layout
-## First, we reorder the labels based on their location in the left hemi
-#label_names = [label.name for label in labels]
-#lh_labels = [name for name in label_names if name.endswith('lh')]
-#
-## Get the y-location of the label
-#label_ypos = list()
-#for name in lh_labels:
-#    idx = label_names.index(name)
-#    ypos = np.mean(labels[idx].pos[:, 1])
-#    label_ypos.append(ypos)
-#
-## Reorder the labels based on their location
-#lh_labels = [label for (ypos, label) in sorted(zip(label_ypos, lh_labels))]
-#
-## For the right hemi
-#rh_labels = [label[:-2] + 'rh' for label in lh_labels]
-#
-## Save the plot order and create a circular layout
-#node_order = list()
-#node_order.extend(lh_labels[::-1])  #reverse the order
-#node_order.extend(rh_labels)
-#
-#node_angles = circular_layout(label_names, node_order, start_pos=90,
-#                              group_boundaries=[0, len(label_names) / 2])
-#
-## Plot the graph using node colors from the FreeSurfer parcellation. We only
-## show the 300 strongest connections.
-#plot_connectivity_circle(coh, label_names, n_lines=300, indices = indices,
-#                         node_angles=node_angles, node_colors=label_colors,
-#                         title='All-to-All Connectivity')
-#import matplotlib.pyplot as plt
-#plt.savefig('/home/custine/MEG/data/epi_conn/EP1/coh/circle.png', facecolor='black')
-#
-## Plot connectivity for both methods in the same plot
-#fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
-#no_names = [''] * len(label_names)
-#
-#plot_connectivity_circle(coh, no_names, n_lines=300,
-#                             node_angles=node_angles, node_colors=label_colors,
-#                             title='EP1 coh connectivity plot', padding=0, fontsize_colorbar=6,
-#                             fig=fig, subplot=(1, 2))
-#
-#plt.show()
-#    
+##coh, freqs, times, n_epochs, n_tapers = spectral_connectivity(stcs, method='coh', mode='fourier', indices=indices, sfreq=sfreq, 
+##                                                              fmin=fmin, fmax=fmax, faverage=True, n_jobs=2)
+##print coh    
+##print freqs
+##print n_epochs
+##print n_tapers
+##print 
+##    
+##np.savetxt('/home/custine/MEG/data/epi_conn/EP1/coh/coherence.txt', coh, delimiter = ' ')
+##    
+#########################################################################################3
+#########Connectivity Circle Plotting############
+##from mne.viz import circular_layout, plot_connectivity_circle
+###
+#### con is a 3D array, get the connectivity for the first (and only) freq. band
+#### for each method
+###con_res = dict()
+###con_res= con[:, :, 0]
+##
+### Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels/hemi
+##labels, label_colors = mne.labels_from_parc('EP1', parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
+##src = inverse_operator['src']
+##label_ts = mne.extract_label_time_course(stcs, src, labels, mode = 'mean', return_generator=True)
+###print labels
+##
+###### Now, we visualize the connectivity using a circular graph layout
+### First, we reorder the labels based on their location in the left hemi
+##label_names = [label.name for label in labels]
+##lh_labels = [name for name in label_names if name.endswith('lh')]
+##
+### Get the y-location of the label
+##label_ypos = list()
+##for name in lh_labels:
+##    idx = label_names.index(name)
+##    ypos = np.mean(labels[idx].pos[:, 1])
+##    label_ypos.append(ypos)
+##
+### Reorder the labels based on their location
+##lh_labels = [label for (ypos, label) in sorted(zip(label_ypos, lh_labels))]
+##
+### For the right hemi
+##rh_labels = [label[:-2] + 'rh' for label in lh_labels]
+##
+### Save the plot order and create a circular layout
+##node_order = list()
+##node_order.extend(lh_labels[::-1])  #reverse the order
+##node_order.extend(rh_labels)
+##
+##node_angles = circular_layout(label_names, node_order, start_pos=90,
+##                              group_boundaries=[0, len(label_names) / 2])
+##
+### Plot the graph using node colors from the FreeSurfer parcellation. We only
+### show the 300 strongest connections.
+##plot_connectivity_circle(coh, label_names, n_lines=300, indices = indices,
+##                         node_angles=node_angles, node_colors=label_colors,
+##                         title='All-to-All Connectivity')
+##import matplotlib.pyplot as plt
+##plt.savefig('/home/custine/MEG/data/epi_conn/EP1/coh/circle.png', facecolor='black')
+##
+### Plot connectivity for both methods in the same plot
+##fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
+##no_names = [''] * len(label_names)
+##
+##plot_connectivity_circle(coh, no_names, n_lines=300,
+##                             node_angles=node_angles, node_colors=label_colors,
+##                             title='EP1 coh connectivity plot', padding=0, fontsize_colorbar=6,
+##                             fig=fig, subplot=(1, 2))
+##
+##plt.show()
+##    
