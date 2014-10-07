@@ -141,7 +141,8 @@ data = ft_resampledata(cfg, data)
 cfg = []
 cfg.output = 'fourier' 
 cfg.method = 'mtmfft'
-cfg.foilim = [1 40]
+%cfg.foilim = [1 40]
+cfg.foi = 18
 cfg.keeptrials = 'yes'
 cfg.taper = 'hanning'
 cfg.toi = 0:0.05:2.0 %the times on which the analysis windows should be centered (in seconds)
@@ -188,6 +189,11 @@ cfg.resamplefs = 600
 cfg.detrend = 'no'
 data_segmented = ft_resampledata(cfg, data_segmented)
 
+%%only choosing the first 10 trials.. :/ out of memory issues
+%%troubleshooting... 
+cfg.trials = 1:10;
+data_segmented = ft_redefinetrial(cfg, data_segmented)
+
 %% TimeLock Analysis 
 hdr = ft_read_header(fiff);
 [meg] = ft_channelselection('MEG', hdr.label);
@@ -197,7 +203,7 @@ cfg.headerfile = 'emptyroom_raw.fif'
 cfg.channel = 'MEG'
 data_empty = ft_preprocessing(cfg)
 cfg = []
-cfg.vartrllength = 0
+cfg.vartrllength = 1
 cfg.covariance = 'yes'
 cfg.covariancewindow = 'all'
 cfg.channel = 'MEG'
@@ -205,9 +211,10 @@ tlcov = ft_timelockanalysis(cfg, data_empty)
 
 noise_cov = tlcov.cov;
 cfg = []
-cfg.vartrllength = 0
+cfg.vartrllength = 1
 cfg.channel = 'MEG'
 cfg.keeptrials = 'no'
+cfg.trials = 1:10;
 tl_run1 = ft_timelockanalysis(cfg, data_segmented)
 tl_run1.cov = noise_cov
 
@@ -216,14 +223,15 @@ cfg = []
 cfg.method = 'mtmfft'
 cfg.taper = 'hanning'
 cfg.output = 'powandcsd'
-cfg.foilim = [1 30]
+%cfg.foilim = [1 30]
+cfg.foi = 18
 cfg.keeptrials = 'no'
-cfg.channelcmb = {'MEGMAG', 'MEGMAG'}
+%cfg.channelcmb = {meg, meg}
 freq_segmented = ft_freqanalysis(cfg, data_segmented)
 
 cfg = []
 cfg.method = 'coh'
-cfg.channel = 'MEGMAG'
+cfg.channel = meg
 coh = ft_connectivityanalysis(cfg, freq_segmented)
 cfg = []
 cfg.parameter = 'cohspctrm'
@@ -269,9 +277,9 @@ figure
 ft_plot_vol(vol_T1, 'facecolor', 'red'); alpha 0.5
 ft_plot_mesh(shape, 'edgecolor', 'none'); camlight
 %% REDUCE THE NUMBER OF VERTICES ###### 
-cfg=[];cfg.numvertices=1500;
+cfg=[];cfg.numvertices=3000;
 cfg.method = 'singleshell'
-
+vol_T1 = ft_prepare_headmodel(cfg, seg_T1)
 %% Then doing the well you know... source analysis 
 %%with time lock data
 cfg = []
@@ -281,13 +289,14 @@ cfg.channel = meg;  % the used channels
 cfg.vol = vol_T1 % volume conduction model
 cfg.grid.pos = vol_T1.bnd.pnt % source points
 cfg.normalize = 'yes'
-%cfg.reducerank = 2
+cfg.reducerank = 2
 leadfield_tl = ft_prepare_leadfield(cfg)
 load('sources.mat', 'tl_run1')
 cfg = []
 cfg.grid = leadfield_tl
 cfg.vol = vol_T1
-cfg.keepfilter = 'yes'
+% cfg.keepfilter = 'yes'
+cfg.keeptrials = 'no'
 cfg.method = 'lcmv'
 cfg.lcmv.fixedori = 'yes'
 source = ft_sourceanalysis(cfg, tl_run1)
@@ -311,30 +320,24 @@ source.avg %HAS AVG POW POS MOM AND ALL THOSE THINGS....
 %        mom: {3000x1 cell}
 %     filter: {3000x1 cell}
 %% with freq data
-cfg = []
-cfg.grid.inside = 1:size(vol_T1.bnd.pnt, 1)
-cfg.grad = freq_segmented.grad  % sensor positions
-cfg.channel = meg;  % the used channels
-cfg.vol = vol_T1
-cfg.grid.pos = vol_T1.bnd.pnt % source points
-cfg.normalize = 'yes'
-leadfield_fq = ft_prepare_leadfield(cfg)
-cfg = []
-cfg.grid = leadfield_fq
-cfg.vol = vol_T1
-cfg.keepfilter = 'yes'
-cfg.keeptrials = 'no'
-cfg.method = 'dics'
-cfg.frequency    = 18;
-cfg.channel = mag;
-cfg.supchan = grad;
-source_fq = ft_sourceanalysis(cfg, freq_segmented)
-source_fq.avg
+sp
 %% NETWORK ANALYSIS:
 cfg = []
 cfg.method = 'betweenness' % see http://fieldtrip.fcdonders.nl/reference/ft_networkanalysis for more methods.... 
 cfg.parameter = 'cohspctrm'
 stat = ft_networkanalysis(cfg, coh)
+
+%% CONNECTIVITY ANALYSIS WITH SOURCE
+cfg = []
+cfg.method = 'coh'
+cfg.complex = 'imag'
+cfg.channelcmb = {mag, mag}
+stat = ft_connectivityanalysis(cfg, source)
+
+%% do this with freq_source 
+cfg = []
+cfg.method = 'powcorr' %computes power envelope (i.e. amplitude envelope squared) correlation.
+stat = ft_connectivityanalysis(cfg, source_fq)
 
 end
 
