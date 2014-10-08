@@ -4,7 +4,7 @@ Created on Fri Oct  3 11:28:29 2014
 
 @author: custine
 Usage: python preProc_avg.py subjID 
-Example: python preProc_avg.py 9511 
+Example: python preProc_avg.py EP1 
 """
 
 import sys
@@ -15,7 +15,7 @@ def mnepy_avg(subjID,run):
     import mne
     from mne import fiff
     from mne import viz
-    from mne.viz import evoked
+    #from mne.viz import evoked
     import argparse
     import copy
     import numpy
@@ -38,7 +38,7 @@ def mnepy_avg(subjID,run):
     event_id = None
     #######Experiment specific parameters 
     ###TimeWindow
-    tmin = -.1
+    tmin = 0
     tmax = 2 ##float(cc.epMax[eve])
     ########Artifact rejection parameters
     ###General
@@ -70,14 +70,14 @@ def mnepy_avg(subjID,run):
     ##Filter raw data 
     fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
     
-    ##Pick all channels 
+    #Pick all channels 
     picks = []
     for i in range(raw.info['nchan']):
         picks.append(i)
         
     ##Read Epochs and compute Evoked :) 
-    print 'Reading Epochs from evokedaw file...'
-    epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
+    print 'Reading Epochs from evoked file...'
+    epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), proj = True, picks = picks, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
     print epochs
     evoked = [epochs.average(picks =picks)]
     #    #        epochs.plot()
