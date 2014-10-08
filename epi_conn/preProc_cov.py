@@ -6,8 +6,8 @@ Created on Fri Oct  3 12:01:23 2014
 Estimate covariance matrix from a raw FIF file
 ==============================================
 
-Usage: python preProc_cov.py subjID run
-Example: python preProc_cov.py EP1 run1
+Usage: python preProc_cov.py subjID
+Example: python preProc_cov.py EP1 
 
 FOR EPI_CONN PILOT
 
@@ -57,21 +57,25 @@ for runID in runs:
         print covLog_file
         print 'Reading Raw data... '
         raw = io.Raw(fname)
+        ##Pick all channels 
+        picks = []
+        for i in range(raw.info['nchan']):
+            picks.append(i)
         if runID == "emptyroom":
             tmin = 0
             tmax = 2
-            cov = mne.compute_raw_data_covariance(raw, tmin = tmin, tmax = tmax) #, tmin = None, tmax = 0) #, reject = None, picks = picks)
+            cov = mne.compute_raw_data_covariance(raw, tmin = tmin, tmax = tmax, picks = picks) #, tmin = None, tmax = 0) #, reject = None, picks = picks)
             print cov
         else:
             
             events = mne.read_events(event_file)
-            include = []  # or stim channels ['STI 014']
-    #        #raw.info['bads'] += ['EEG 053']  # bads + 1 more
-    #        # pick EEG channels
-            picks = mne.pick_types(raw.info, meg=True, eeg=False, stim=False, eog=True, include=include, exclude='bads')
-            reject = dict(mag = 4e-12, grad = 4000e-13)
-            epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, preload = True, reject=reject)
-            print epochs
+#            include = []  # or stim channels ['STI 014']
+#    #        #raw.info['bads'] += ['EEG 053']  # bads + 1 more
+#    #        # pick EEG channels
+#            picks = mne.pick_types(raw.info, meg=True, eeg=False, stim=False, eog=True, include=include, exclude='bads')
+#            reject = dict(mag = 4e-12, grad = 4000e-13)
+#            epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, preload = True, reject=reject)
+#            print epochs
 #            ##Example: reject = dict(grad=4000e-13, # T / m (gradiometers)
 #                          mag=4e-12, # T (magnetometers)
 #                          eeg=40e-6, # uV (EEG channels)
@@ -79,8 +83,8 @@ for runID in runs:
 #                          )
             
 #             Compute the covariance from the raw data or from epochs 
-            cov = mne.compute_covariance(epochs, tmin = None, tmax = 0) #Use for runs... 
-            print cov
+#            cov = mne.compute_covariance(epochs, tmin = None, tmax = 0) #Use for runs... 
+#            print cov
 #        covRuns.append(cov)
         mne.write_cov(cname, cov)
 #        
