@@ -4,7 +4,7 @@
 ##@author: custine
 ##Script for epi_conn pilot study 
 ##./makeFwd.sh subjID 
-## ./makeFwd.sh 9367 
+## ./makeFwd.sh EP1 
 
 echo "Subject ID: " 
 echo $1 
