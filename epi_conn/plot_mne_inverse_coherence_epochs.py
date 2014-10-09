@@ -161,6 +161,7 @@ print
 
 snr = 1.0  # use lower SNR for single epochs
 lambda2 = 1.0 / snr ** 2
+method = "dSPM"
 stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
                             pick_ori="normal", return_generator=True)
 ################################################################################################3
@@ -238,14 +239,16 @@ stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
 #######Connectivity Circle Plotting############
 print inverse_operator['src']
 from mne.viz import circular_layout, plot_connectivity_circle
-# Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels/hemi
+# Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels per hemi
 labels, label_colors = mne.labels_from_parc(subj, parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
-print label_colors
+print labels
 print 
 src = inverse_operator['src']
 label_ts = mne.extract_label_time_course(stcs, labels, src,mode = 'mean', return_generator=True)
 print label_ts
+###################################33
 
+#################################################3333
 # Now we are ready to compute the connectivity in the alpha band. Notice
 # from the status messages, how mne-python: 1) reads an epoch from the raw
 # file, 2) applies SSP and baseline correction, 3) computes the inverse to
@@ -300,7 +303,7 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
-plot_connectivity_circle(con_res['coh'], label_names, n_lines=300, indices = indices,
+plot_connectivity_circle(con_res['coh'], label_names, n_lines=300,
                          node_angles=node_angles, node_colors=label_colors,
                          title='All-to-All Connectivity(Coherence)')
 import matplotlib.pyplot as plt
