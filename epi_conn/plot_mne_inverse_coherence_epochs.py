@@ -4,10 +4,6 @@
 Compute coherence in source space using a MNE inverse solution
 ==============================================================
 
-This examples computes the coherence between a seed in the left
-auditory cortex and the rest of the brain based on single-trial
-MNE-dSPM inverse soltions.
-
 """
 
 # Author: Martin Luessi <mluessi@nmr.mgh.harvard.edu>
@@ -22,6 +18,7 @@ from mne.io import Raw
 from mne.minimum_norm import (apply_inverse, apply_inverse_epochs,
                               read_inverse_operator)
 from mne.connectivity import seed_target_indices, spectral_connectivity
+from mne import read_labels_from_annot
 
 import surfer
 from surfer.viz import Brain
@@ -70,16 +67,17 @@ elif freq == 'gamma':
 print fmin
 print fmax 
 ##
-fname_inv = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-inv.fif'
+#fname_inv = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-inv.fif'
 fname_fwd = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-fwd.fif'
 evoked_fname = data_path + 'ave_projon/'+ subj + '_run1_All-ave.fif'
+coh_fname = data_path + 'coh/' + subj + '_' + freq + '_connectivityMatrix.txt'
 cov_fname = data_path + 'cov/emptyroom-cov.fif'
 raw_file = data_path + 'run1_raw.fif'
-cohLog_file = data_path + 'logs/'+ subj + '_coherence.log'
+cohLog_file = data_path + 'logs/'+ subj + '_' + freq + '_coherence.log'
 event_file = data_path + 'eve/run1.eve'
-Lbrain_image = data_path + 'coh/run1_%s_left.png' %label_name_lh
-Rbrain_image = data_path + 'coh/run1_%s_right.png' %label_name_lh
-stc_file = data_path + 'ave_projon/stc/'+ subj + '_run1-spm-lh.stc' 
+#Lbrain_image = data_path + 'coh/run1_%s_left.png' %label_name_lh
+#Rbrain_image = data_path + 'coh/run1_%s_right.png' %label_name_lh
+#stc_file = data_path + 'ave_projon/stc/'+ subj + '_run1-spm-lh.stc' 
 mne.set_log_file(fname = cohLog_file, overwrite = True)
 
 print evoked_fname 
@@ -113,8 +111,8 @@ lambda2 = 1.0 / snr ** 2
 
 method = "dSPM"  # use dSPM method (could also be MNE or sLORETA)
 sample_vertices = [s['vertno'] for s in inverse_operator['src']]
-
-#    Let's average and compute inverse, resampling to speed things up
+##################################################################
+# ##Let's average and compute inverse, resampling to speed things up
 # #evoked1 = epochs1.average()
 # #evoked = mne.read_evokeds(evoked_fname) #, condition = 'epochs_TaggedWord')
 print evoked
@@ -122,8 +120,7 @@ print
 print inverse_operator
 stc = apply_inverse(evoked, inverse_operator, lambda2, method, pick_ori = "normal")
 print stc
-#stc = mne.read_source_estimate(stc_file)
-#
+
 ###############
 # Restrict the source estimate to the label in the left auditory cortex
 stc_label = stc.in_label(label_lh)
@@ -164,6 +161,12 @@ lambda2 = 1.0 / snr ** 2
 method = "dSPM"
 stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
                             pick_ori="normal", return_generator=True)
+                            
+#vertices_to = mne.grade_to_vertices('fsaverage', grade = 5)                            
+#stcs  = mne.morph_data(subj, 'fsaverage', stcs_orig, grade = vertices_to)
+#teststc_fname = data_path + 'ave_projon/stc/'+ subj + '_run1-spm-test-lh.stc' 
+#stcs.save(teststc_fname)
+
 ################################################################################################3
 ## Now we are ready to compute the coherence in the alpha and beta band.
 ## fmin and fmax specify the lower and upper freq. for each band, resp.
@@ -240,15 +243,19 @@ stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
 print inverse_operator['src']
 from mne.viz import circular_layout, plot_connectivity_circle
 # Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels per hemi
-labels, label_colors = mne.labels_from_parc(subj, parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
+labels, label_colors = mne.labels_from_parc('fsaverage', parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
 print labels
+print labels[:-1] #### TO GET RID OF UNKNOWN LABEL.LH 
+labels = labels[:-1]
+print 
+label_colors = label_colors[:-1]
 print 
 src = inverse_operator['src']
-label_ts = mne.extract_label_time_course(stcs, labels, src,mode = 'mean', return_generator=True)
+label_ts = mne.extract_label_time_course(stcs, labels, src, mode = 'mean', return_generator=True)
 print label_ts
-###################################33
-
-#################################################3333
+#np.savetxt('/home/custine/MEG/data/epi_conn/EP1/coh/coherence_label_ts.txt', label_ts)
+####################################
+##################################################3333
 # Now we are ready to compute the connectivity in the alpha band. Notice
 # from the status messages, how mne-python: 1) reads an epoch from the raw
 # file, 2) applies SSP and baseline correction, 3) computes the inverse to
@@ -258,22 +265,22 @@ print label_ts
 # behaviour is because we are using generators and allows us to
 # compute connectivity in computationally efficient manner where the amount
 # of memory (RAM) needed is independent from the number of epochs.
-#fmin = 4.
-#fmax = 8.
+fmin = 4.
+fmax = 8.
 sfreq = raw.info['sfreq']  # the sampling frequency
 con_methods = ['coh', 'imcoh']
 con, freqs, times, n_epochs, n_tapers = spectral_connectivity(label_ts,
         method=con_methods, mode='fourier', sfreq=sfreq, fmin=fmin,
-        fmax=fmax, faverage=True, n_jobs=2)
-        
-print len(con)
-#np.savetxt('/home/custine/MEG/data/epi_conn/EP3/coh/coherence.txt', con)
-# con is a 3D array, get the connectivity for the first (and only) freq. band
-# for each method
+        fmax=fmax, faverage=True)      
+print con
+# con is a 3D array, get the connectivity for the first (and only) freq. band for each method
 con_res = dict()
 for method, c in zip(con_methods, con):
     con_res[method] = c[:, :, 0]
-print len(con_res)
+print con_res
+
+####Save ConnectivityMatrix as text file for fuirther averaging 
+np.savetxt(coh_fname, con_res['coh'], delimiter = ',')
 
 #### Now, we visualize the connectivity using a circular graph layout
 # First, we reorder the labels based on their location in the left hemi
@@ -289,9 +296,10 @@ for name in lh_labels:
 
 # Reorder the labels based on their location
 lh_labels = [label for (ypos, label) in sorted(zip(label_ypos, lh_labels))]
-
+print lh_labels
 # For the right hemi
 rh_labels = [label[:-2] + 'rh' for label in lh_labels]
+print rh_labels
 
 # Save the plot order and create a circular layout
 node_order = list()
@@ -307,16 +315,16 @@ plot_connectivity_circle(con_res['coh'], label_names, n_lines=300,
                          node_angles=node_angles, node_colors=label_colors,
                          title='All-to-All Connectivity(Coherence)')
 import matplotlib.pyplot as plt
-plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_' + freq + '.png', facecolor='black')
+plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_fsaverage_' + freq + '.png', facecolor='black')
 
-# Plot connectivity for both methods in the same plot
-fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
-no_names = [''] * len(label_names)
-for ii, method in enumerate(con_methods):
-    plot_connectivity_circle(con_res[method], no_names, n_lines=300,
-                             node_angles=node_angles, node_colors=label_colors,
-                             title=method, padding=0, fontsize_colorbar=6,
-                             fig=fig, subplot=(1, 2, ii + 1))
-plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_coh_imcoh_' + freq + '.png', facecolor='black')
-#plt.show()
+## Plot connectivity for both methods in the same plot
+#fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
+#no_names = [''] * len(label_names)
+#for ii, method in enumerate(con_methods):
+#    plot_connectivity_circle(con_res[method], no_names, n_lines=300,
+#                             node_angles=node_angles, node_colors=label_colors,
+#                             title=method, padding=0, fontsize_colorbar=6,
+#                             fig=fig, subplot=(1, 2, ii + 1))
+#plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_coh_imcoh_' + freq + '.png', facecolor='black')
+##plt.show()
     
