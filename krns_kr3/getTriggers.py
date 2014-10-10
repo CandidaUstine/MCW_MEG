@@ -18,8 +18,8 @@ def Sentences(subjID, sessID, runID):
 #    sent_file = data_path + 'data_sentences0' + runID + '.txt'
     eprime_file = data_path + 'eprime_run' + runID.zfill(2) + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
-    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
-    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/triggers/' + subjID + '_s'+ sessID +'_run'+runID + '_Sentence-Triggers.eve'
     
     print "Using Modified Eve file: " + Modeve_file
     print 
@@ -33,6 +33,7 @@ def Sentences(subjID, sessID, runID):
     sent_tags = []
     
     if os.path.exists(Modeve_file):
+        print "Jane Jane here here"
         ##Sent File:
         #### SentID Onset and Offset Tags
         myFile1 = open(eprime_file, "r")
@@ -210,7 +211,7 @@ def Words(subjID, sessID, runID):
             sentwordID = wordID_tags[ii]
             sentword = word_tags[ii]
             #print sentword
-            if (lineTemp[3] == '100' or lineTemp[3] == '110' or lineTemp[3] == '111' or lineTemp[3] == '0'):
+            if (lineTemp[2] == '100' or lineTemp[2] == '110' or lineTemp[2] == '111' or lineTemp[2] == '0'): #######[3] Modified aftER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
                 ii = ii+1
             elif (sentword == 'The' or sentword == 'the' or sentword == 'was' or sentword == 'a'):
                 ii = ii +1
@@ -220,8 +221,8 @@ def Words(subjID, sessID, runID):
                 myFile3.write("\t")
                 myFile3.write(lineTemp[1])
                 myFile3.write("\t")
-                myFile3.write(lineTemp[2])
-                myFile3.write("\t")
+#                myFile3.write(lineTemp[2]) ##*********#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+#                myFile3.write("\t")
                 myFile3.write(str(sentwordID))
                 myFile3.write("\n")
     ##Write the Mod Word Trigger File as well... 
@@ -229,8 +230,8 @@ def Words(subjID, sessID, runID):
                 myFile4.write("\t")
                 myFile4.write(lineTemp[1])
                 myFile4.write("\t")
-                myFile4.write(lineTemp[2])
-                myFile4.write("\t")
+#                myFile4.write(lineTemp[2]) ##*************#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+#                myFile4.write("\t")
                 myFile4.write(str(1))
                 myFile4.write("\n")
             
@@ -292,7 +293,7 @@ def Category(subjID, sessID, runID, Category):
         myFile1.close()
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
-            jane = lineTemp[3]
+            jane = lineTemp[2] ##***********[3]#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
             jane = str(int(jane[3:]))
             word_tags.append(jane)
             if jane in (categorywords):
@@ -301,8 +302,8 @@ def Category(subjID, sessID, runID, Category):
                 myFile2.write("\t")
                 myFile2.write(lineTemp[1])
                 myFile2.write("\t")
-                myFile2.write(lineTemp[2])
-                myFile2.write("\t")
+#                myFile2.write(lineTemp[2]) ##*****#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+#                myFile2.write("\t")
                 myFile2.write('1')
                 myFile2.write("\n")
 
@@ -316,7 +317,7 @@ if __name__ == "__main__":
     ####### Get Input ########
     subjID = sys.argv[1] ##9367 
     sessID = sys.argv[2] ##s5
-    runs = ['1', '2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
+    runs = ['1','2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
     Trig_type = sys.argv[3]
 
     for runID in runs: 
@@ -330,7 +331,7 @@ if __name__ == "__main__":
         if Trig_type == "Sentence":
             Sentences(subjID, sessID, runID)
             
-        elif Trig_type == 'Words':
+        elif Trig_type == 'Words': 
             Words(subjID, sessID, runID)
         else:
             Type = sys.argv[4]
