@@ -265,8 +265,8 @@ print label_ts
 # behaviour is because we are using generators and allows us to
 # compute connectivity in computationally efficient manner where the amount
 # of memory (RAM) needed is independent from the number of epochs.
-fmin = 4.
-fmax = 8.
+# #fmin = 4.
+# #fmax = 8.
 sfreq = raw.info['sfreq']  # the sampling frequency
 con_methods = ['coh', 'imcoh']
 con, freqs, times, n_epochs, n_tapers = spectral_connectivity(label_ts,
