@@ -66,11 +66,11 @@ elif freq == 'gamma':
 
 print fmin
 print fmax 
-##
+#
 #fname_inv = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-inv.fif'
 fname_fwd = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-fwd.fif'
 evoked_fname = data_path + 'ave_projon/'+ subj + '_run1_All-ave.fif'
-coh_fname = data_path + 'coh/' + subj + '_' + freq + '_connectivityMatrix.txt'
+coh_fname = data_path + 'coh/' + subj + '_' + freq + '_subj_connectivityMatrix.txt'
 cov_fname = data_path + 'cov/emptyroom-cov.fif'
 raw_file = data_path + 'run1_raw.fif'
 cohLog_file = data_path + 'logs/'+ subj + '_' + freq + '_coherence.log'
@@ -243,12 +243,12 @@ stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
 print inverse_operator['src']
 from mne.viz import circular_layout, plot_connectivity_circle
 # Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels per hemi
-labels, label_colors = mne.labels_from_parc('fsaverage', parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
+labels, label_colors = mne.labels_from_parc(subj, parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
 print labels
-print labels[:-1] #### TO GET RID OF UNKNOWN LABEL.LH 
-labels = labels[:-1]
-print 
-label_colors = label_colors[:-1]
+#print labels[:-1] #### TO GET RID OF UNKNOWN LABEL.LH 
+#labels = labels[:-1]
+#print 
+#label_colors = label_colors[:-1]
 print 
 src = inverse_operator['src']
 label_ts = mne.extract_label_time_course(stcs, labels, src, mode = 'mean', return_generator=True)
@@ -281,7 +281,18 @@ print con_res
 
 ####Save ConnectivityMatrix as text file for fuirther averaging 
 np.savetxt(coh_fname, con_res['coh'], delimiter = ',')
+##
+#################################################################################################
+##################### OR #######################
+######Read from text - coherence matrix file and plot the connectivity circle. :) 
+#con_res1 = np.loadtxt(coh_fname, delimiter = ',')
 
+
+################################################################################################
+from mne.viz import circular_layout, plot_connectivity_circle
+
+# Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels per hemi
+labels, label_colors = mne.labels_from_parc(subj, parc='aparc', subjects_dir=subjects_dir)
 #### Now, we visualize the connectivity using a circular graph layout
 # First, we reorder the labels based on their location in the left hemi
 label_names = [label.name for label in labels]
@@ -311,11 +322,11 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
-plot_connectivity_circle(con_res['coh'], label_names, n_lines=300,
+plot_connectivity_circle(con_res1, label_names, n_lines=300, ##con_res['coh']
                          node_angles=node_angles, node_colors=label_colors,
-                         title='All-to-All Connectivity(Coherence)')
+                         title='All-to-All Connectivity(Coherence)-'+ freq, vmin = 0.40, vmax = 1.00)
 import matplotlib.pyplot as plt
-plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_fsaverage_' + freq + '.png', facecolor='black')
+plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_' + freq + '.png', facecolor='black')
 
 ## Plot connectivity for both methods in the same plot
 #fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
@@ -326,5 +337,5 @@ plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circl
 #                             title=method, padding=0, fontsize_colorbar=6,
 #                             fig=fig, subplot=(1, 2, ii + 1))
 #plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_coh_imcoh_' + freq + '.png', facecolor='black')
-##plt.show()
+#plt.show()
     
