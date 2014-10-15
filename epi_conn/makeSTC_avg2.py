@@ -4,6 +4,8 @@ Created on Thu Oct  9 09:08:51 2014
 Read STC files and average them. 
 
 @author: custine
+python makeSTC_avg2.py beta Left
+
 """
 
 
@@ -23,33 +25,35 @@ from mne.viz import circular_layout, plot_connectivity_circle
 ##Get Inputs 
 parser = argparse.ArgumentParser(description='Get input')
 parser.add_argument('freq', type = str)
-parser.add_argument('subj1',type=str) 
-parser.add_argument('subj2',type=str)  
-parser.add_argument('subj3',type=str) 
-parser.add_argument('subj4',type=str)
+parser.add_argument('group',type=str) 
 args=parser.parse_args()
 freq = args.freq
 print freq
-subj1 = args.subj1
-print subj1
-subj2 = args.subj2
-print subj2
-subj3 = args.subj3
-print subj3
-subj4 = args.subj4
-print subj4
+group = args.group
+print group 
 
+if group == 'Left':
+    subj1 = 'EP1'
+    subj2 = 'EP3'
+    subj3 = 'EP5'
+    subj4 = 'EP7'
+elif group == 'Right':
+    subj1 = 'EP4'
+    subj2 = 'EP6'
+    subj3 = 'EP8'
+    subj4 = 'EP10'
+    
 
 
 # Set parameters
-data_path = '/home/custine/MEG/results/source_level/' # + subj + '/'
+data_path = '/home/custine/MEG/results/source_level/ConnectivityPlots/' # + subj + '/'
 subjects_dir = '/home/custine/MRI/structurals/subjects/'
-con1_fname = '/home/custine/MEG/data/epi_conn/'+ subj1 + '/coh/' + subj1 + '_connectivityMatrix.txt'
-con2_fname = '/home/custine/MEG/data/epi_conn/'+ subj2 + '/coh/' + subj2 + '_connectivityMatrix.txt'
-con3_fname = '/home/custine/MEG/data/epi_conn/'+ subj3 + '/coh/' + subj3 + '_connectivityMatrix.txt'
-con4_fname = '/home/custine/MEG/data/epi_conn/'+ subj4 + '/coh/' + subj4 + '_connectivityMatrix.txt'
-conAll_plot_fname = data_path + 'GrandAvgConnectivityPlot_' + freq + '_' + subj1 + '-' + subj2 + '-' + subj3 + '-' + subj4 + '.png'
-conAll_matrix_fname = data_path + 'GrandAvgConnectivityMatrix_' + freq + '_' + subj1 + '-' + subj2 + '-' + subj3 + '-' + subj4 + '.txt'
+con1_fname = '/home/custine/MEG/data/epi_conn/'+ subj1 + '/coh/' + subj1 +'_' + freq+ '_subj_connectivityMatrix.txt'
+con2_fname = '/home/custine/MEG/data/epi_conn/'+ subj2 + '/coh/' + subj2 +'_' + freq+ '_subj_connectivityMatrix.txt'
+con3_fname = '/home/custine/MEG/data/epi_conn/'+ subj3 + '/coh/' + subj3 +'_' + freq+ '_subj_connectivityMatrix.txt'
+con4_fname = '/home/custine/MEG/data/epi_conn/'+ subj4 + '/coh/' + subj4 +'_' + freq+ '_subj_connectivityMatrix.txt'
+conAll_plot_fname = data_path + 'GrandAvgConnectivityPlot_' + freq + '_' + group  + '.png'
+conAll_matrix_fname = data_path + 'GrandAvgConnectivityMatrix_' + freq + '_' + group + '.txt'
 
 ##################################################################################3
 ################Averaging Conn-coherence matrices #####################################3
@@ -60,8 +64,7 @@ con_res4 = np.loadtxt(con4_fname, delimiter = ',')
 grand_con = np.mean([con_res1, con_res2, con_res3, con_res4], axis = 0)
 print grand_con
 np.savetxt(conAll_matrix_fname, grand_con)
-#
-################################################################################################
+
 ##############################################################################################
 ###############Plotting the average Conn##################
 labels, label_colors = mne.labels_from_parc('fsaverage', parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
@@ -102,11 +105,11 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
 plot_connectivity_circle(grand_con, label_names, n_lines=300,
-                         node_angles=node_angles, node_colors=label_colors,
-                         title='All-to-All Connectivity(Coherence)- Grand Average')
+                         node_angles=node_angles, node_colors=label_colors,vmin = 0.60, vmax = 1.00,
+                         title='All-to-All Connectivity(Coherence)- Grand Average - ' + freq)
 import matplotlib.pyplot as plt
 plt.savefig(conAll_plot_fname, facecolor='black')
-plt.show()
+#plt.show()
 ## Plot connectivity for both methods in the same plot
 #fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
 #no_names = [''] * len(label_names)
