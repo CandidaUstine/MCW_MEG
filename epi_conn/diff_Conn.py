@@ -3,6 +3,8 @@
 Created on Mon Oct 13 13:21:59 2014
 
 @author: custine
+python diff_Conn.py alpha Left Right
+
 """
 
 print(__doc__)
@@ -45,63 +47,69 @@ con_gp2 = np.loadtxt(Gp2_conAll_matrix_fname, delimiter = ' ')
 diff_con = con_gp1 - con_gp2 
 #print diff_con
 np.savetxt(conAll_diff_matrix_fname, diff_con)
-###############################################################################################
-###############################################################################################
-########################## T test ##########################################################
-##if group == 'Left':
-#subj1 = 'EP1'
-#subj2 = 'EP3'
-##    subj3 = 'EP5'
-##    subj4 = 'EP7'
-##elif group == 'Right':
-#subj3 = 'EP4'
-#subj4 = 'EP6'
-##    subj3 = 'EP8'
-##    subj4 = 'EP10'
-#
-#con1_fname = '/home/custine/MEG/data/epi_conn/'+ subj1 + '/coh/' + subj1 +'_' + freq+ '_subj_connectivityMatrix.txt'
-#con2_fname = '/home/custine/MEG/data/epi_conn/'+ subj2 + '/coh/' + subj2 +'_' + freq+ '_subj_connectivityMatrix.txt'
-#con3_fname = '/home/custine/MEG/data/epi_conn/'+ subj3 + '/coh/' + subj3 +'_' + freq+ '_subj_connectivityMatrix.txt'
-#con4_fname = '/home/custine/MEG/data/epi_conn/'+ subj4 + '/coh/' + subj4 +'_' + freq+ '_subj_connectivityMatrix.txt'
-#con_res1 = np.loadtxt(con1_fname, delimiter = ',')
-#con_res2 = np.loadtxt(con2_fname, delimiter = ',')
-#con_res3 = np.loadtxt(con3_fname, delimiter = ',')
-#con_res4 = np.loadtxt(con4_fname, delimiter = ',')
-#
-#con_t = np.empty((68,68))
-#con_t.fill(0)
-#for i in range (0, 68):
-#    print 'new'
-#    print 'i', i
-#    for j in range(0,68):
-#        print 'j', j
-#        print con_res1[i,j]
-#        print con_res2[i,j]
-#        print con_res3[i,j]
-#        print con_res4[i,j]
-#        l_mean = (con_res1[i,j] + con_res2[i,j])/2
-#        r_mean = (con_res3[i,j] + con_res4[i,j])/2
-#        l_a = [con_res1[i,j], con_res2[i,j]]
-#        l_std = float(np.std(l_a))
-#        #print l_std
-#        r_a = [con_res3[i,j], con_res4[i,j]]
-#        r_std = float(np.std(r_a))
-#        #print r_std
-#        if l_mean == 0 and r_mean == 0:
-#            t = float(0)
-#        else:
-#            s_lr = np.sqrt((pow(l_std, 2) + pow(r_std,2))/2) 
-#            s_lr = s_lr * np.sqrt(2/2)
-#            t = (l_mean - r_mean)
-#            t = t/s_lr
-#        print t 
-#        con_t[i,j] = t 
-#    print 
-##print con_res1[5,5]
-##print con_res2[5,5]
-#
-#print con_t 
+##############################################################################################
+##############################################################################################
+######################### 2 sample T test ##########################################################
+#if group == 'Left':
+lsubj1 = 'EP1'
+lsubj2 = 'EP3'
+lsubj3 = 'EP5'
+lsubj4 = 'EP7'
+#elif group == 'Right':
+rsubj1 = 'EP4'
+rsubj2 = 'EP6'
+rsubj3 = 'EP8'
+rsubj4 = 'EP10'
 
+lcon1_fname = '/home/custine/MEG/data/epi_conn/'+ lsubj1 + '/coh/' + lsubj1 +'_' + freq+ '_subj_connectivityMatrix.txt'
+lcon2_fname = '/home/custine/MEG/data/epi_conn/'+ lsubj2 + '/coh/' + lsubj2 +'_' + freq+ '_subj_connectivityMatrix.txt'
+lcon3_fname = '/home/custine/MEG/data/epi_conn/'+ lsubj3 + '/coh/' + lsubj3 +'_' + freq+ '_subj_connectivityMatrix.txt'
+lcon4_fname = '/home/custine/MEG/data/epi_conn/'+ lsubj4 + '/coh/' + lsubj4 +'_' + freq+ '_subj_connectivityMatrix.txt'
+lcon_res1 = np.loadtxt(lcon1_fname, delimiter = ',')
+lcon_res2 = np.loadtxt(lcon2_fname, delimiter = ',')
+lcon_res3 = np.loadtxt(lcon3_fname, delimiter = ',')
+lcon_res4 = np.loadtxt(lcon4_fname, delimiter = ',')
+
+rcon1_fname = '/home/custine/MEG/data/epi_conn/'+ rsubj1 + '/coh/' + rsubj1 +'_' + freq+ '_subj_connectivityMatrix.txt'
+rcon2_fname = '/home/custine/MEG/data/epi_conn/'+ rsubj2 + '/coh/' + rsubj2 +'_' + freq+ '_subj_connectivityMatrix.txt'
+rcon3_fname = '/home/custine/MEG/data/epi_conn/'+ rsubj3 + '/coh/' + rsubj3 +'_' + freq+ '_subj_connectivityMatrix.txt'
+rcon4_fname = '/home/custine/MEG/data/epi_conn/'+ rsubj4 + '/coh/' + rsubj4 +'_' + freq+ '_subj_connectivityMatrix.txt'
+rcon_res1 = np.loadtxt(rcon1_fname, delimiter = ',')
+rcon_res2 = np.loadtxt(rcon2_fname, delimiter = ',')
+rcon_res3 = np.loadtxt(rcon3_fname, delimiter = ',')
+rcon_res4 = np.loadtxt(rcon4_fname, delimiter = ',')
+
+conAll_T_matrix_fname = data_path + 'TStat_GrandAvgConnectivityMatrix_' + freq + '_' + gp1 + '-' + gp2 + '.txt'
+conAll_T_plot_fname = data_path + 'TStat_GrandAvgConnectivityPlot_' + freq + '_' + gp1 + '-' + gp2 + '.png'
+
+con_t = np.empty((68,68))
+con_t.fill(0)
+for i in range (0, 68):
+    for j in range(0,68):
+        l_mean = (lcon_res1[i,j] + lcon_res2[i,j] + lcon_res3[i,j] + lcon_res4[i,j] )/4
+        r_mean = (rcon_res1[i,j] + rcon_res2[i,j] + rcon_res3[i,j] + rcon_res4[i,j] )/4
+        l_a = [lcon_res1[i,j], lcon_res2[i,j], lcon_res3[i,j], lcon_res4[i,j]]
+        l_std = float(np.std(l_a))
+        #print l_std
+        r_a = [rcon_res1[i,j], rcon_res2[i,j], rcon_res3[i,j], rcon_res4[i,j]]
+        r_std = float(np.std(r_a))
+        #print r_std
+        l_var = pow(l_std, 2)
+        r_var = pow(r_std, 2)
+        print l_var, r_var
+        if l_mean == 0 and r_mean == 0:
+            t = float(0)
+        else:
+            s_lr = np.sqrt((l_var + r_var)/2)
+            s_lr = float(s_lr * np.sqrt(0.5))
+            t = (l_mean - r_mean)
+            print s_lr
+            t = t/s_lr
+        print t 
+        con_t[i,j] = t 
+    print 
+print con_t 
+np.savetxt(conAll_T_matrix_fname, con_t)
 ##############################################################################################
 ##############################################################################################
 ###############Plotting the Conn##################
@@ -142,12 +150,24 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
+plot_connectivity_circle(con_t, label_names, n_lines=300,
+                         node_angles=node_angles, node_colors=label_colors,
+                         title='Coherence - T stats ('+ gp1 + '-' +gp2 +') - '+ freq)
+import matplotlib.pyplot as plt
+plt.savefig(conAll_T_plot_fname, facecolor='black')
+#plt.show()
+
+################
+#########Plot the difference 
+##############3
+# Plot the graph using node colors from the FreeSurfer parcellation. We only
+# show the 300 strongest connections.
 plot_connectivity_circle(diff_con, label_names, n_lines=300,
-                         node_angles=node_angles, node_colors=label_colors,vmin = 0.10, vmax = 1.00,
-                         title='Coherence Difference ('+ gp1 + '-' +gp2 +') - '+ freq)
+                         node_angles=node_angles, node_colors=label_colors,vmin = 0.0, vmax = 1.0,
+                         title='Coherence - Difference ('+ gp1 + '-' +gp2 +') - '+ freq)
 import matplotlib.pyplot as plt
 plt.savefig(conAll_diff_plot_fname, facecolor='black')
-#plt.show()
+
 ## Plot connectivity for both methods in the same plot
 #fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
 #no_names = [''] * len(label_names)
@@ -157,5 +177,5 @@ plt.savefig(conAll_diff_plot_fname, facecolor='black')
 #                             title=method, padding=0, fontsize_colorbar=6,
 #                             fig=fig, subplot=(1, 2, ii + 1))
 #plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_coh_imcoh_' + freq + '.png', facecolor='black')
-plt.show()
+#plt.show()
     
