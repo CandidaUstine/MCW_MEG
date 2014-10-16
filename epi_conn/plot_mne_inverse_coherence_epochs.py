@@ -71,13 +71,12 @@ print fmax
 fname_fwd = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-fwd.fif'
 evoked_fname = data_path + 'ave_projon/'+ subj + '_run1_All-ave.fif'
 coh_fname = data_path + 'coh/' + subj + '_' + freq + '_subj_connectivityMatrix.txt'
+plv_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_plv_ConnectivityMatrix.txt'
+pli_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_pli_ConnectivityMatrix.txt'
 cov_fname = data_path + 'cov/emptyroom-cov.fif'
 raw_file = data_path + 'run1_raw.fif'
 cohLog_file = data_path + 'logs/'+ subj + '_' + freq + '_coherence.log'
-event_file = data_path + 'eve/run1.eve'
-#Lbrain_image = data_path + 'coh/run1_%s_left.png' %label_name_lh
-#Rbrain_image = data_path + 'coh/run1_%s_right.png' %label_name_lh
-#stc_file = data_path + 'ave_projon/stc/'+ subj + '_run1-spm-lh.stc' 
+event_file = data_path + 'eve/run1.eve' 
 mne.set_log_file(fname = cohLog_file, overwrite = True)
 
 print evoked_fname 
@@ -167,77 +166,6 @@ stcs = apply_inverse_epochs(epochs, inverse_operator, lambda2, method,
 #teststc_fname = data_path + 'ave_projon/stc/'+ subj + '_run1-spm-test-lh.stc' 
 #stcs.save(teststc_fname)
 
-################################################################################################3
-## Now we are ready to compute the coherence in the alpha and beta band.
-## fmin and fmax specify the lower and upper freq. for each band, resp.
-#fmin = (8., 13.)
-#fmax = (13., 25.)
-####Only the Alpha Band                                                         
-##fmin = 8.
-##fmax = 14.                            
-#sfreq = raw.info['sfreq']  # the sampling frequency
-#
-## Now we compute connectivity. To speed things up, we use 2 parallel jobs
-## and use mode='fourier', which uses a FFT with a Hanning window
-## to compute the spectra (instead of multitaper estimation, which has a
-## lower variance but is slower). By using faverage=True, we directly
-## average the coherence in the alpha and beta band, i.e., we will only
-## get 2 frequency bins
-#coh, freqs, times, n_epochs, n_tapers = spectral_connectivity(stcs,
-#    method='coh', mode='fourier', indices=indices,
-#    sfreq=sfreq, fmin=fmin, fmax=fmax, faverage=True, n_jobs=2)
-#
-#print('Frequencies in Hz over which coherence was averaged for alpha: ')
-#print(freqs[0])
-#print('Frequencies in Hz over which coherence was averaged for beta: ')
-#print(freqs[1])
-#print 
-#print coh 
-##
-#np.savetxt('/home/custine/MEG/data/epi_conn/EP3/coh/coherence.txt', coh, delimiter = ' ')
-#################################################################################################3
-## Generate a SourceEstimate with the coherence. This is simple since we
-## used a single seed. For more than one seeds we would have to split coh.
-## Note: We use a hack to save the frequency axis as time
-#tmin = np.mean(freqs[0])
-#tstep = np.mean(freqs[1]) - tmin
-#
-#coh_stc = mne.SourceEstimate(coh, vertices=stc.vertno, tmin=1e-3 * tmin,
-#                             tstep=1e-3 * tstep, subject='EP3')
-#                             
-#print coh_stc 
-#import os                              
-#os.environ["subjects_dir"] = "/home/custine/MRI/structurals/subjects/"
-#
-## Now we can visualize the coherence using the plot method
-#brainR = coh_stc.plot('EP3', 'inflated', 'rh', fmin=0.25, fmid=0.4,
-#                     fmax=0.65, time_label='Coherence %0.1f Hz',
-#                     subjects_dir=subjects_dir)
-#brainR.set_data_time_index(0)
-#brainR.show_view('lateral')
-#brainR.save_image(Rbrain_image)
-#
-## Now we can visualize the coherence using the plot method
-#brainL = coh_stc.plot('EP3', 'inflated', 'lh', fmin=0.25, fmid=0.4,
-#                     fmax=0.65, time_label='Coherence %0.1f Hz',
-#                     subjects_dir=subjects_dir)
-#brainL.set_data_time_index(0)
-#brainL.show_view('lateral')
-#brainL.save_image(Lbrain_image)
-
-####################################################################################3
-##
-
-##coh, freqs, times, n_epochs, n_tapers = spectral_connectivity(stcs, method='coh', mode='fourier', indices=indices, sfreq=sfreq, 
-##                                                              fmin=fmin, fmax=fmax, faverage=True, n_jobs=2)
-##print coh    
-##print freqs
-##print n_epochs
-##print n_tapers
-##print 
-##    
-##np.savetxt('/home/custine/MEG/data/epi_conn/EP3/coh/coherence.txt', coh, delimiter = ' ')
-##    
 #######################################################################################3
 #######Connectivity Circle Plotting############
 print inverse_operator['src']
@@ -245,6 +173,12 @@ from mne.viz import circular_layout, plot_connectivity_circle
 # Get labels for FreeSurfer 'aparc' cortical parcellation with 34 labels per hemi
 labels, label_colors = mne.labels_from_parc(subj, parc='aparc', subjects_dir=subjects_dir) ##or use read_labels_from_annot() 
 print labels
+
+label_names = [label.name for label in labels]
+#for label in label_names:
+#    print label 
+#  #  print 
+
 #print labels[:-1] #### TO GET RID OF UNKNOWN LABEL.LH 
 #labels = labels[:-1]
 #print 
@@ -253,6 +187,11 @@ print
 src = inverse_operator['src']
 label_ts = mne.extract_label_time_course(stcs, labels, src, mode = 'mean', return_generator=True)
 print label_ts
+print 'Jane Here ---------------------------------------------------'
+print 
+print '--------------------------'
+print 
+
 #np.savetxt('/home/custine/MEG/data/epi_conn/EP1/coh/coherence_label_ts.txt', label_ts)
 ####################################
 ##################################################3333
@@ -268,7 +207,7 @@ print label_ts
 # #fmin = 4.
 # #fmax = 8.
 sfreq = raw.info['sfreq']  # the sampling frequency
-con_methods = ['coh', 'imcoh']
+con_methods = ['plv', 'pli']
 con, freqs, times, n_epochs, n_tapers = spectral_connectivity(label_ts,
         method=con_methods, mode='fourier', sfreq=sfreq, fmin=fmin,
         fmax=fmax, faverage=True)      
@@ -280,11 +219,12 @@ for method, c in zip(con_methods, con):
 print con_res
 
 ####Save ConnectivityMatrix as text file for fuirther averaging 
-np.savetxt(coh_fname, con_res['coh'], delimiter = ',')
-##
-#################################################################################################
-##################### OR #######################
-######Read from text - coherence matrix file and plot the connectivity circle. :) 
+#np.savetxt(coh_fname, con_res['coh'], delimiter = ',')
+np.savetxt(plv_fname, con_res['plv'], delimiter = ',')
+np.savetxt(pli_fname, con_res['pli'], delimiter = ',')
+##################################################################################################
+###################### OR #######################
+#######Read from text - coherence matrix file and plot the connectivity circle. :) 
 #con_res1 = np.loadtxt(coh_fname, delimiter = ',')
 
 
@@ -322,20 +262,16 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
-plot_connectivity_circle(con_res1, label_names, n_lines=300, ##con_res['coh']
+plot_connectivity_circle(con_res['plv'], label_names, n_lines=300, ##con_res['coh'] or con_res1 if reading directly from text file - see commented section above 
                          node_angles=node_angles, node_colors=label_colors,
-                         title='All-to-All Connectivity(Coherence)-'+ freq, vmin = 0.40, vmax = 1.00)
+                         title='All-to-All Connectivity(PLV)-'+ freq, vmin = 0.40, vmax = 1.00)
 import matplotlib.pyplot as plt
-plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_' + freq + '.png', facecolor='black')
+plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_PLV_' + freq + '.png', facecolor='black')
 
-## Plot connectivity for both methods in the same plot
-#fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
-#no_names = [''] * len(label_names)
-#for ii, method in enumerate(con_methods):
-#    plot_connectivity_circle(con_res[method], no_names, n_lines=300,
-#                             node_angles=node_angles, node_colors=label_colors,
-#                             title=method, padding=0, fontsize_colorbar=6,
-#                             fig=fig, subplot=(1, 2, ii + 1))
-#plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_coh_imcoh_' + freq + '.png', facecolor='black')
-#plt.show()
-    
+# Plot the graph using node colors from the FreeSurfer parcellation. We only
+# show the 300 strongest connections.
+plot_connectivity_circle(con_res['plv'], label_names, n_lines=300, ##con_res['coh'] or con_res1 if reading directly from text file - see commented section above 
+                         node_angles=node_angles, node_colors=label_colors,
+                         title='All-to-All Connectivity(PLI)-'+ freq, vmin = 0.0, vmax = 1.00)
+import matplotlib.pyplot as plt
+plt.savefig('/home/custine/MEG/data/epi_conn/' + subj + '/coh/' + subj + '_circle_PLI_' + freq + '.png', facecolor='black')
