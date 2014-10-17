@@ -48,12 +48,12 @@ elif group == 'Right':
 # Set parameters
 data_path = '/home/custine/MEG/results/source_level/ConnectivityPlots/' # + subj + '/'
 subjects_dir = '/home/custine/MRI/structurals/subjects/'
-con1_fname = '/home/custine/MEG/data/epi_conn/'+ subj1 + '/coh/' + subj1 +'_' + freq+ '_subj_connectivityMatrix.txt'
-con2_fname = '/home/custine/MEG/data/epi_conn/'+ subj2 + '/coh/' + subj2 +'_' + freq+ '_subj_connectivityMatrix.txt'
-con3_fname = '/home/custine/MEG/data/epi_conn/'+ subj3 + '/coh/' + subj3 +'_' + freq+ '_subj_connectivityMatrix.txt'
-con4_fname = '/home/custine/MEG/data/epi_conn/'+ subj4 + '/coh/' + subj4 +'_' + freq+ '_subj_connectivityMatrix.txt'
-conAll_plot_fname = data_path + 'GrandAvgConnectivityPlot_' + freq + '_' + group  + '.png'
-conAll_matrix_fname = data_path + 'GrandAvgConnectivityMatrix_' + freq + '_' + group + '.txt'
+con1_fname = '/home/custine/MEG/data/epi_conn/'+ subj1 + '/coh/' + subj1 +'_' + freq+ '_subj_plv_ConnectivityMatrix.txt'
+con2_fname = '/home/custine/MEG/data/epi_conn/'+ subj2 + '/coh/' + subj2 +'_' + freq+ '_subj_plv_ConnectivityMatrix.txt'
+con3_fname = '/home/custine/MEG/data/epi_conn/'+ subj3 + '/coh/' + subj3 +'_' + freq+ '_subj_plv_ConnectivityMatrix.txt'
+con4_fname = '/home/custine/MEG/data/epi_conn/'+ subj4 + '/coh/' + subj4 +'_' + freq+ '_subj_plv_ConnectivityMatrix.txt'
+conAll_plot_fname = data_path + 'PLV_GrandAvgConnectivityPlot_' + freq + '_' + group  + '.png'
+conAll_matrix_fname = data_path + 'PLV_GrandAvgConnectivityMatrix_' + freq + '_' + group + '.txt'
 
 ##################################################################################3
 ################Averaging Conn-coherence matrices #####################################3
@@ -105,11 +105,11 @@ node_angles = circular_layout(label_names, node_order, start_pos=90,
 # Plot the graph using node colors from the FreeSurfer parcellation. We only
 # show the 300 strongest connections.
 plot_connectivity_circle(grand_con, label_names, n_lines=300,
-                         node_angles=node_angles, node_colors=label_colors,vmin = 0.60, vmax = 1.00,
-                         title='All-to-All Connectivity(Coherence)- Grand Average - ' + freq)
+                         node_angles=node_angles, node_colors=label_colors,vmin = 0.50, vmax = 1.00,
+                         title='All-to-All Connectivity(PLV)- Grand Average - ' + freq)
 import matplotlib.pyplot as plt
 plt.savefig(conAll_plot_fname, facecolor='black')
-#plt.show()
+plt.show()
 ## Plot connectivity for both methods in the same plot
 #fig = plt.figure(num=None, figsize=(8, 4), facecolor='black')
 #no_names = [''] * len(label_names)
