@@ -76,6 +76,7 @@ print
 label_names = [label.name for label in labels]
 print label_names[:-1] #### TO GET RID OF UNKNOWN LABEL.LH 
 label_names = label_names[:-1]
+
 lh_labels = [name for name in label_names if name.endswith('lh')]
 print len(lh_labels)
 
@@ -92,7 +93,8 @@ lh_labels = [label for (ypos, label) in sorted(zip(label_ypos, lh_labels))]
 
 # For the right hemi
 rh_labels = [label[:-2] + 'rh' for label in lh_labels]
-print rh_labels
+
+    
 
 # Save the plot order and create a circular layout
 node_order = list()
