@@ -42,7 +42,7 @@ for runID in runs:
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
     #dataWord_file =  data_path + 'kr3/' + subjID + '/' + 'word_sentences0' + runID + '.txt'
     dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + 'word_sentences' + runID + '.txt'
-    #print wordList_file
+    print eprime_file
     
     tempA = 1
     tempB = 1
@@ -70,6 +70,7 @@ for runID in runs:
         myFile2 = open(wordList_file, "r")
         myFile3 = open(sentList_file, "r")
         myFile4 = open(dataWord_file, "w")
+        print "jane here"
         
     ############################ 
     #E Prime spreadsheet
@@ -123,10 +124,10 @@ for runID in runs:
             sentWord_tags.append(lineTemp[leng-1].split('.')[0]) ##To remove the full stop at the end of the sentence. 
             sentWordLine_tags.append(sentWord_tags)
     
-        myFile4.write('0')
-        myFile4.write("\t")
-        myFile4.write('0')
-        myFile4.write("\n")
+#        myFile4.write('0') ##************
+#        myFile4.write("\t")
+#        myFile4.write('0')
+#        myFile4.write("\n")
         for ii in range(0, len(sentID)): #len(sentID)):
              x = int(sentID[ii])
              new = []
