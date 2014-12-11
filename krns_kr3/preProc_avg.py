@@ -61,6 +61,7 @@ def mnepy_avg(subjID, sessID, eve):
     ####################################
     #######Compute averages for each run 
  #   evoked=[]
+    
     evokedRuns =[]
     for runID in runs:
             print runID
@@ -69,8 +70,8 @@ def mnepy_avg(subjID, sessID, eve):
             event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
             print event_file
             
-            raw_file = data_path + '/' + subjID + '_' + sessID+ '_' + runID + '_raw.fif' ##Change this suffix if you are using SSP 
-            avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'_py-ave.log'
+            raw_file = data_path + '/' + subjID + '_' + sessID+ '_' + runID + '_raw.fif' ##Change this suffix if you are using SSP ##_clean_ecg_
+            avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'-ave.log'
             print raw_file, avgLog_file
     #        
             ##Setup Reading fiff data structure
@@ -90,7 +91,7 @@ def mnepy_avg(subjID, sessID, eve):
                 picks.append(i)
                 
             ##Read Epochs and compute Evoked :) 
-            print 'Reading Epochs from revokedaw file...'
+            print 'Reading Epochs from evoked raw file...'
             epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, name = condName, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
             print epochs
             evoked = [epochs[cond].average(picks =picks) for cond in event_id]
@@ -102,9 +103,9 @@ def mnepy_avg(subjID, sessID, eve):
             evokedRuns.append(evoked)
             print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
 
-#    #        ###############################################################################
-#    #        #Show the Result - Plotting the evoked data
-#    #        mne.viz.evoked.plot_evoked(evoked, exclude = [])
+    #        ###############################################################################
+    #        #Show the Result - Plotting the evoked data
+    #        mne.viz.evoked.plot_evoked(evoked, exclude = [])
     
     print len(evokedRuns)
     
