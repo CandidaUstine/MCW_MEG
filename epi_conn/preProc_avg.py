@@ -4,7 +4,7 @@ Created on Fri Oct  3 11:28:29 2014
 
 @author: custine
 Usage: python preProc_avg.py subjID 
-Example: python preProc_avg.py EP1 
+Example: python preProc_avg.py EP1 DFNAM
 """
 
 import sys
@@ -25,21 +25,23 @@ def mnepy_avg(subjID,run):
 
     
     ########Analysis Parameters##
-    ###Event file suffix 
-    eveSuffix = '.eve' 
-    eve_file = run + eveSuffix #eve + eveSuffix 
-    print "You have chosen the event file " + eve_file
+
     
     ###Projection and Average Reference and Filtering
     projVal = True
     avgRefVal = False
     hp_cutoff = 0.7
     lp_cutoff = 40 
-    event_id = None
+    event_id = 2
     #######Experiment specific parameters 
     ###TimeWindow
     tmin = 0
-    tmax = 2 ##float(cc.epMax[eve])
+    tmax = 2.0 ##float(cc.epMax[eve])
+    
+    if run == 'CRM':
+        tmax = 1.0 
+    elif run == 'DFNAM':
+        tmax = 2.0
     ########Artifact rejection parameters
     ###General
     gradRej = 2000e-13
@@ -48,8 +50,16 @@ def mnepy_avg(subjID,run):
     gradFlat = 1000e-15
     ####################################
     #######Compute averages for each run 
- #   evoked=[]
+# #   evoked=[]
+#    if subjID == 'EP2':
+#        runs = ['run1', 'run2', 'run3']
+    
     evokedRuns =[]
+#    for run in runs:
+        ###Event file suffix 
+    eveSuffix = '.eve' 
+    eve_file = run + eveSuffix #eve + eveSuffix 
+    print "You have chosen the event file " + eve_file
     ##Setup Subject Speciifc Information
     data_path = '/home/custine/MEG/data/epi_conn/' +subjID
     event_file = data_path + '/eve/' + eve_file
@@ -79,12 +89,12 @@ def mnepy_avg(subjID,run):
     print 'Reading Epochs from evoked file...'
     epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), proj = True, picks = picks, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
     print epochs
-    evoked = [epochs.average(picks =picks)]
+    evoked = [epochs.average(picks =None)]
     #    #        epochs.plot()
     
     ##Write Evoked 
     print 'Writing Evoked data to -ave.fif file...' 
-    fiff.write_evoked(data_path + '/ave_projon/' + run +'-ave.fif', evoked)
+    fiff.write_evoked(data_path + '/ave_projon/' + run +'-noise-ave.fif', evoked)
     evokedRuns.append(evoked)
     print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
 #
@@ -93,31 +103,31 @@ def mnepy_avg(subjID,run):
 ##    #        mne.viz.evoked.plot_evoked(evoked, exclude = [])
 #    
     print len(evokedRuns)
-    
-    ##Make the Final Grand average of all the runs
-    runData = []
-    runNave = []
 
-    newEvoked = copy.deepcopy(evoked)
-    numCond = len(newEvoked)
-    print 'Length', numCond
-    for c in range(numCond):
-        for evRun in evokedRuns:
-            runData.append(evRun[c].data)
-            runNave.append(evRun[c].nave)
-        print 'Jane Here', c, runNave    
-        gaveData = numpy.mean(runData,0)
-        gaveNave = numpy.sum(runNave)
-        print 'Sum', sum(runNave)
-    
-        newEvoked[c].data = gaveData
-        newEvoked[c].nave = gaveNave
-        
-        runData = []
-        runNave = []
-    
-    ##Write Grand average Evoked     
-    fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' +run +'_All-ave.fif', newEvoked)
+#    ##Make the Final Grand average of all the runs
+#    runData = []
+#    runNave = []
+#    
+#    newEvoked = copy.deepcopy(evoked)
+#    numCond = len(newEvoked)
+#    print 'Length', numCond
+#    for c in range(numCond):
+#        for evRun in evokedRuns:
+#            runData.append(evRun[c].data)
+#            runNave.append(evRun[c].nave)
+#        print 'Jane Here', c, runNave    
+#        gaveData = numpy.mean(runData,0)
+#        gaveNave = numpy.sum(runNave)
+#        print 'Sum', sum(runNave)
+#    
+#        newEvoked[c].data = gaveData
+#        newEvoked[c].nave = gaveNave
+#        
+#        runData = []
+#        runNave = []
+#    
+#    ##Write Grand average Evoked     
+#    fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_All-ave.fif', newEvoked)
 
 
 if __name__ == "__main__":
