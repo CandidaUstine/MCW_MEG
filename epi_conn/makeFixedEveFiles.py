@@ -26,7 +26,7 @@ eegRej = 100e-6
 magFlat = 1e-14
 gradFlat = 1000e-15
 picks = []
-event_id, tmin, tmax = 1, 0.0, 2.0
+event_id, tmin, tmax = 1, 0.0, 1.0 ##for CRM and DFNAM using 1 sec epochs for others use 2 second 
 
 data_path = '/home/custine/MEG/data/epi_conn/' + subjID + '/'
 raw_fname = data_path + runName + '_raw.fif'
@@ -37,8 +37,9 @@ evoked_fname = data_path + 'ave_projon/' + runName + '-ave.fif'
 #########
 # #Read Raw file 
 raw = mne.io.Raw(raw_fname)
+print raw.info
 print(raw.info['ch_names'])
-picks = mne.pick_types(raw.info, meg= True, eeg = True, eog = True, stim = True, exclude = [])
+picks = mne.pick_types(raw.info, meg= True, eeg = False, eog = True, stim = True, exclude = [])
 print picks
 
 # #Epoch data into 5s intervals
@@ -50,6 +51,6 @@ epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), pick
 print epochs
 epochs.save(epoch_fname)
 
-evoked = epochs.average(picks = picks)
+evoked = epochs.average(picks = None)
 evoked.save(evoked_fname)
 print evoked
