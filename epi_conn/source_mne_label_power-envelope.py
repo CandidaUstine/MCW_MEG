@@ -10,7 +10,7 @@ Created on Thu Oct 23 17:00:34 2014
 ==============================================================
 power envelope
 ==============================================================
-
+example: python source_mne_label_power-envelope.py EP6 beta CRM-noise
 """
 
 
@@ -35,9 +35,12 @@ import argparse
 parser = argparse.ArgumentParser(description='Get input')
 parser.add_argument('subj',type=str) ##EP1
 parser.add_argument('freq',type=str) ## alpha or beta or gamma or theta 
+parser.add_argument('run',type=str)
+
 args=parser.parse_args()
 subj = args.subj
 freq = args.freq
+run = args.run
 print subj
 print freq
 #######################################
@@ -67,27 +70,34 @@ elif freq == 'gamma':
 print fmin
 print fmax 
 
+event_id = 1
+tmin = 0
+tmax = 2.0 
 #################################3
 #############VARIABLES##############
 ###################################
-run = 'DFNAM'
-event_id = 1
-tmin = 0
-tmax = 1.0 # Use a lower tmax to reduce multiple comparisons
+if run == 'CRM':
+    event_id = 2
+    tmin = 0
+    tmax = 1.0  
+elif run == 'DFNAM':
+    event_id = 2
+    tmin = 0
+    tmax = 2.0
 
 #fname_inv = data_path + 'ave_projon/'+ subj + '_run1-ave-7-meg-inv.fif'
-fname_fwd = data_path + 'ave_projon/'+ subj + '_' + run + '-ave-7-meg-fwd.fif' #for EP2 _All For EP% and EP^ also do CRM and DFNAM incl run1 
-evoked_fname = data_path + 'ave_projon/'+ subj + '_' + run + '_All-ave.fif' #for EP2 All
-coh_fname = data_path + 'coh/' + subj + '_' + freq + '_subj_connectivityMatrix.txt'
-plv_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_plv_ConnectivityMatrix.txt'
-pli_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_pli_ConnectivityMatrix.txt'
+fname_fwd = data_path + 'ave_projon/'+ subj + '_' + run + '-noise-ave-7-meg-fwd.fif' #for EP2 _All For EP% and EP^ also do CRM and DFNAM incl run1 
+#evoked_fname = data_path + 'ave_projon/'+ subj + '_' + run + '_All-ave.fif' #for EP2 All
+#coh_fname = data_path + 'coh/' + subj + '_' + freq + '_subj_connectivityMatrix.txt'
+#plv_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_plv_ConnectivityMatrix.txt'
+#pli_fname = data_path + 'coh/' + subj+ '_' + freq + '_subj_pli_ConnectivityMatrix.txt'
 cov_fname = data_path + 'cov/emptyroom-cov.fif'
 raw_file = data_path + run + '_raw.fif'
 cohLog_file = data_path + 'logs/'+ subj + '_' + freq + '_' + run + '_coherence.log'
 event_file = data_path + 'eve/' + run + '.eve' 
 mne.set_log_file(fname = cohLog_file, overwrite = True)
 stc_fname = data_path + 'ave_projon/stc_py/'+ subj + '_' + run
-powenv_fname = data_path + 'coh/' + subj +'_' + freq + '_' + run + '_powEnv_LabelsMatrix.txt'
+powenv_fname = data_path + 'coh/' + subj +'_' + freq + '_' + run + '-noise_powEnv_LabelsMatrix.txt'
 print fname_fwd 
 print 
 
@@ -202,7 +212,8 @@ elif subj == 'EP8':
     x = 2001
 else: x = 3001
 
-x = 1001 #for CRM and DFNAM 
+if run == 'CRM': x = 1001 #for CRM and DFNAM 
+elif run == 'DFNAM': x = 2001
 
 
 new = np.empty([0, x])
