@@ -6,7 +6,7 @@ Estimate covariance matrix from a raw FIF file
 ==============================================
 
 Usage: python preProc_cov.py subjID sessID eve
-Example: python preProc_cov.py 9511 s1 Word
+Example: python preProc_cov.py 9511 s1 Word/Noun_People/Noun_Place
 
 """
 # Author: Alexandre Gramfort <alexandre.gramfort@telecom-paristech.fr>
@@ -44,7 +44,7 @@ for row in labelList:
     event_id[row[1]] = int(row[0])
     condName[row[1]] = row[1]
 print event_id
-
+tmin, tmax = -0.2, 0.5
 #runs = cc.runDict['Word']
 runs = ['emptyroom'] #, 'run1', 'run2'] ###For other runs use the baseline and set tmin/tmax using epoched data. 
 #print runs
@@ -56,7 +56,7 @@ for runID in runs:
         fname = data_path +'/'+ subjID + '_'+ sessID +'_'+runID +'_raw.fif'
         print fname
         cname = data_path +'/cov/'+ subjID + '_'+ sessID +'_' + runID + '-cov.fif'
-        covLog_file = data_path + '/cov/logs/' +subjID + '_' + sessID+ '_'+runID + '_cov.log'
+        covLog_file = data_path + '/logs/' +subjID + '_' + sessID+ '_'+runID + '_cov.log'
         event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
         mne.set_log_file(fname = covLog_file, overwrite = True)
         print covLog_file
