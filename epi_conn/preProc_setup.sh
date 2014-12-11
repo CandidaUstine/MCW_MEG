@@ -20,16 +20,26 @@ cd /home/custine/MEG/data/epi_conn/$1/
 set subj_dir = '/home/custine/MEG/data/epi_conn/'$1'/'
 
 mkdir eve -m g+rws
-mkdir ssp -m g+rws
-mkdir ssp/fieldtrip -m g+rws
+mkdir eve/mod -m g+rws
+mkdir eve/triggers -m g+rws
+mkdir ave -m g+rws
 mkdir cov -m g+rws
-mkdir logs -m g+rws
+mkdir cov/logs -m g+rws
 mkdir ave_projon -m g+rws
+mkdir ave_projoff -m g+rws
 mkdir ave_projon/logs -m g+rws
 mkdir ave_projon/plots -m g+rws
 mkdir ave_projon/stc -m g+rws
+mkdir ave_projoff/logs -m g+rws
+mkdir ave_projoff/plots -m g+rws
+mkdir ave_projoff/plots/fieldtrip -m g+rws
+mkdir ave_projon/plots/fieldtrip -m g+rws
+mkdir ssp -m g+rws
+mkdir ssp/fieldtrip -m g+rws
+mkdir ssp/mne -m g+rws
+mkdir rej -m g+rws
+mkdir logs -m g+rws 
 mkdir fig -m g+rws
-mkdir orig -m g+rws
 
 if ( ! -d "orig" ) then
 	mkdir orig
