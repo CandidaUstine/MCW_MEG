@@ -2,20 +2,19 @@
 
 ##Created on Wed Apr  2 14:45:27 2014
 ##author: custine
-## for krns_kr3
+## for krns_kr3 pilot study 
 
 ##Usage: ./makeInv.sh subjID sessID par
 ##Ex: ./makeInv.sh 9367 s5 Word
 
 echo "Subject ID: " 
 echo $1 
-echo "Session ID: " 
-echo $2
+
 set subj_dir = /home/custine/MEG/data/krns_kr3/$1/$2
-set surf_dir = /mnt/file1/binder/KRNS/anatomies/surfaces
+set surf_dir = /mnt/file1/binder/KRNS/anatomies/surfaces/
 setenv SUBJECTS_DIR $surf_dir
 setenv SUBJECT $1
-set log = /home/custine/MEG/data/krns_kr3/$1/$2/logs/$1_$2_$3_makeInv.log
+set log = /home/custine/MEG/data/krns_kr3/$1/logs/$1_makeInv.log
 
 ##Remove the existing log file
 if ( -e $log ) then
@@ -37,9 +36,9 @@ pwd
 foreach t ('meg')
    foreach run ($runList)
         echo $run
-	mne_do_inverse_operator --fwd $1_$2_{$run}_$3-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov ../cov/$1_$2_emptyroom-cov.fif --inv $1_$2_{$run}_$3-ave-7-$t-inv.fif >>&$log 
+	mne_do_inverse_operator --fwd $1_$2_{$run}_$3-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov ../cov/$1_$2_*cov.fif --inv $1_$2_{$run}_$3-ave-7-$t-inv.fif >>&$log 
    end
-   mne_do_inverse_operator --fwd $1_$2_$3_All-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov ../cov/$1_$2_emptyroom-cov.fif --inv $1_$2_$3_All-ave-7-$t-inv.fif >>&$log 
+   mne_do_inverse_operator --fwd $1_$2_$3_All-ave-7-$t-fwd.fif --depth --loose 0.5 --$t --senscov ../cov/$1_$2_*-cov.fif --inv $1_$2_$3_All-ave-7-$t-inv.fif >>&$log 
 end 
 
 ##Create Morph maps between the subject space and fsaverage 
