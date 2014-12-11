@@ -25,7 +25,7 @@ if ( $#argv == 2 ) then
     echo "Logging to default log..." >>& $log
 endif
 
-set runList = (run1)
+set runList = (DFNAM-noise CRM-noise) # run 2 run3 run1 CRM DFNAM 
 
 cd $subj_dir/ave_projon/
 pwd
@@ -39,7 +39,14 @@ foreach m ('meg')
    end
 end
 
-
+echo "Averaging Forward Solutions..."
+foreach m ('meg')
+	#mne_average_forward_solutions \
+	#--fwd $1_run1-ave-7-$m-fwd.fif \
+	#--fwd $1_run2-ave-7-$m-fwd.fif \
+	#--fwd $1_run3-ave-7-$m-fwd.fif \
+	#--out $1_All-ave-7-$m-fwd.fif ##>>&log
+end
 
 
 
