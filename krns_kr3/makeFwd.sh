@@ -4,7 +4,7 @@
 ##@author: custine
 ##Script for Krns_kr3 study 
 ##./makeFwd.sh subjID sessID par
-## ./makeFwd.sh 9367 s5 Word/AllItems/Noun
+## ./makeFwd.sh 9367 s5 Word/AllItems/Noun/Noun_People/Noun_People_ssp
 
 echo "Subject ID: " 
 echo $1 
