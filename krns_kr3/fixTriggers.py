@@ -10,6 +10,8 @@ Example: fixTriggers.py 9367 5
 import os 
 import os.path
 import argparse
+from email.mime.text import MIMEText
+import smtplib
 
 ####### Get Input ########
 parser = argparse.ArgumentParser(description='Get input')
@@ -129,7 +131,21 @@ for runID in runs:
         print "Done! See resulting file in " + Modeve_file      
     
     
-    
+#construct the message
+sender = "candida.ustine@gmail.com"
+receiver = "candy.ustine@gmail.com"
+message = Modeve_file
+msg = MIMEText(message)
+msg["From"] = sender
+msg["To"] = receiver
+msg["Subject"] = "Ready Jane"    
+   
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls() 
+
+server.sendmail(sender, receiver, msg.as_string())
+
+server.quit()
     
     
     
