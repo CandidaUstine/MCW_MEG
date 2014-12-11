@@ -96,6 +96,8 @@ cfg = ft_artifact_jump(cfg)
 %cfg.channel = {'all', '-refchan'};
 cfg.channel = meg
 cfg.layout    = 'neuromag306mag.lay'
+cfg.trl = samples
+
 
 % You can now preprocess the data:
 data = ft_preprocessing(cfg)
