@@ -7,7 +7,7 @@ codes = {
          'Adverb': ('1'),
          'Noun_People': ('1'),
          'Noun_Place': ('1'),
-         'run6': ('1'),
+         'run6': ('1', '2', '3'),
          'run7': ('1'),
          'run8': ('1'),
          'run9': ('1'),
