@@ -111,7 +111,6 @@ echo "Extracted events saved in the /eve folder" >>& $log
 rm *raw-eve.fif
 #rm eve/*.eve
 
-
 #############################################################
 ###Marking bad channels
 echo
