@@ -26,7 +26,7 @@ endS = []
 
 %% OPTION 1: Keep this (and comment out OPTION 2) IF you are proceeding with Averaging after ICA analysis. 
 for i = 1:len
-   if Fevents(i).value == condNum %% Enter trigger number/value of the interested event
+   if Fevents(i).value == 1 %% Enter trigger number/value of the interested event
        F = [F, Fevents(i).sample];
    end
 end
@@ -74,8 +74,8 @@ cfg.trl = samples
 % ICA To Remove ECG Artifacts
 cfg.trialdef.eventtype = 'all'
 
-%remove all jump and muscle artifacts before running your ICA
-cfg = ft_artifact_jump(cfg)
+% %remove all jump and muscle artifacts before running your ICA
+% cfg = ft_artifact_jump(cfg)
 [meg] = ft_channelselection('all', hdr.label) %% NOTE: MUST BE ALL CHANNELS FOR THE FT_PREPROCESSING STEP AND THEN WHEN YOU ARE DOING THE ICA YOU CAN JUST COMPUTE ON THE MAGNETOMETERS OR ALL MEG CHANNELS… :) IMPORTANT!!! 
 %cfg.channel = {'all', '-refchan'};
 cfg.channel = meg
