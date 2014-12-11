@@ -6,9 +6,13 @@
 
 date 
 
+echo $2
+date
+
 setenv SUBJECT $2
 set BEM_METHOD = WATER 
-set surf_dir = '/home/custine/MRI/structurals/subjects/$2/'
+set surf_dir = /home/custine/MRI/structurals/subjects
+set subj_dir = /home/custine/MEG/data/$1/$2/
 
 if ($1 == 'krns_kr3') then 
     echo "Study Name: " 
@@ -18,6 +22,7 @@ if ($1 == 'krns_kr3') then
     setenv SUBJECTS_DIR $surf_dir
 endif
 set log = /home/custine/MEG/data/$1/$2/logs/$2_preAnat.log
+setenv SUBJECTS_DIR $surf_dir
 
 ##remove the existing log file
 if ( -e $log ) then
@@ -41,30 +46,34 @@ echo "Hello! Make sure the Cortical surface reconstructions have been created fo
 
 #Setting up the anatomical MR images for MRILab 
 echo "Setting up the anatomical MR images for MRILab..." 
-mne_setup_mri --overwrite >>& $log 
+mne_setup_mri >>& $log 
 
 #Setting up the Source Space(creating a decimated dipole grid on the wm surface - default 7mm grid spacing)
 echo "Setting up the Source Space..."
 mne_setup_source_space >>& $log 
+mne_setup_source_space --ico 4 >>& $log 
 
 #Creating the BEM Model meshes 
 echo "Creating the BEM meshes..."
 echo "Using the Watershed method to create the surfaces"
-mne_watershed_bem --overwrite >>& $log
+mne_watershed_bem >>& $log
 cd $surf_dir/$2/bem
 
 ls
- 
 rm *.surf
 ln -s ./watershed/$2_outer_skin_surface outer_skin.surf
 ln -s ./watershed/$2_outer_skull_surface outer_skull.surf
 ln -s ./watershed/$2_inner_skull_surface inner_skull.surf
-#mv $SUBJECTS_DIR/$1/bem/$1-bem.fif $SUBJECTS_DIR/$1/bem/$1-orig-bem.fif
+mv $SUBJECTS_DIR/$2/bem/$2-bem.fif $SUBJECTS_DIR/$2/bem/$2-orig-bem.fif
 
 #Setting up the BEM surfaces for viewing 
-mne_setup_forward_model --surf --ico 4  >>& $log ##IF surfaces are not contained within each other in the proper manner then use the --innershift and --outershift tags in order to modify the surfaces while creating the forward model. 
+mne_setup_forward_model --surf --ico 4 >>& $log ##IF surfaces are not contained within each other in the proper manner then use the --innershift and --outershift tags in order to modify the surfaces while creating the forward model. 
+
 mne_make_scalp_surfaces >>& $log
-mv $surf_dir/$2/bem/$2-head.fif $surf_dir/$2/bem/$2-head-old.fif 
-ln $surf_dir/$2/bem/$2-head-medium.fif $surf_dir/$2/bem/$2/$2-head.fif
+mv $surf_dir/$2/bem/$2-head.fif $surf_dir/$2/bem/$2-head-old.fif >>& $log
+
+ln $surf_dir/$2/bem/$2-head-medium.fif $surf_dir/$2/bem/$2-head.fif >>& $log
+
+
 
 
