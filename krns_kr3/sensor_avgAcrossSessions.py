@@ -6,7 +6,8 @@ Created on Thu Dec 11 15:16:37 2014
 
 This scripts generates a new Grand Average of sessions within a subject. A new _gaSess-ave.fif file is created. 
 Usage: python sensor_grandAverage.py exp paradigm
-Example:  
+Example: python sensor_avgAcrossSessions.py 9511 Noun_Place
+
 """
 
 import numpy as np 
