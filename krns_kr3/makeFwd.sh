@@ -37,7 +37,7 @@ echo "Computing forward solutions for individual runs..."
 foreach m ('meg')
    foreach run ($runList)
       echo $run
-      mne_do_forward_solution --subject $1 --bem $1-5120-5120-5120-bem.fif --megonly --meas $1_$2_{$run}_$3-ave.fif --fwd $1_$2_{$run}_$3-ave-7-$m-fwd.fif --overwrite >>& $log
+      mne_do_forward_solution --subject $1 --bem $1-5120-5120-5120-bem.fif --mri COR-custine-$2.fif --megonly --meas $1_$2_{$run}_$3-ave.fif --fwd $1_$2_{$run}_$3-ave-7-$m-fwd.fif --overwrite >>& $log
    end
 end
 
