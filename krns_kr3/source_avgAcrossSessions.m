@@ -5,8 +5,7 @@ function source_avgAcrossSessions(subjID, exp,condNum,norm,type,numSamples)
 %%if you pick mne and norm=1, you should end up with something basically identical to
 %%spm
 %%numSamples: 1400 (-100 to 599.5sec and 2000Hz sampling rate) 
-
-%%ex: source_avgAcrossSubjs('MaskedMM_All', '0007.meg.',1,'spm',0,481)
+%%Ex: source_avgAcrossSessions('9367', 'Noun_Place_All', 1, 1, 'spm', 1400) 
 
 dataPath = ['/home/custine/MEG/data/krns_kr3/', subjID, '/'];
 sessList = {'s5', 's6', 's7', 's8'} 
