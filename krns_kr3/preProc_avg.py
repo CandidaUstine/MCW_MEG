@@ -12,7 +12,7 @@ import sys
 import os 
 import os.path
 
-def mnepy_avg(subjID, sessID, eve):
+def mnepy_avg(subjID, sessID, eve, ssp_type):
     import mne
     from mne import fiff
     from mne import viz
@@ -25,8 +25,15 @@ def mnepy_avg(subjID, sessID, eve):
     #######Get Input ##
     print subjID
     print sessID
-    print eve 
+    print eve
+    data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+    if ssp_type == 'run':
     
+        raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+        runSuffix = '_raw.fif'
+    elif ssp_type == 'ecg' or ssp_type == 'eog':
+        raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID + '/ssp/mne'
+        runSuffix = '_clean_' + ssp_type + '_raw.fif'
     ########Analysis Parameters##
     ###Event file suffix 
     eveSuffix = '-TriggersMod.eve' 
@@ -66,12 +73,12 @@ def mnepy_avg(subjID, sessID, eve):
     for runID in runs:
             print runID
             ##Setup Subject Speciifc Information
-            data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+            
             event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
             print event_file
             
-            raw_file = data_path + '/' + subjID + '_' + sessID+ '_' + runID + '_raw.fif' ##Change this suffix if you are using SSP ##_clean_ecg_
-            avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'-ave.log'
+            raw_file = raw_data_path + '/' + subjID + '_' + sessID+ '_' + runID + runSuffix ##Change this suffix if you are using SSP ##_clean_ecg_
+            avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'_' + ssp_type +'-ave.log'
             print raw_file, avgLog_file
     #        
             ##Setup Reading fiff data structure
@@ -99,7 +106,7 @@ def mnepy_avg(subjID, sessID, eve):
             
             ##Write Evoked 
             print 'Writing Evoked data to -ave.fif file...' 
-            fiff.write_evoked(data_path + '/ave_projon/' + subjID+'_' + sessID+'_'+runID+'_' + eve +'-ave.fif', evoked)
+            fiff.write_evoked(data_path + '/ave_projon/' + subjID+'_' + sessID+'_'+runID+'_' + eve +'_' + ssp_type+'-ave.fif', evoked)
             evokedRuns.append(evoked)
             print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
 
@@ -132,7 +139,7 @@ def mnepy_avg(subjID, sessID, eve):
         runNave = []
     
     ##Write Grand average Evoked     
-    fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' + sessID+'_' + eve +'_All-ave.fif', newEvoked)
+    fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' + sessID+'_' + eve +'_' + ssp_type+'_All-ave.fif', newEvoked)
 
 
 if __name__ == "__main__":
@@ -140,12 +147,14 @@ if __name__ == "__main__":
     subjID = sys.argv[1]
     sessID = sys.argv[2]
     Trig_type = sys.argv[3]
+    ssp_type = sys.argv[4] #raw or ecg or eog 
     print 
     print "Subject ID:" + subjID
     print "Sess ID:" + sessID 
     print "Asking for " + Trig_type + " Triggers..."
     
-    mnepy_avg(subjID, sessID, Trig_type)
+    
+    mnepy_avg(subjID, sessID, Trig_type, ssp_type)
     
 #    if Trig_type == "Sentence":
 #       mnepy_avg(subjID, sessID)
