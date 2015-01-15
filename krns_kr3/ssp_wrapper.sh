@@ -25,7 +25,7 @@ echo $3
 # set ngrad = 1
 # set nmag = 1
 # set neeg = 1 
-##10/1/12 Using new set of projectors for ECG(1mag, 1grad, 0eeg-specified in ssp_clean_ecgeogProj.py script) and EOG(1mag 1grad 1eeg).
+##Using new set of projectors for ECG(1mag, 1grad, 0eeg-specified in ssp_clean_ecgeogProj.py script) and EOG(1mag 1grad 1eeg).
 
 ##Default Parameters
 set magrej = 4000
