@@ -14,7 +14,7 @@ set subj_dir = /home/custine/MEG/data/krns_kr3/$1/$2
 set surf_dir = /mnt/file1/binder/KRNS/anatomies/surfaces/
 setenv SUBJECTS_DIR $surf_dir
 setenv SUBJECT $1
-set log = /home/custine/MEG/data/krns_kr3/$1/logs/$1_makeInv.log
+set log = /home/custine/MEG/data/krns_kr3/$1/$2/logs/$1_$2_$3_makeInv.log
 
 ##Remove the existing log file
 if ( -e $log ) then
