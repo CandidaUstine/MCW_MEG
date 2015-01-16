@@ -3,8 +3,10 @@
 Created on Tue Aug 19 13:46:04 2014
 
 @author: custine
-Usage: getTriggers.py subjID sessID runID TriggerType(Enter 'Sentence' or 'Word')
-Example: getTriggers.py 9367 5 1 Word/Sentence/Category (if Category - specify 'Noun' verb etc.,) 
+Usage: getTriggers.py subjID sessID TriggerType(Enter 'Sentence' or 'Word')
+Example: getTriggers.py 9367 5 Word/Sentence/Category (if Category - specify 'Noun' verb etc.,) 
+EX2: python getTriggers.py 9567 s5 PreStim
+
 """
 
 import sys
@@ -161,8 +163,6 @@ def Words(subjID, sessID, runID):
     dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
     Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-TriggersMod.eve'
     
-
-    
     tempA = 1
     dataTable1 = []
     dataTable2 = []
@@ -238,10 +238,89 @@ def Words(subjID, sessID, runID):
         print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
     else:
         print "File not found.... Check your inputs!!"
+        
+def PreStim(subjID, sessID, runID):
+    sessNum = sessID[1:]
+    print sessNum
+    data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessNum + '/eprime/'
+    sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
+#    dataWord_file = data_path + 'eprime_run0' + runID + '.txt'
+    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + subjID + '_'+ sessID +'_run'+runID + '.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_PreStim-Triggers.eve'
+#    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
+    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_PreStim-TriggersMod.eve'
+    print sent_file
+    
+    tempA = 1
+    dataTable1 = []
+    dataTable2 = []
+    tempB = 1
+    lineTemp = []
+    sentID_tags = []
+    word_tags = []
+    wordID_tags = []
+    sentword = []
+    sentwordID = []
+    
+    if os.path.exists(eve_file):
+        print "Using Modified Eve file: " + eve_file
+        print 
+        ##Sent File:
+        #### SentID Onset and Offset Tags
+        myFile1 = open(Modeve_file, "r")
+        myFile2 = open(sent_file, "r")
+        myFile3 = open(trigger_file, "w")
+        myFile4 = open(Modtrigger_file, "w")
+       
+       ##Mod Event File 
+        while tempA: 
+            tempA = myFile1.readline()
+            temp1 = tempA.strip()
+            #print temp1
+            if temp1:
+                temp2 = temp1.split("\t")    
+                dataTable1.append(temp2)
+        myFile1.close()
+       
+        ##Sentence ID file in mnt/        
+        while tempB: 
+            tempB = myFile2.readline()
+            temp1 = tempB.strip()
+            #print temp1
+            if temp1:
+                temp2 = temp1.split("\t")
+                dataTable2.append(temp2[0])
+                sentID_tags.append(temp2[0])
+        myFile2.close()
+        sentID_tags = sentID_tags[0:]
+        print sentID_tags
+        
+        ii = 0
+        ##Trigger File wrtiting 
+        for i in range(0, len(dataTable1)): 
+            lineTemp = (dataTable1[i])
+            if lineTemp[2] in str(range(34)):
+                ii+=1
+                newSamp = str(int(lineTemp[0]) - 1200)
+                myFile3.write(newSamp)
+                myFile3.write("\t")
+                myFile3.write(lineTemp[1])
+                myFile3.write("\t")
+                myFile3.write(sentID_tags[ii])
+                myFile3.write("\n")
+                
+                myFile4.write(newSamp)
+                myFile4.write("\t")
+                myFile4.write(lineTemp[1])
+                myFile4.write("\t")
+                myFile4.write('1')
+                myFile4.write("\n")
 
+                
+                
 def Category(subjID, sessID, runID, Category):
     #print "Under construction.. :)"
-    
     data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/' + sessID
     wordTrigger_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_run' +runID + '_Word-Triggers.eve'
     wordCategory_file = '/home/custine/MEG/scripts/krns_kr3/Info/WordCategory_' + Category + '.txt' 
@@ -333,6 +412,9 @@ if __name__ == "__main__":
             
         elif Trig_type == 'Words': 
             Words(subjID, sessID, runID)
+            
+        elif Trig_type == 'PreStim':
+            PreStim(subjID, sessID, runID)
         else:
             Type = sys.argv[4]
             Category(subjID, sessID, runID, Type)
