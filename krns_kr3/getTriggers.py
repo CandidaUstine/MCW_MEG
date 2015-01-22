@@ -192,10 +192,10 @@ def Words(subjID, sessID, runID):
         myFile1.close()
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
+            #print lineTemp[0]
             wordID_tags.append(lineTemp[0]) ##Word IDs
             word_tags.append(lineTemp[1])
-        print len(wordID_tags)
-        #print word_tags
+        #print len(wordID_tags)
         ii = 0
         ##Mod Eve File : 
         #### Sent Onset Time point (in samples)
@@ -206,35 +206,40 @@ def Words(subjID, sessID, runID):
                 temp2 = temp1.split()
                 dataTable2.append(temp2)
         dataTable2.append(['0', '0', '0', '0']) ## to account for the lineTemp_next line :/ 
+        number = 0
         for i in range(0, len(dataTable2)-1):
             lineTemp = (dataTable2[i])        
             sentwordID = wordID_tags[ii]
             sentword = word_tags[ii]
             #print sentword
-            if (lineTemp[2] == '100' or lineTemp[2] == '110' or lineTemp[2] == '111' or lineTemp[2] == '0'): #######[3] Modified aftER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
+            if (lineTemp[2] == '100' or lineTemp[2] == '111' or lineTemp[2] == '0'): #######[3] Modified aftER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
                 ii = ii+1
+            elif  (lineTemp[2] == '110'):
+                ii = ii + 1
+                #print 'here jane'
+                number = 0
             elif (sentword == 'The' or sentword == 'the' or sentword == 'was' or sentword == 'a'):
                 ii = ii +1
             else:
                 ii = ii+1
+                number = number + 1
+                word_rank = number * 1000000
+                wordranksentwordID = word_rank + int(sentwordID)  ## Rank of Word in Sentence(1 digit) + Sentence ID (3 digits) + Word ID (3 digits) 
                 myFile3.write(lineTemp[0])
                 myFile3.write("\t")
                 myFile3.write(lineTemp[1])
                 myFile3.write("\t")
-#                myFile3.write(lineTemp[2]) ##*********#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
-#                myFile3.write("\t")
-                myFile3.write(str(sentwordID))
+                myFile3.write(str(wordranksentwordID))
                 myFile3.write("\n")
     ##Write the Mod Word Trigger File as well... 
                 myFile4.write(lineTemp[0])
                 myFile4.write("\t")
                 myFile4.write(lineTemp[1])
                 myFile4.write("\t")
-#                myFile4.write(lineTemp[2]) ##*************#####REMOVED AFTER USING MAKEeVEfILES.PY TYO CREATE EVENT FILES. 
-#                myFile4.write("\t")
                 myFile4.write(str(1))
                 myFile4.write("\n")
-            
+                
+            #print i
         print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
     else:
         print "File not found.... Check your inputs!!"
@@ -396,7 +401,7 @@ if __name__ == "__main__":
     ####### Get Input ########
     subjID = sys.argv[1] ##9367 
     sessID = sys.argv[2] ##s5
-    runs = ['1','2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
+    runs = ['1', '2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
     Trig_type = sys.argv[3]
 
     for runID in runs: 
