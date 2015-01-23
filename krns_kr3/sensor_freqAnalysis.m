@@ -134,6 +134,7 @@ for sessID= sessList
                 new = fft(data.trial{i}', 2048);
                 FT(:,:,i) = new;
             end
+            FT = FT(1:308, :, :);
 % %           %Frequency Analysis - Fieldtrip 
 %             cfg = []
 %             cfg.output = 'fourier';
@@ -232,6 +233,7 @@ for sessID= sessList
         meanruns = cat(3, meanrun1, meanrun2, meanrun3, meanrun4, meanrun5, meanrun6, meanrun7, meanrun8, meanrun9, meanrun10, meanrun11, meanrun12);
         grandavg_FT = mean(meanruns,3);  
         reorder = megcolorplot(grandavg_FT');
+        %grandavgFT = grandavgFT(1:308,:)
         size(reorder)
         save(compAll_file{1}, 'grandavg_FT', 'meanruns', 'reorder')
         disp 'Results saved in'
