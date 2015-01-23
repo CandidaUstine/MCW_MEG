@@ -156,7 +156,7 @@ def Words(subjID, sessID, runID):
     
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
 #    sent_file = data_path + 'data_sentences0' + runID + '.txt'
-    dataWord_file = data_path + 'eprime_run0' + runID + '.txt'
+    eprimeWord_file = data_path + 'eprime_run0' + runID + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
     trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-Triggers.eve'
@@ -182,7 +182,8 @@ def Words(subjID, sessID, runID):
         myFile2 = open(Modeve_file, "r")
         myFile3 = open(trigger_file, "w")
         myFile4 = open(Modtrigger_file, "w")
-        
+        print myFile1 
+        print 'jane here'
         while tempA: 
             tempA = myFile1.readline()
             temp1 = tempA.strip()
@@ -192,7 +193,7 @@ def Words(subjID, sessID, runID):
         myFile1.close()
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
-            #print lineTemp[0]
+            #print lineTemp
             wordID_tags.append(lineTemp[0]) ##Word IDs
             word_tags.append(lineTemp[1])
         #print len(wordID_tags)
@@ -249,7 +250,7 @@ def PreStim(subjID, sessID, runID):
     print sessNum
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessNum + '/eprime/'
     sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
-#    dataWord_file = data_path + 'eprime_run0' + runID + '.txt'
+    eprimeWord_file = data_path + 'eprime_run' + runID.zfill(2) + '.txt'
     eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + subjID + '_'+ sessID +'_run'+runID + '.eve'
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
     trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_PreStim-Triggers.eve'
@@ -260,9 +261,13 @@ def PreStim(subjID, sessID, runID):
     tempA = 1
     dataTable1 = []
     dataTable2 = []
+    dataTable3 = []
     tempB = 1
+    tempC = 1
     lineTemp = []
+    sentID = []
     sentID_tags = []
+    sentID_temp = []
     word_tags = []
     wordID_tags = []
     sentword = []
@@ -277,7 +282,8 @@ def PreStim(subjID, sessID, runID):
         myFile2 = open(sent_file, "r")
         myFile3 = open(trigger_file, "w")
         myFile4 = open(Modtrigger_file, "w")
-       
+        myFile5 = open(eprimeWord_file, "r")
+        
        ##Mod Event File 
         while tempA: 
             tempA = myFile1.readline()
@@ -287,32 +293,47 @@ def PreStim(subjID, sessID, runID):
                 temp2 = temp1.split("\t")    
                 dataTable1.append(temp2)
         myFile1.close()
-       
-        ##Sentence ID file in mnt/        
-        while tempB: 
-            tempB = myFile2.readline()
-            temp1 = tempB.strip()
+        #print dataTable1
+       ##Eprime File to get sent IDs
+        while tempC: 
+            tempC = myFile5.readline()
+            temp1 = tempC.strip("")
             #print temp1
             if temp1:
-                temp2 = temp1.split("\t")
-                dataTable2.append(temp2[0])
-                sentID_tags.append(temp2[0])
-        myFile2.close()
-        sentID_tags = sentID_tags[0:]
-        print sentID_tags
+                temp2 = temp1.split("\t") 
+                #sentID = temp2[4]
+                #sentID = sentID.zfill(3)
+                sentID_tags.append(temp2[4])
+        myFile5.close()
+        sentID_tags = sentID_tags [1:]
+        #print len(sentID_tags)
+#        ##Sentence ID file in mnt/        
+#        while tempB: 
+#            tempB = myFile2.readline()
+#            temp1 = tempB.strip()
+#            #print temp1
+#            if temp1:
+#                temp2 = temp1.split("\t")
+#                dataTable2.append(temp2[0])
+#                sentID_tags.append(temp2[0])
+#        myFile2.close()
+#        sentID_tags = sentID_tags[0:]
+        #print sentID_tags
         
         ii = 0
         ##Trigger File wrtiting 
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
-            if lineTemp[2] in str(range(34)):
+
+            if (lineTemp[2] in str(range(34))) or (lineTemp[2] == '101'):
                 ii+=1
+                #print lineTemp[2]
                 newSamp = str(int(lineTemp[0]) - 1200)
                 myFile3.write(newSamp)
                 myFile3.write("\t")
                 myFile3.write(lineTemp[1])
                 myFile3.write("\t")
-                myFile3.write(sentID_tags[ii])
+                myFile3.write(sentID_tags[ii-1])
                 myFile3.write("\n")
                 
                 myFile4.write(newSamp)
@@ -321,7 +342,7 @@ def PreStim(subjID, sessID, runID):
                 myFile4.write("\t")
                 myFile4.write('1')
                 myFile4.write("\n")
-
+        print str(ii) + " Sentences found"
                 
                 
 def Category(subjID, sessID, runID, Category):
