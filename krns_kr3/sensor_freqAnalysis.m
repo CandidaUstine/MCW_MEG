@@ -184,7 +184,7 @@ for sessID= sessList
             save(comp_file{1},'cfg', 'data', 'TFRconvol_pow_evoked')
         end
         
-     end
+   end
     %% Sensor level average across runs ina  session. - GRAND AVERAGE - POWER SPECTRUM 
     
     disp 'Jane Here'
