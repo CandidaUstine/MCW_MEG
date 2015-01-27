@@ -6,7 +6,7 @@ Created on Fri Dec 12 11:08:43 2014
 
 Script to plot the RMS for the magnetometers and gradiometers 
 Ex: python sensor_plot_meg_rms.py 5049 run Noun_People Noun_Place s5 ##Use run(One plot per session) or session (one plot per subject)
-Ex: python sensor_plot_meg_rms.py 9367 session Noun_Place Verb
+Ex: python sensor_plot_meg_rms.py 9367 session Noun_Place Verb s(dummy variable)
 
 """
 
