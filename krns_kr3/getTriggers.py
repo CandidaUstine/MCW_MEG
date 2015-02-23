@@ -17,7 +17,7 @@ def Sentences(subjID, sessID, runID):
 
 
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
-#    sent_file = data_path + 'data_sentences0' + runID + '.txt'
+    sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
     eprime_file = data_path + 'eprime_run' + runID.zfill(2) + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/mod/' + subjID + '_s'+ sessID +'_run'+runID + '_Mod.eve'
@@ -33,6 +33,8 @@ def Sentences(subjID, sessID, runID):
     lineTemp = []
     lineTemp_next = []
     sent_tags = []
+    tempC = 1
+    sent_offset = []
     
     if os.path.exists(Modeve_file):
         print "Jane Jane here here"
@@ -41,6 +43,7 @@ def Sentences(subjID, sessID, runID):
         myFile1 = open(eprime_file, "r")
         myFile2 = open(Modeve_file, "r")
         myFile3 = open(trigger_file, "w")
+        myFile4 = open(sent_file, "r")
         
         while tempA: 
             tempA = myFile1.readline()
@@ -52,7 +55,8 @@ def Sentences(subjID, sessID, runID):
         for i in range(1, len(dataTable1)): #Neglecting the first row - titles 
             lineTemp = (dataTable1[i]) #total 58 items 55 + 3 probe items for each sentence)
             sent_tags.append(lineTemp[4]) ##Sentence ID
-    
+        print sent_tags
+        
         ##Eve File : 
         #### Sent Onset Time point (in samples)
         while tempB:
@@ -63,88 +67,134 @@ def Sentences(subjID, sessID, runID):
                 dataTable2.append(temp2)
         dataTable2.append(['0', '0', '0', '0']) ## to account for the lineTemp_next line :/ 
         
+       ##To get the original length of Sentences in seconds from sent_file. 
+        while tempC: 
+            tempC = myFile4.readline()
+#            print tempC
+            temp1 = tempC.strip("\n")
+            if temp1:
+                temp2 = temp1.split("\t") 
+                sent_offset.append(temp2[2])
+        myFile4.close()
+#        sent_offset = sent_offset[1:]
+#        print len(sent_offset)
+        
+        
         ii = 0
         j = 0
-        for i in range(0, len(dataTable2)-1):
+        jj = 0
+        word_count=0
+        sent_off = 0
+        for i in range(0,len(dataTable2)-1):
             lineTemp = (dataTable2[i])
             lineTemp_next = dataTable2[i+1]
             lineTemp_prev = dataTable2[i-1]
             
-            if ((float(lineTemp[3]) == 110) or (float(lineTemp[3]) == 0)):
-                if ((float(lineTemp_next[3]) in range(1, 34)) or (float(lineTemp_next[3]) == 101)):
+#            word_count = 0
+            if ((float(lineTemp[2]) in range(1, 34)) or (float(lineTemp[2]) == 101)):
                     sent = sent_tags[ii]
                     ii = ii + 1
-                
-            if ((float(lineTemp_prev[3]) == 110) or (float(lineTemp_prev[3]) == 0)):
-                if (float(lineTemp[3]) in range(1, 34)):
-                    myFile3.write(lineTemp[0])
+                    
+                    
+            #### Sent Onset time point (in samples)
+            if (float(lineTemp[2]) in range(1, 34)):
+                    sent_onset = int(lineTemp[0]) - 2000
+                    jj = jj+1
+                    print word_count
+                    word_count = 0
+                    word_count = word_count + 1
+                    myFile3.write(str(sent_onset))
                     myFile3.write("\t")
-                    myFile3.write(lineTemp[1])
+                    myFile3.write(lineTemp[2]) ##Number of the Sentence 
                     myFile3.write("\t")
-                    myFile3.write(lineTemp[2])
+                    myFile3.write(str(sent)) ##Sent ID 
                     myFile3.write("\t")
-                    myFile3.write(str(sent))
-                    myFile3.write("\n")
+                    myFile3.write(lineTemp[0]) ##first word
+                    myFile3.write("\t")                                       
                   
             #### Sent Offset time point (in samples)
-            if float(lineTemp[3]) in range(66,100):
-                if float(lineTemp_next[3]) == 100:
-                    myFile3.write(lineTemp_next[0])
+            if float(lineTemp[2]) in range(66,100):
+                if float(lineTemp_next[2]) == 100:
+                    sent_off = int(lineTemp[0]) + 2000
+                    word_count = word_count + 1 
+                    myFile3.write(lineTemp[0])
                     myFile3.write("\t")
-                    myFile3.write(lineTemp_next[1])
+#                    myFile3.write("\n")
+#                    myFile3.write(str(sent_off))
+#                    myFile3.write("\t")
+                    if word_count<10:
+                        for d in range(word_count+1, 10):
+        #                    print d
+                            myFile3.write("0")
+                            myFile3.write("\t")
+                    myFile3.write(str(sent_off))
                     myFile3.write("\t")
-                    myFile3.write(lineTemp_next[2])
-                    myFile3.write("\t")
-                    myFile3.write(str(int(1000+ float(sent))))
+                    myFile3.write(str(word_count))
                     myFile3.write("\n")
-    #
+
+                      
+
+            ####Middle Word Onset times (in samples)
+            if float(lineTemp[2]) in range(34, 67):
+#                    print lineTemp[2]
+                    word_count = word_count + 1 
+                    myFile3.write(lineTemp[0])
+                    myFile3.write("\t")
+            
+            
+
             #### Probe Onset Time point (in samples) and Tag 
-            if ((float(lineTemp_prev[3]) == 110) or (float(lineTemp_prev[3]) == 0)):
-                if float(lineTemp[3]) == 101:
-                    myFile3.write(lineTemp[0])
-                    myFile3.write("\t")
-                    myFile3.write(lineTemp[1])
-                    myFile3.write("\t")
-                    myFile3.write(lineTemp[2])
-                    myFile3.write("\t")
-                    myFile3.write(str(int(2000+ float(sent))))
-                    myFile3.write("\n")
-    
-        #### Probe Offset time point (in samples) and Tag
-            if float(lineTemp[3]) in range(101,109):
-                if float(lineTemp_next[3]) == 100:
-                    myFile3.write(lineTemp[0])
-                    myFile3.write("\t")
-                    myFile3.write(lineTemp[1])
-                    myFile3.write("\t")
-                    myFile3.write(lineTemp[2])
-                    myFile3.write("\t")
-                    myFile3.write(str(int(3000 +float(sent))))
-                    myFile3.write("\n")
-    
-        #### Probe in the Sentence Tag                 
-            if float(lineTemp[3]) == 111:
-                myFile3.write(lineTemp[0])
-                myFile3.write("\t")
-                myFile3.write(lineTemp[1])
-                myFile3.write("\t")
-                myFile3.write(lineTemp[2])
-                myFile3.write("\t")
-                myFile3.write(str(int(4000 +float(sent))))
-                myFile3.write("\n")
-    
-        #### Reset Tag                 
-            if float(lineTemp[3]) == 110:
-                myFile3.write(lineTemp[0])
-                myFile3.write("\t")
-                myFile3.write(lineTemp[1])
-                myFile3.write("\t")
-                myFile3.write(lineTemp[2])
-                myFile3.write("\t")
-                myFile3.write(str(int(5000 +float(lineTemp[3]))))
-                myFile3.write("\n")
-                j = j + 1
-    
+            #if ((float(lineTemp_prev[2]) == 110) or (float(lineTemp_prev[2]) == 0)):
+#            if float(lineTemp_next[2]) == 101:
+#                    myFile3.write(lineTemp[0])
+#                    myFile3.write("\t")
+#                    myFile3.write(lineTemp[1])
+#                    myFile3.write("\t")
+#                    myFile3.write(lineTemp[2])
+#                    myFile3.write("\t")
+#                    myFile3.write(str(sent_offset[ii]))
+#                    myFile3.write("\t")                    
+#                    myFile3.write(str(int(2000+ float(sent))))
+#                    myFile3.write("\n")
+#    
+#        #### Probe Offset time point (in samples) and Tag
+#            if float(lineTemp[2]) in range(101,109):
+#                if float(lineTemp_next[2]) == 100:
+#                    myFile3.write(lineTemp[0])
+#                    myFile3.write("\t")
+#                    myFile3.write(lineTemp[1])
+#                    myFile3.write("\t")
+#                    myFile3.write(lineTemp[2])
+#                    myFile3.write("\t")
+#                    myFile3.write(str(int(3000 +float(sent))))
+#                    myFile3.write("\n")
+#    
+#        #### Probe in the Sentence Tag                 
+#            if float(lineTemp[2]) == 111:
+#                myFile3.write(lineTemp[0])
+#                myFile3.write("\t")
+#                myFile3.write(lineTemp[1])
+#                myFile3.write("\t")
+#                myFile3.write(lineTemp[2])
+#                myFile3.write("\t")
+#                myFile3.write(str(sent_offset[ii]))
+#                myFile3.write("\t")
+#                myFile3.write(str(int(4000 +float(sent))))
+#                myFile3.write("\n")
+#    
+#        #### Reset Tag                 
+#            if float(lineTemp[2]) == 110:
+##                myFile3.write(lineTemp[0])
+##                myFile3.write("\t")
+##                myFile3.write(lineTemp[1])
+##                myFile3.write("\t")
+##                myFile3.write(lineTemp[2])
+##                myFile3.write("\t")
+##                myFile3.write(str(int(5000 +float(lineTemp[2]))))
+##                myFile3.write("\n")
+#                j = j + 1
+                           
+    print jj                
     myFile3.close()
     myFile2.close()
     print "Number of Sentences found:"
@@ -156,7 +206,7 @@ def Words(subjID, sessID, runID):
     
     data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessID + '/eprime/'
 #    sent_file = data_path + 'data_sentences0' + runID + '.txt'
-    eprimeWord_file = data_path + 'eprime_run0' + runID + '.txt'
+#    eprimeWord_file = data_path + 'eprime_run0' + runID + '.txt'
 #    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/s'+sessID+ '/eve/' + subjID + '_s'+ sessID +'_run'+runID + '.eve'
     Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
     trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_Word-Triggers.eve'
@@ -288,17 +338,16 @@ def PreStim(subjID, sessID, runID):
         while tempA: 
             tempA = myFile1.readline()
             temp1 = tempA.strip()
-            #print temp1
             if temp1:
                 temp2 = temp1.split("\t")    
                 dataTable1.append(temp2)
         myFile1.close()
-        #print dataTable1
+        
        ##Eprime File to get sent IDs
         while tempC: 
             tempC = myFile5.readline()
             temp1 = tempC.strip("")
-            #print temp1
+
             if temp1:
                 temp2 = temp1.split("\t") 
                 #sentID = temp2[4]
