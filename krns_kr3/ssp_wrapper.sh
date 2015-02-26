@@ -64,7 +64,7 @@ else if $3 == 'ecgeog' then
     set h_tmax = 0.08
 endif 
 
-set runList = (run1 run2 run3 run4 run5 run6 run7 run8 run9 run10 run11 run12) 
+set runList = (run1) # run2 run3 run4 run5 run6 run7 run8 run9 run10 run11 run12) 
 
 foreach run ($runList)
 			
