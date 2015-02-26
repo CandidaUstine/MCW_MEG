@@ -34,7 +34,7 @@ def Sentences(subjID, sessID, runID):
     lineTemp_next = []
     sent_tags = []
     tempC = 1
-    sent_offset = []
+    sent_len = []
     
     if os.path.exists(Modeve_file):
         print "Jane Jane here here"
@@ -74,10 +74,11 @@ def Sentences(subjID, sessID, runID):
             temp1 = tempC.strip("\n")
             if temp1:
                 temp2 = temp1.split("\t") 
-                sent_offset.append(temp2[2])
+                sent_len.append(temp2[2])
         myFile4.close()
-#        sent_offset = sent_offset[1:]
-#        print len(sent_offset)
+        sent_len = sent_len[1:]
+        print len(sent_len)
+        print len(sent_tags)
         
         
         ii = 0
@@ -90,17 +91,14 @@ def Sentences(subjID, sessID, runID):
             lineTemp_next = dataTable2[i+1]
             lineTemp_prev = dataTable2[i-1]
             
-#            word_count = 0
             if ((float(lineTemp[2]) in range(1, 34)) or (float(lineTemp[2]) == 101)):
                     sent = sent_tags[ii]
                     ii = ii + 1
-                    
-                    
+                           
             #### Sent Onset time point (in samples)
-            if (float(lineTemp[2]) in range(1, 34)):
+            if (float(lineTemp[2]) in range(1, 34)) or float(lineTemp[2]) == 101:
                     sent_onset = int(lineTemp[0]) - 2000
                     jj = jj+1
-                    print word_count
                     word_count = 0
                     word_count = word_count + 1
                     myFile3.write(str(sent_onset))
@@ -113,15 +111,13 @@ def Sentences(subjID, sessID, runID):
                     myFile3.write("\t")                                       
                   
             #### Sent Offset time point (in samples)
-            if float(lineTemp[2]) in range(66,100):
+            if float(lineTemp[2]) in range(66,100) or float(lineTemp[2]) == 103:
                 if float(lineTemp_next[2]) == 100:
                     sent_off = int(lineTemp[0]) + 2000
                     word_count = word_count + 1 
                     myFile3.write(lineTemp[0])
                     myFile3.write("\t")
-#                    myFile3.write("\n")
-#                    myFile3.write(str(sent_off))
-#                    myFile3.write("\t")
+
                     if word_count<10:
                         for d in range(word_count+1, 10):
         #                    print d
@@ -130,12 +126,12 @@ def Sentences(subjID, sessID, runID):
                     myFile3.write(str(sent_off))
                     myFile3.write("\t")
                     myFile3.write(str(word_count))
+#                    myFile3.write("\t")
+#                    myFile3.write(str(sent_len))                    
                     myFile3.write("\n")
 
-                      
-
             ####Middle Word Onset times (in samples)
-            if float(lineTemp[2]) in range(34, 67):
+            if float(lineTemp[2]) in range(34, 67) or float(lineTemp[2]) == 102:
 #                    print lineTemp[2]
                     word_count = word_count + 1 
                     myFile3.write(lineTemp[0])
