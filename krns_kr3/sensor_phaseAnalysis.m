@@ -26,9 +26,9 @@ for sessID= sessList
         %% Initialise Subject Specific Defaults
         inpath = ['/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/'];
         
-        fiff = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/', subjID,'_',sessID,'_',run,'_raw.fif')
+        fiff = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/ssp/mne/', subjID,'_',sessID,'_',run,'_clean_ecg_raw.fif')
         hdr = ft_read_header(fiff{1});
-        comp_file = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/coh/', subjID,'_',sessID,'_', run,'_', tag, '_sensor_phaseAnalysis.mat')
+        comp_file = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/coh/', subjID,'_',sessID,'_', run,'_', tag, '_sensor_phaseAnalysis_with_ecg_ssp.mat')
         modeve_file = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/eve/triggers/', subjID,'_',sessID,'_', run,'_', tag, '-TriggersMod.eve')
         eve_file = strcat('/home/custine/MEG/data/krns_kr3/', subjID, '/', sessID, '/eve/triggers/', subjID,'_',sessID,'_', run,'_', tag, '-Triggers.eve')
         
@@ -36,61 +36,35 @@ for sessID= sessList
         hdr = ft_read_header(fiff{1});
         %Fevents = ft_read_event(modeve_file{1}, 'header', hdr); Use this if reading eve.fif file 
         M = dlmread(eve_file{1})
-        Fevents = M(:,4)
+        Fevents = M(:,3)
         Fsamp = M(:,1)
+        endS = M(:,13); %end of sentence (samples ) got from modified (2/23/15) getTriggers.py script sentence script. column 13 is the end of the sentence. 
+        sentLen = M(:,14);
         [len, ~] = size(Fevents);
-        F = [];
-        FT = [];
+        Fbeg = [];
+        Fend = [];
         eventID = [];
         size(Fevents)
         for i = 1:len
-%             if strcmp(rank, 'first')
-%                 x = num2str(Fevents(i));
-%                 x =  x(1:1); 
-%                 if strcmp(pow_type, 'fft')
-%                     if strcmp(x, '1')
-%                 %hdr.orig.raw.first_samp
-%                 %F = [F, Fevents(i).sample];
-%                         disp 'here'
-%                         new = Fsamp(i) - hdr.orig.raw.first_samp;
-%                         new;
-%                         F = [F, new];
-%                         eventID = [eventID, Fevents(i)];
-%                     end
-%                 end
-%             else
             Fevents(i);
-            new = Fsamp(i) - hdr.orig.raw.first_samp;
-            new
-            F = [F, new];
+            newFsamp = Fsamp(i) - hdr.orig.raw.first_samp;
+            newFend = endS(i) - hdr.orig.raw.first_samp;
+            Fbeg = [Fbeg, newFsamp];
+            Fend = [Fend, newFend];
             eventID = [eventID, Fevents(i)];
          end
 %         end
         size(eventID);
         %% Define Trial samples
-        F = F';
-        size(F);
-        [len, ~] = size(F);
-        endSi = []
-        begS = F(:,1);
-        sentLen = M(:,5);%End of the sample is got from the length of the sentence from data_sentence01.txt file from mnt/file1/ folder... See getTriggers.py script. 
-        for i = 1:size(sentLen);
-           new = 2000 * (sentLen(i) * 0.001) 
-           endSi = [endSi, new];
-        end
-        begS
-        endSi
-        
-        begS = begS(1:len);
-        endS = [];
-        for i = 1:size(begS);
-            endS(i) = (begS(i) + endSi(i)); %End of the sample is got from the length of the sentence from data_sentence01.txt file from mnt/file1/ folder... See getTriggers.py script. 
-        end
+        Fbeg = Fbeg';
+        size(Fbeg)
+        [len, ~] = size(Fbeg);
+
         offset = zeros(1,len);
-        size(begS)
+        size(Fbeg)
         size(offset)
-        size(endS)
-        samples = horzcat(begS, endS', offset')
+        size(Fend)
+        samples = horzcat(Fbeg, Fend', offset')
         
         %% Define Trials
         dat = ft_read_data(fiff{1});
@@ -109,7 +83,9 @@ for sessID= sessList
         
         %% Preprocess the data:
         data = ft_preprocessing(cfg)
-
+        data.hdr.orig.projs(1).active = 1
+        data.hdr.orig.projs(2).active = 1
+         
         %FFT of the Signal 
         [~, len] = size(data.trial); 
         len;
@@ -120,7 +96,7 @@ for sessID= sessList
         end
         FT;
         
-        save(comp_file{1}, 'cfg', 'eventID', 'FT', 'sentLen')
+        save(comp_file{1}, 'cfg', 'eventID', 'FT', 'sentLen', 'data')
   end
 end
 end
