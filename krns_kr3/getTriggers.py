@@ -112,15 +112,16 @@ def Sentences(subjID, sessID, runID):
                   
             #### Sent Offset time point (in samples)
             if float(lineTemp[2]) in range(66,100) or float(lineTemp[2]) == 103:
-                if float(lineTemp_next[2]) == 100:
+                if float(lineTemp_next[2]) == 100 or float(lineTemp_next[2]) == 110 or float(lineTemp_next[2]) == 111:
                     sent_off = int(lineTemp[0]) + 2000
                     word_count = word_count + 1 
                     myFile3.write(lineTemp[0])
                     myFile3.write("\t")
 
                     if word_count<10:
+#                        print word_count
                         for d in range(word_count+1, 10):
-        #                    print d
+#                            print d
                             myFile3.write("0")
                             myFile3.write("\t")
                     myFile3.write(str(sent_off))
@@ -128,6 +129,8 @@ def Sentences(subjID, sessID, runID):
                     myFile3.write(str(word_count))
 #                    myFile3.write("\t")
 #                    myFile3.write(str(sent_len))                    
+                    myFile3.write("\n")
+                elif float(lineTemp_next[2]) == 110:
                     myFile3.write("\n")
 
             ####Middle Word Onset times (in samples)
@@ -137,58 +140,7 @@ def Sentences(subjID, sessID, runID):
                     myFile3.write(lineTemp[0])
                     myFile3.write("\t")
             
-            
-
-            #### Probe Onset Time point (in samples) and Tag 
-            #if ((float(lineTemp_prev[2]) == 110) or (float(lineTemp_prev[2]) == 0)):
-#            if float(lineTemp_next[2]) == 101:
-#                    myFile3.write(lineTemp[0])
-#                    myFile3.write("\t")
-#                    myFile3.write(lineTemp[1])
-#                    myFile3.write("\t")
-#                    myFile3.write(lineTemp[2])
-#                    myFile3.write("\t")
-#                    myFile3.write(str(sent_offset[ii]))
-#                    myFile3.write("\t")                    
-#                    myFile3.write(str(int(2000+ float(sent))))
-#                    myFile3.write("\n")
-#    
-#        #### Probe Offset time point (in samples) and Tag
-#            if float(lineTemp[2]) in range(101,109):
-#                if float(lineTemp_next[2]) == 100:
-#                    myFile3.write(lineTemp[0])
-#                    myFile3.write("\t")
-#                    myFile3.write(lineTemp[1])
-#                    myFile3.write("\t")
-#                    myFile3.write(lineTemp[2])
-#                    myFile3.write("\t")
-#                    myFile3.write(str(int(3000 +float(sent))))
-#                    myFile3.write("\n")
-#    
-#        #### Probe in the Sentence Tag                 
-#            if float(lineTemp[2]) == 111:
-#                myFile3.write(lineTemp[0])
-#                myFile3.write("\t")
-#                myFile3.write(lineTemp[1])
-#                myFile3.write("\t")
-#                myFile3.write(lineTemp[2])
-#                myFile3.write("\t")
-#                myFile3.write(str(sent_offset[ii]))
-#                myFile3.write("\t")
-#                myFile3.write(str(int(4000 +float(sent))))
-#                myFile3.write("\n")
-#    
-#        #### Reset Tag                 
-#            if float(lineTemp[2]) == 110:
-##                myFile3.write(lineTemp[0])
-##                myFile3.write("\t")
-##                myFile3.write(lineTemp[1])
-##                myFile3.write("\t")
-##                myFile3.write(lineTemp[2])
-##                myFile3.write("\t")
-##                myFile3.write(str(int(5000 +float(lineTemp[2]))))
-##                myFile3.write("\n")
-#                j = j + 1
+        
                            
     print jj                
     myFile3.close()
@@ -254,6 +206,7 @@ def Words(subjID, sessID, runID):
                 dataTable2.append(temp2)
         dataTable2.append(['0', '0', '0', '0']) ## to account for the lineTemp_next line :/ 
         number = 0
+        endSamp = []
         for i in range(0, len(dataTable2)-1):
             lineTemp = (dataTable2[i])        
             sentwordID = wordID_tags[ii]
@@ -274,12 +227,13 @@ def Words(subjID, sessID, runID):
                 wordranksentwordID = word_rank + int(sentwordID)  ## Rank of Word in Sentence(1 digit) + Sentence ID (3 digits) + Word ID (3 digits) 
                 myFile3.write(lineTemp[0])
                 myFile3.write("\t")
-                myFile3.write(lineTemp[1])
+                endSamp = str(int(lineTemp[0])+ 1200)
+                myFile3.write(endSamp)
                 myFile3.write("\t")
                 myFile3.write(str(wordranksentwordID))
                 myFile3.write("\n")
     ##Write the Mod Word Trigger File as well... 
-                myFile4.write(lineTemp[0])
+                myFile4.write(lineTemp[0])            
                 myFile4.write("\t")
                 myFile4.write(lineTemp[1])
                 myFile4.write("\t")
@@ -290,6 +244,7 @@ def Words(subjID, sessID, runID):
         print "Done! See resulting file in " + trigger_file + ' and ' + '\n' + Modtrigger_file
     else:
         print "File not found.... Check your inputs!!"
+        
         
 def PreStim(subjID, sessID, runID):
     sessNum = sessID[1:]
@@ -339,6 +294,7 @@ def PreStim(subjID, sessID, runID):
                 dataTable1.append(temp2)
         myFile1.close()
         
+        
        ##Eprime File to get sent IDs
         while tempC: 
             tempC = myFile5.readline()
@@ -346,33 +302,17 @@ def PreStim(subjID, sessID, runID):
 
             if temp1:
                 temp2 = temp1.split("\t") 
-                #sentID = temp2[4]
-                #sentID = sentID.zfill(3)
                 sentID_tags.append(temp2[4])
         myFile5.close()
         sentID_tags = sentID_tags [1:]
-        #print len(sentID_tags)
-#        ##Sentence ID file in mnt/        
-#        while tempB: 
-#            tempB = myFile2.readline()
-#            temp1 = tempB.strip()
-#            #print temp1
-#            if temp1:
-#                temp2 = temp1.split("\t")
-#                dataTable2.append(temp2[0])
-#                sentID_tags.append(temp2[0])
-#        myFile2.close()
-#        sentID_tags = sentID_tags[0:]
-        #print sentID_tags
-        
         ii = 0
+        
         ##Trigger File wrtiting 
         for i in range(0, len(dataTable1)): 
             lineTemp = (dataTable1[i])
 
             if (lineTemp[2] in str(range(34))) or (lineTemp[2] == '101'):
                 ii+=1
-                #print lineTemp[2]
                 newSamp = str(int(lineTemp[0]) - 1200)
                 myFile3.write(newSamp)
                 myFile3.write("\t")
@@ -388,6 +328,96 @@ def PreStim(subjID, sessID, runID):
                 myFile4.write('1')
                 myFile4.write("\n")
         print str(ii) + " Sentences found"
+
+
+def PostStim(subjID, sessID, runID):
+    sessNum = sessID[1:]
+    print sessNum
+    data_path = '/mnt/file1/binder/KRNS/kr3/' + subjID + '/' + sessNum + '/eprime/'
+    sent_file = data_path + 'data_sentences' + runID.zfill(2) + '.txt'
+    eprimeWord_file = data_path + 'eprime_run' + runID.zfill(2) + '.txt'
+    eve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + subjID + '_'+ sessID +'_run'+runID + '.eve'
+    Modeve_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/mod/' + subjID + '_'+ sessID +'_run'+runID + '_Mod.eve'
+    trigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_PostStim-Triggers.eve'
+#    dataWord_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/' + 'word_sentences' + runID.zfill(2) + '.txt'
+    Modtrigger_file = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID+ '/eve/triggers/' + subjID + '_'+ sessID +'_run'+runID + '_PostStim-TriggersMod.eve'
+    print sent_file
+    
+    tempA = 1
+    dataTable1 = []
+    dataTable2 = []
+    dataTable3 = []
+    tempB = 1
+    tempC = 1
+    lineTemp = []
+    sentID = []
+    sentID_tags = []
+    sentID_temp = []
+    word_tags = []
+    wordID_tags = []
+    sentword = []
+    sentwordID = []
+
+    
+    if os.path.exists(eve_file):
+        print "Using Modified Eve file: " + eve_file
+        print 
+        ##Sent File:
+        #### SentID Onset and Offset Tags
+        myFile1 = open(Modeve_file, "r")
+        myFile2 = open(sent_file, "r")
+        myFile3 = open(trigger_file, "w")
+        myFile4 = open(Modtrigger_file, "w")
+        myFile5 = open(eprimeWord_file, "r")
+        
+       ##Mod Event File 
+        while tempA: 
+            tempA = myFile1.readline()
+            temp1 = tempA.strip()
+            if temp1:
+                temp2 = temp1.split("\t")    
+                dataTable1.append(temp2)
+        myFile1.close()
+        dataTable1.append(['0', '0', '0', '0'])
+        
+       ##Eprime File to get sent IDs
+        while tempC: 
+            tempC = myFile5.readline()
+            temp1 = tempC.strip("")
+
+            if temp1:
+                temp2 = temp1.split("\t") 
+                sentID_tags.append(temp2[4])
+        myFile5.close()
+        sentID_tags = sentID_tags [1:]
+        
+        ii = 0
+        ##Trigger File wrtiting 
+        for i in range(0, len(dataTable1)-1): 
+            lineTemp = (dataTable1[i])
+            lineTemp_next = dataTable1[i+1]
+
+            if (lineTemp[2] == '110'):
+                ii+=1
+                newSamp = str(int(lineTemp_next[0]) - 500)
+                if int(newSamp)<0:
+                    newSamp = str((int(lineTemp[0])) + 2000)
+                myFile3.write(lineTemp[0]) #Beginning 
+                myFile3.write("\t")
+                myFile3.write(newSamp) #End of rest
+                myFile3.write("\t")
+                myFile3.write(sentID_tags[ii-1])
+                myFile3.write("\n")
+                
+                myFile4.write(lineTemp[0])
+                myFile4.write("\t")
+                myFile4.write(newSamp)
+                myFile4.write("\t")
+                myFile4.write('1')
+                myFile4.write("\n")
+        print str(ii) + " Sentences found"    
+    
+
                 
                 
 def Category(subjID, sessID, runID, Category):
@@ -467,7 +497,7 @@ if __name__ == "__main__":
     ####### Get Input ########
     subjID = sys.argv[1] ##9367 
     sessID = sys.argv[2] ##s5
-    runs = ['1', '2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING################################################
+    runs = [ '1', '2', '3', '4', '5','6', '7', '8', '9', '10', '11', '12']  # TESTING#######'4', '6', '12',#########################################
     Trig_type = sys.argv[3]
 
     for runID in runs: 
@@ -486,6 +516,10 @@ if __name__ == "__main__":
             
         elif Trig_type == 'PreStim':
             PreStim(subjID, sessID, runID)
+            
+        elif Trig_type == 'PostStim':
+            PostStim(subjID, sessID, runID)
+            
         else:
             Type = sys.argv[4]
             Category(subjID, sessID, runID, Type)
