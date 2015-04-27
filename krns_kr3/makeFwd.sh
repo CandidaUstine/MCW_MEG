@@ -27,7 +27,7 @@ if ( $#argv == 3 ) then
     echo "Logging to default log..." >>& $log
 endif
 
-set runList = (run1 run2 run3 run4 run5 run6 run7 run8 run9 run10 run11 run12) 
+set runList = (run1 run2 run3 run4 run5 run6 run7 run8 run9 run10 run11 run12)  #
 
 cd $subj_dir/ave_projon/
 pwd
@@ -37,7 +37,7 @@ echo "Computing forward solutions for individual runs..."
 foreach m ('meg')
    foreach run ($runList)
       echo $run
-      mne_do_forward_solution --subject $1 --bem $1-5120-5120-5120-bem.fif --mri COR-custine-$2.fif --megonly --meas $1_$2_{$run}_$3-ave.fif --fwd $1_$2_{$run}_$3-ave-7-$m-fwd.fif --overwrite >>& $log
+      mne_do_forward_solution --subject $1 --bem $1-5120-5120-5120-bem.fif --mri COR-custine-$2.fif --megonly --meas $1_$2_{$run}_$3_run-ave.fif --fwd $1_$2_{$run}_$3-ave-7-$m-fwd.fif --overwrite >>& $log
    end
 end
 
@@ -56,7 +56,7 @@ foreach m ('meg')
 	--fwd $1_$2_run10_$3-ave-7-$m-fwd.fif \
 	--fwd $1_$2_run11_$3-ave-7-$m-fwd.fif \
 	--fwd $1_$2_run12_$3-ave-7-$m-fwd.fif \
-	--out $1_$2_$3_All-ave-7-$m-fwd.fif ##>>&log
+	--out $1_$2_$3_All-ave-7-$m-fwd.fif >>&log
 end
 
 
