@@ -58,14 +58,14 @@ foreach c ($condList)
 	echo "Preparing the Space time estimates(stc files) for the condition $c" >>& $log
 
    if ($t == 'full') then
-        #echo "Making mne maps... " >>& $log
-	#mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-mne.stc --smooth 5 --morph fsaverage --subject $1 >>& $log  
+        echo "Making mne maps... " >>& $log
+	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_run_All-ave.fif --set $c --bmin -500 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-mne.stc --smooth 5 --subject $1 >>& $log #--morph fsaverage
  
         echo "Making dSPM maps... " >>& $log
-	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-spm.stc --smooth 5 --morph fsaverage --spm --subject $1 >>& $log  
+	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_run_All-ave.fif --set $c --bmin -500 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-spm.stc --smooth 5 --spm --subject $1 >>& $log  
 
-        #echo "Making sLORETA maps... " >>& $log
-	#mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-sLORETA.stc --smooth 5 --morph fsaverage --sLORETA --subject $1 >>& $log 
+        echo "Making sLORETA maps... " >>& $log
+	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_run_All-ave.fif --set $c --bmin -500 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M-sLORETA.stc --smooth 5 --sLORETA --subject $1 >>& $log #--morph fsaverage
 
 
    else
@@ -73,7 +73,7 @@ foreach c ($condList)
 	#mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --tmin $tmin --tmax $tmax --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M_{$tmin}-{$tmax}-mne.stc --smooth 5 --morph fsaverage --subject $1 >>& $log  
  
         echo "Making dSPM maps... " >>& $log
-	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --tmin $4 --tmax $5 --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M_{$tmin}-{$tmax}-spm.stc --smooth 5 --morph fsaverage --spm --subject $1 >>& $log  
+	mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_run_All-ave.fif --set $c --tmin $4 --tmax $5 --bmin -500 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M_{$tmin}-{$tmax}-spm.stc --smooth 5 --spm --subject $1 >>& $log  #--morph fsaverage 
 
         #echo "Making sLORETA maps... " >>& $log
 	#mne_make_movie --inv $1_$2_$3_All-ave-7-meg-inv.fif --meas $1_$2_$3_All-ave.fif --set $c --tmin $4 --tmax $5 --bmin -100 --bmax -0.01 --stc stc/$1_$2_$3_All_c{$c}M_{$tmin}-{$tmax}-sLORETA.stc --smooth 5 --morph fsaverage --sLORETA --subject $1 >>& $log     
@@ -82,7 +82,7 @@ foreach c ($condList)
    foreach run ($runList)
         echo "Making dSPM maps for individual runs... " >>& $log
         echo $run 
-	mne_make_movie --inv $1_$2_{$run}_$3-ave-7-meg-inv.fif --meas $1_$2_{$run}_$3-ave.fif --set $c --bmin -100 --bmax -0.01 --stc stc/$1_$2_{$run}_$3_c{$c}M-spm.stc --smooth 5 --morph fsaverage --spm --subject $1 >>& $log 
+	mne_make_movie --inv $1_$2_{$run}_$3-ave-7-meg-inv.fif --meas $1_$2_{$run}_$3_run-ave.fif --set $c --bmin -100 --bmax -0.01 --stc stc/$1_$2_{$run}_$3_c{$c}M-spm.stc --smooth 5 --spm --subject $1 >>& $log  #--morph fsaverage
    end
 
 end 
