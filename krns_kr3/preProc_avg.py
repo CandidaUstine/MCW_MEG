@@ -5,7 +5,7 @@ Created on Thu Feb 13 16:59:34 2014
 
 @author: custine
 Usage: python preProc_avg.py subjID sessID eve
-Example: python preProc_avg.py 9511 s1 Word/AllItems/Noun/Verb/Noun_People
+Example: python preProc_avg.py 9511 s1 Word/AllItems/Noun/Verb/Noun_People/Sentence4W
 """
 
 import sys
@@ -28,7 +28,6 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
     print eve
     data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
     if ssp_type == 'run':
-    
         raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
         runSuffix = '_raw.fif'
     elif ssp_type == 'ecg' or ssp_type == 'eog':
@@ -36,7 +35,7 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
         runSuffix = '_clean_' + ssp_type + '_raw.fif'
     ########Analysis Parameters##
     ###Event file suffix 
-    eveSuffix = '-TriggersMod.eve' 
+    eveSuffix = '-Triggers.eve' 
     eve_file = eve + eveSuffix #eve + eveSuffix 
     print "You have chosen the event file " + eve_file
     
@@ -44,7 +43,7 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
     projVal = True
     avgRefVal = False
     hp_cutoff = 0.7
-    lp_cutoff = 20 
+    lp_cutoff = 50 
     #######Experiment specific parameters 
     ###EventLabels and Runs
     runs = cc.runDict[eve] ##TESTING################################################
@@ -57,17 +56,18 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
         condName[row[1]] = row[1]
     print event_id 
     ###TimeWindow
-    tmin = -.1
+    tmin = -.5
     tmax = float(cc.epMax[eve])
+#    tmax = 3.00 #4Words Category 
     ########Artifact rejection parameters
     ###General
-    gradRej = 2000e-13
-    magRej = 3000e-15
+    gradRej = 4000e-13
+    magRej = 4000e-12
     magFlat = 1e-14
     gradFlat = 1000e-15
     ####################################
-    #######Compute averages for each run 
- #   evoked=[]
+    ######Compute averages for each run 
+    evoked=[]
     
     evokedRuns =[]
     for runID in runs:
@@ -80,7 +80,7 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
             raw_file = raw_data_path + '/' + subjID + '_' + sessID+ '_' + runID + runSuffix ##Change this suffix if you are using SSP ##_clean_ecg_
             avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'_' + ssp_type +'-ave.log'
             print raw_file, avgLog_file
-    #        
+            
             ##Setup Reading fiff data structure
             print 'Reading Raw data... '
             raw = fiff.Raw(raw_file, preload = True)
@@ -99,7 +99,7 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
                 
             ##Read Epochs and compute Evoked :) 
             print 'Reading Epochs from evoked raw file...'
-            epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (None,0), picks = picks, proj = True, name = condName, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
+            epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline = (-0.5,0), picks = picks, proj = True, name = condName, preload = True, flat = dict(mag = magFlat, grad= gradFlat), reject=dict(mag=magRej, grad=gradRej))
             print epochs
             evoked = [epochs[cond].average(picks =picks) for cond in event_id]
 #    #        epochs.plot()
@@ -110,9 +110,9 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
             evokedRuns.append(evoked)
             print 'Completed! See ave.fif result in folder', data_path + '/ave_projon/'
 
-    #        ###############################################################################
-    #        #Show the Result - Plotting the evoked data
-    #        mne.viz.evoked.plot_evoked(evoked, exclude = [])
+            ###############################################################################
+            ##Show the Result - Plotting the evoked data
+            #mne.viz.evoked.plot_evoked(evoked, exclude = [])
     
     print len(evokedRuns)
     
@@ -121,6 +121,7 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
     runNave = []
 
     newEvoked = copy.deepcopy(evoked)
+    print newEvoked
     numCond = len(newEvoked)
     print 'Length', numCond
     for c in range(numCond):
@@ -135,8 +136,9 @@ def mnepy_avg(subjID, sessID, eve, ssp_type):
         newEvoked[c].data = gaveData
         newEvoked[c].nave = gaveNave
         
-        runData = []
-        runNave = []
+#        runData = []
+#        runNave = []
+    print newEvoked[0].nave
     
     ##Write Grand average Evoked     
     fiff.write_evoked(data_path + '/ave_projon/'+subjID+'_' + sessID+'_' + eve +'_' + ssp_type+'_All-ave.fif', newEvoked)
@@ -147,7 +149,7 @@ if __name__ == "__main__":
     subjID = sys.argv[1]
     sessID = sys.argv[2]
     Trig_type = sys.argv[3]
-    ssp_type = sys.argv[4] #raw or ecg or eog 
+    ssp_type = sys.argv[4] #run or ecg or eog 
     print 
     print "Subject ID:" + subjID
     print "Sess ID:" + sessID 
