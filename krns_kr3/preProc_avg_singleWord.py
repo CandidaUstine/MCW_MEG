@@ -3,8 +3,8 @@
 Created on Tue Apr 28 15:05:29 2015
 
 @author: custine
-Usage: python preProc_avg_singleWord.py subjID type
-Example: python preProc_avg_singleWord.py 9511 run/ssp
+Usage: python preProc_avg_singleWord.py subjID
+Example: python preProc_avg_singleWord.py 9511 
 """
 
 import sys
@@ -51,62 +51,92 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     magRej = 4000e-12
     magFlat = 1e-14
     gradFlat = 1000e-15
+    
     ####################################
     ######Compute averages for each run 
+#    newArr = [0]*257
     evoked=[]
     evokedRuns =[]
     epochsRuns =[]
+    newadd = np.zeros((258,325,1401))
+    meanArr = np.zeros((258,325,1401))
+    count = 0
     (ID, word, role) = readTable('/mnt/file1/binder/KRNS/info/krns_word_list.txt')
-#    print ID, word
-#    ID = ID[0:1]
-#    word = word[0:1]
+    ID = [int(i) for i in ID]
+    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '-epochs.mat'
+    print epochs_file
 
-    for evid,w in zip(ID, word):
-        print evid, w
-        for sessID in sess:
-            raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
-            data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
-            for runID in runs:
-                    print runID                 
-                    
-                    ##Setup Subject Speciifc Information
-                    event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
-                    print event_file
-                    epochs_file = data_path + '/epochs/' + runID + '/'+ subjID + '_'+ sessID +'_'+runID + '_' + evid.zfill(3) + str(w)+ '-epochs.mat'
-                    print epochs_file
-                    raw_file = raw_data_path + '/' + subjID + '_' + sessID+ '_' + runID + runSuffix ##Change this suffix if you are using SSP ##_clean_ecg_
-                    avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'-ave.log'
+    for sessID in sess:
+        raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+        data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+        epochs_sess_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '_'+ sessID + '-epochs.mat'
+        for runID in runs:
+                print runID                 
+                count = count + 1
+                print 'Count' + str(count)
+                ##Setup Subject Speciifc Information
+                event_file = data_path + '/eve/triggers/' + subjID + '_'+ sessID +'_'+runID +'_' + eve_file
+                print event_file
+
+                raw_file = raw_data_path + '/' + subjID + '_' + sessID+ '_' + runID + runSuffix ##Change this suffix if you are using SSP ##_clean_ecg_
+                avgLog_file = data_path + '/ave_projon/logs/' +subjID + '_' + sessID+ '_'+runID + '_'+eve+'-ave.log'
+            
+                ##Setup Reading fiff data structure
+                print 'Reading Raw data... '
+                raw = fiff.Raw(raw_file, preload = True)
+                events = mne.read_events(event_file)
                 
-                    ##Setup Reading fiff data structure
-                    print 'Reading Raw data... '
-                    raw = fiff.Raw(raw_file, preload = True)
-                    events = mne.read_events(event_file)
-                    
-        #            mne.set_log_file(fname = avgLog_file, overwrite = True)
-        #            ##Filter raw data 
-        #            fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
-                    
-                    ##Check if the event exists in the run else save empty mat file. 
-                    (x, y, run_eveID) = readTable(event_file)
-                    if evid in run_eveID:
-                        print "EventID exists in the run... "                        
-                        ##Pick all channels 
-                        picks = []
-                        for i in range(raw.info['nchan']):
-                            picks.append(i)
-                        ##Create epochs.mat file for specified event ID 
-                        print 'Reading Epochs from evoked raw file...'
-                        epochs = mne.Epochs(raw, events, int(evid), tmin, tmax, baseline = (-0.1,0),name = str(w), preload = True,reject=dict(mag=magRej, grad=gradRej))
-                        epochs_data = epochs.get_data()
-                        ##Saving Epochs in mat file 
-                        print epochs_data.shape
-                        print epochs_file
-                        io.savemat(epochs_file, dict(epochs_data = epochs_data), oned_as = 'row')
+    #            mne.set_log_file(fname = avgLog_file, overwrite = True)
+    #            ##Filter raw data 
+    #            fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
+########################################################################                            
+                ##Check if the event exists in the run else save empty mat file. 
+                (x, y, run_eveID) = readTable(event_file)
+#                if evid in run_eveID:
+#                print "EventID exists in the run... " 
+                ##Pick all channels 
+                picks = []
+                for i in range(raw.info['nchan']):
+                    picks.append(i)
+########################################################################                                    
+                ##Create epochs.mat file for specified event ID 
+                print 'Reading Epochs from evoked raw file...'
+                epochs = mne.Epochs(raw, events,ID , tmin, tmax, baseline = (-0.1,0), preload = True,reject=dict(mag=magRej, grad=gradRej))
+#                print epochs
+                new = np.zeros((1,325,1401)) 
+#########################################################################                
+                ##Save the epochs data as a array 
+                for evID,i in zip(ID, range(1,258)): ##258 Items but 257 unique codes (so 0 to 256)
+                    data = np.asarray([epochs[str(evID)].get_data()])
+                    data = np.squeeze(data)
+                    if len(data) == 325: 
+                        data = np.expand_dims(data, axis = 0)
                     else:
-                        epochs_empty = dict()
-                        print "EventID Does not exist in the run. Saving empty mat file... "
-                        io.savemat(epochs_file, epochs_empty, oned_as = 'row')
-                            
+                        data = np.zeros((1,325,1401)) ##'No epochs for this condition'
+                    data = np.asarray(data)
+                    new = np.append(new, data, axis = 0)
+                print new.shape ##(258, 325, 1401)
+########################################################################                
+                ##Creating a running sum... :) 
+                print newadd.shape
+                for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
+                    newitem = (new[i,:,:]) + (newadd[i,:,:])
+                    newadd[i] = np.expand_dims(np.array(newitem), axis = 0)
+                print newadd.shape
+########################################################################                                
+    ##Creating the mean of (individual) epochs across runs(and)sessions. 
+    print newadd[1,1,1]
+    print count
+    for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
+        newitem = np.divide((newadd[i,:,:]), float(count))
+        meanArr[i] = np.expand_dims(np.array(newitem), axis = 0)
+    print meanArr.shape
+#    print meanArr[1,1,1]
+########################################################################    
+    io.savemat(epochs_file, dict(meanArr = meanArr), oned_as = 'row')
+
+
+
 
 if __name__ == "__main__":
     ####### Get Input ########
