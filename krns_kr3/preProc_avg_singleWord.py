@@ -41,7 +41,7 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     lp_cutoff = 50 
     #######Experiment specific parameters 
     ###SessIDs and Runs
-    runs = ['run1', 'run2', 'run3', 'run4', 'run5', 'run6', 'run7', 'run8', 'run9', 'run10', 'run11', 'run12'] #'run1', 'run2'] #
+    runs = ['run1', 'run2','run3', 'run4', 'run5', 'run6', 'run7', 'run8', 'run9', 'run10', 'run11', 'run12'] #'run1', 'run2'] #
     sess = ['s5', 's6', 's7', 's8']
     ###Word TimeWindow
     tmin = -.1
@@ -60,16 +60,26 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     epochsRuns =[]
     newadd = np.zeros((258,325,1401))
     meanArr = np.zeros((258,325,1401))
+    sumArr = np.zeros((258,325,1401))
+    newlenArr = np.zeros((258,))
+    
     count = 0
     (ID, word, role) = readTable('/mnt/file1/binder/KRNS/info/krns_word_list.txt')
     ID = [int(i) for i in ID]
-    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '-epochs.mat'
+    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_sum-epochs.mat'
+    epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_mean-epochs.mat'
+    epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_len-epochs.mat'
     print epochs_file
+
+    for evID,i in zip(ID, range(0,258)): ##258 Items but 257 unique codes (so 0 to 256)
+        print ID[i]  
+        print word[i]
+    
 
     for sessID in sess:
         raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
         data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
-        epochs_sess_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '_'+ sessID + '-epochs.mat'
+#        epochs_sess_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '_'+ sessID + '-epochs.mat'
         for runID in runs:
                 print runID                 
                 count = count + 1
@@ -102,12 +112,18 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                 ##Create epochs.mat file for specified event ID 
                 print 'Reading Epochs from evoked raw file...'
                 epochs = mne.Epochs(raw, events,ID , tmin, tmax, baseline = (-0.1,0), preload = True,reject=dict(mag=magRej, grad=gradRej))
-#                print epochs
+                print epochs.__len__
                 new = np.zeros((1,325,1401)) 
+                newNum = np.zeros(0)
+                newNum = np.append(newNum, 0)
 #########################################################################                
                 ##Save the epochs data as a array 
-                for evID,i in zip(ID, range(1,258)): ##258 Items but 257 unique codes (so 0 to 256)
-                    data = np.asarray([epochs[str(evID)].get_data()])
+                for evID,i in zip(ID, range(1,258)):## 1,258 Starts from 1 to 257 (first item is 0s but not incl in this counter) append.##258 total Items but 257 unique codes (so 0 to 256)
+                    ev = ID[i]
+#                    print ev
+                    lenNum = len(epochs[str(ev)].events) #Number of events in each condition. :) 
+#                    print lenNum
+                    data = np.asarray([epochs[str(ev)].get_data()])
                     data = np.squeeze(data)
                     if len(data) == 325: 
                         data = np.expand_dims(data, axis = 0)
@@ -115,25 +131,40 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                         data = np.zeros((1,325,1401)) ##'No epochs for this condition'
                     data = np.asarray(data)
                     new = np.append(new, data, axis = 0)
-                print new.shape ##(258, 325, 1401)
-########################################################################                
-                ##Creating a running sum... :) 
-                print newadd.shape
+                    newNum = np.append(newNum, lenNum)
+#                print new.shape ##(258, 325, 1401) first item is 0s with rest 257 items (used and used same item) 
+                print newNum.shape
+                
+##########################################################################                
+                #Creating a running sum... :) 
+#                print newadd.shape
                 for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
+#                    print i
                     newitem = (new[i,:,:]) + (newadd[i,:,:])
                     newadd[i] = np.expand_dims(np.array(newitem), axis = 0)
-                print newadd.shape
-########################################################################                                
+                    newlenitem = newNum[i] + newlenArr[i]
+                    newlenArr[i] = newlenitem
+#                print newlenArr.shape
+                    print newadd.shape
+##                    
+#                
+                
+#########################################################################                                
     ##Creating the mean of (individual) epochs across runs(and)sessions. 
     print newadd[1,1,1]
     print count
     for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
-        newitem = np.divide((newadd[i,:,:]), float(count))
-        meanArr[i] = np.expand_dims(np.array(newitem), axis = 0)
+        newitem = np.divide((newadd[i,:,:]), float(newlenArr[i]))
+        meanArr[i] = np.expand_dims(np.array(newitem.astype(float)), axis = 0)
     print meanArr.shape
-#    print meanArr[1,1,1]
-########################################################################    
-    io.savemat(epochs_file, dict(meanArr = meanArr), oned_as = 'row')
+    print meanArr[1,1,1]
+#########################################################################                                
+##Creating the of (individual) epochs across runs(and)sessions. 
+    sumArr = newadd            
+#########################################################################    
+    io.savemat(epochs_file, dict(sumArr = sumArr), oned_as = 'row')
+    io.savemat(epochsLen_file, dict(lenArr = newlenArr), oned_as = 'row')
+    io.savemat(epochsMean_file, dict(meanArr = meanArr), oned_as = 'row')
 
 
 
