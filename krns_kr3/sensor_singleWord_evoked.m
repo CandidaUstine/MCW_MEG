@@ -1,3 +1,6 @@
+%% Trial One 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 subjID = '9367'
 sessID = {'s5', 's6'}
 word = textread('/home/custine/MEG/scripts/krns_kr3/word.txt', '%s')
@@ -89,3 +92,45 @@ for w = word(1:2)
         fiff_write_evoked(g_ave_file{1}, ev_all)
     end
 end
+%% Trial Two 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+word = textread('/home/custine/MEG/scripts/krns_kr3/word.txt', '%s');
+wordID = textread('/home/custine/MEG/scripts/krns_kr3/wordID.txt', '%d')
+subjID = '9367'
+
+epochs = ['/home/custine/MEG/data/krns_kr3/9367/9367_sum-epochs.mat']
+epochs = load(epochs);
+
+epochsLen = ['/home/custine/MEG/data/krns_kr3/9367/9367_len-epochs.mat']
+epochsLen = load(epochsLen);
+
+epochsR = epochs.meanArr; 
+evokednew = fiff_read_evoked_all('/home/custine/MEG/data/krns_kr3/9367/s5/ave_projon/9367_s5_AllItems_All-ave.fif')
+evokednew.info
+info = evokednew.info; 
+
+
+for id = 4:4
+    id
+    w = word(id)
+    item = double(epochsR(id,:, :));
+    
+    
+    ev_all = []
+    ev_all.evoked.aspect_kind = 100;
+    ev_all.evoked.is_smsh = 0; 
+    ev_all.evoked.nave = 1;
+    ev_all.evoked.first = -200;
+    ev_all.evoked.last = 1200;
+    ev_all.evoked.comment = char(w); %'single word';
+    ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
+    ev_all.evoked.epochs = squeeze((item));
+    ev_all.info = info;
+    id = num2str(id,'%03d')
+    
+    g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9367/epochs/', subjID, '_',id,'_', w,'-ave.fif')
+    fiff_write_evoked(g_ave_file{1}, ev_all)
+%     item(1,1,1)
+end
+
+
