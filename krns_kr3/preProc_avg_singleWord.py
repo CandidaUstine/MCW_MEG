@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Apr 28 15:05:29 2015
-
 @author: custine
 Usage: python preProc_avg_singleWord.py subjID
 Example: python preProc_avg_singleWord.py 9511 
@@ -66,16 +65,14 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     count = 0
     (ID, word, role) = readTable('/mnt/file1/binder/KRNS/info/krns_word_list.txt')
     ID = [int(i) for i in ID]
-    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_sum-epochs.mat'
-    epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_mean-epochs.mat'
-    epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_len-epochs.mat'
+    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_sum-epochs.mat'
+    epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_mean-epochs.mat'
+    epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_len-epochs.mat'
     print epochs_file
-
-    for evID,i in zip(ID, range(0,258)): ##258 Items but 257 unique codes (so 0 to 256)
-        print ID[i]  
-        print word[i]
     
-
+    new = np.zeros((257,325,1401)) 
+    newNum = np.zeros(257)
+    
     for sessID in sess:
         raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
         data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
@@ -97,8 +94,8 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                 events = mne.read_events(event_file)
                 
     #            mne.set_log_file(fname = avgLog_file, overwrite = True)
-    #            ##Filter raw data 
-    #            fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
+                ##Filter raw data 
+                fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
 ########################################################################                            
                 ##Check if the event exists in the run else save empty mat file. 
                 (x, y, run_eveID) = readTable(event_file)
@@ -113,57 +110,42 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                 print 'Reading Epochs from evoked raw file...'
                 epochs = mne.Epochs(raw, events,ID , tmin, tmax, baseline = (-0.1,0), preload = True,reject=dict(mag=magRej, grad=gradRej))
                 print epochs.__len__
-                new = np.zeros((1,325,1401)) 
-                newNum = np.zeros(0)
-                newNum = np.append(newNum, 0)
-#########################################################################                
-                ##Save the epochs data as a array 
-                for evID,i in zip(ID, range(1,258)):## 1,258 Starts from 1 to 257 (first item is 0s but not incl in this counter) append.##258 total Items but 257 unique codes (so 0 to 256)
-                    ev = ID[i]
-#                    print ev
-                    lenNum = len(epochs[str(ev)].events) #Number of events in each condition. :) 
-#                    print lenNum
-                    data = np.asarray([epochs[str(ev)].get_data()])
-                    data = np.squeeze(data)
-                    if len(data) == 325: 
-                        data = np.expand_dims(data, axis = 0)
-                    else:
-                        data = np.zeros((1,325,1401)) ##'No epochs for this condition'
-                    data = np.asarray(data)
-                    new = np.append(new, data, axis = 0)
-                    newNum = np.append(newNum, lenNum)
-#                print new.shape ##(258, 325, 1401) first item is 0s with rest 257 items (used and used same item) 
-                print newNum.shape
-                
 ##########################################################################                
-                #Creating a running sum... :) 
-#                print newadd.shape
-                for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
-#                    print i
-                    newitem = (new[i,:,:]) + (newadd[i,:,:])
-                    newadd[i] = np.expand_dims(np.array(newitem), axis = 0)
-                    newlenitem = newNum[i] + newlenArr[i]
-                    newlenArr[i] = newlenitem
-#                print newlenArr.shape
-                    print newadd.shape
-##                    
+                ##Save the epochs data as a array 
+                for evID,i,j in zip(ID, range(1,258), range(0,257)):## 1,258 Starts from 1 to 257 (first item is 0s but not incl in this counter) append.##258 total Items but 257 unique codes (so 0 to 256)
+                    ev = i
+                    lenNum = len(epochs[str(ev)].events) #Number of events in each condition. :) 
+                    data = np.asarray(([epochs[str(ev)].get_data()]))
+                    data = np.squeeze(data)
+                    if len(data) == 0: 
+                        data = np.zeros((1,325,1401)) ##'No epochs for this condition'
+                    elif len(data) == 325:
+                         data = np.expand_dims(data, axis = 0)
+                    data = np.sum(data, axis = 0)
+                    data = np.expand_dims(data, axis = 0)
+#                    print data.shape ## (1, 325, 1401)
+                    new[j,:,:] = new[j,:,:] + data
+                    print data
+
+                    newNum[j] = newNum[j] + lenNum
+                print new.shape ##(257, 325, 1401) 257 items (used and used same item) 
+                print newNum.shape
+
 #                
-                
 #########################################################################                                
     ##Creating the mean of (individual) epochs across runs(and)sessions. 
-    print newadd[1,1,1]
+#    print newadd[1,1,1]
     print count
-    for i in range(0, 258): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
-        newitem = np.divide((newadd[i,:,:]), float(newlenArr[i]))
+    for i in range(0, 257): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
+        newitem = np.divide((new[i,:,:]), float(newNum[i]))
         meanArr[i] = np.expand_dims(np.array(newitem.astype(float)), axis = 0)
-    print meanArr.shape
+        print i 
+    print meanArr.shape #(258, 325, 1401) with last row as zeros - can modify... 
     print meanArr[1,1,1]
-#########################################################################                                
-##Creating the of (individual) epochs across runs(and)sessions. 
-    sumArr = newadd            
-#########################################################################    
-    io.savemat(epochs_file, dict(sumArr = sumArr), oned_as = 'row')
-    io.savemat(epochsLen_file, dict(lenArr = newlenArr), oned_as = 'row')
+         
+##########################################################################    
+    io.savemat(epochs_file, dict(sumArr = new), oned_as = 'row')
+    io.savemat(epochsLen_file, dict(lenArr = newNum), oned_as = 'row')
     io.savemat(epochsMean_file, dict(meanArr = meanArr), oned_as = 'row')
 
 
@@ -178,16 +160,3 @@ if __name__ == "__main__":
     
     
     mnepy_avg_allw(subjID)
-
-
-
-
-
-
-
-
-
-
-
-
-
