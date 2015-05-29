@@ -92,72 +92,78 @@
 %         fiff_write_evoked(g_ave_file{1}, ev_all)
 %     end
 % end
-%% Trial Two 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-word = textread('/home/custine/MEG/scripts/krns_kr3/word.txt', '%s');
-wordID = textread('/home/custine/MEG/scripts/krns_kr3/wordID.txt', '%d')
-subjID = '9511'
+% %% Trial Two 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% word = textread('/home/custine/MEG/scripts/krns_kr3/word.txt', '%s');
+% wordID = textread('/home/custine/MEG/scripts/krns_kr3/wordID.txt', '%d')
+% subjID = '9511'
+% 
+% % epochs = ['/home/custine/MEG/data/krns_kr3/9367/9367_sum-epochs.mat']
+% % epochs = load(epochs);
+% % epochsR = epochs.sumArr; 
+% 
+% epochsMean = ['/home/custine/MEG/data/krns_kr3/9511/9511_mean-epochs.mat']
+% epochsMean = load(epochsMean);
+% epochsR = epochsMean.meanArr; 
+% 
+% epochsLen = ['/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_len-epochs.mat']
+% epochsLen = load(epochsLen);
+% 
+% 
+% evokednew = fiff_read_evoked_all('/home/custine/MEG/data/krns_kr3/9511/s5/ave_projon/9511_s5_AllItems_All-ave.fif')
+% evokednew.info
+% info = evokednew.info; 
+% 
+% len = (epochsLen.lenArr)'
+% 
+% for i = 2:258
+%     id = i -1
+%     w = word(id)
+%     ep_len = len(i) 
+%     item = double(epochsR(i,:, :));
+%     mean = squeeze(item/ep_len);
+%     
+%     meanArr(id,:,:) = mean;
+%     
+%     ev_all = []
+%     ev_all.evoked.aspect_kind = 100;
+%     ev_all.evoked.is_smsh = 0; 
+%     ev_all.evoked.nave = ep_len;
+%     ev_all.evoked.first = -200;
+%     ev_all.evoked.last = 1200;
+%     ev_all.evoked.comment = char(w); %'single word';
+%     ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
+%     ev_all.evoked.epochs = mean;
+%     ev_all.info = info;
+%     id = num2str(id,'%03d')
+%     
+%     g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/epochs/', subjID, '_',id,'_', w,'-ave.fif')
+%     fiff_write_evoked(g_ave_file{1}, ev_all)
+% %     item(1,1,1)
+% end
 
-% epochs = ['/home/custine/MEG/data/krns_kr3/9367/9367_sum-epochs.mat']
-% epochs = load(epochs);
-% epochsR = epochs.sumArr; 
-
-epochsMean = ['/home/custine/MEG/data/krns_kr3/9511/9511_mean-epochs.mat']
-epochsMean = load(epochsMean);
-epochsR = epochsMean.meanArr; 
-
-epochsLen = ['/home/custine/MEG/data/krns_kr3/9511/9511_len-epochs.mat']
-epochsLen = load(epochsLen);
-
-
-evokednew = fiff_read_evoked_all('/home/custine/MEG/data/krns_kr3/9511/s5/ave_projon/9511_s5_AllItems_All-ave.fif')
-evokednew.info
-info = evokednew.info; 
-
-len = (epochsLen.lenArr)'
-
-for i = 2:258
-    id = i -1
-    w = word(id)
-    ep_len = len(i) 
-    item = double(epochsR(i,:, :));
-    mean = squeeze(item/ep_len);
-    
-    meanArr(id,:,:) = mean;
-    
-    ev_all = []
-    ev_all.evoked.aspect_kind = 100;
-    ev_all.evoked.is_smsh = 0; 
-    ev_all.evoked.nave = ep_len;
-    ev_all.evoked.first = -200;
-    ev_all.evoked.last = 1200;
-    ev_all.evoked.comment = char(w); %'single word';
-    ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
-    ev_all.evoked.epochs = mean;
-    ev_all.info = info;
-    id = num2str(id,'%03d')
-    
-    g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/epochs/', subjID, '_',id,'_', w,'-ave.fif')
-    fiff_write_evoked(g_ave_file{1}, ev_all)
-%     item(1,1,1)
-end
-
-%% Stats with Words (Beta coef and t stats) 
-epochsMean = ['/home/custine/MEG/data/krns_kr3/9511/9511_filtered_mean-epochs.mat']
+%% Stats with Words (Beta coef and t stats) all 5 ratings together 
+epochsMean = ['/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_mean-epochs.mat'] %%Last row is empty for the ones created on Memorial day. so 258=[]
 epochsMean = load(epochsMean);
 epochsR = epochsMean.meanArr;
-epochsR(1,:,:) = [];
+epochsR(258,:,:) = []; 
 
 rows2remove = [7 34 39 45 81 85 92 93 97 125 137 153 164 167 210 230 250]
 epochsR(rows2remove,:,:) = [];
 epochsRsel = epochsR;
-save('/home/custine/MEG/data/krns_kr3/9511/9511_filtered_meanSel-epochs.mat', 'epochsRsel')
+save('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat', 'epochsRsel')
 
 
-mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_filtered_meanSel-epochs.mat')
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
 designmat = load('/home/custine/MEG/data/krns_kr3/9367/5attributeRatings.mat')
-epochsRsel = mean.epochsRsel;
 dm = designmat.rat;
+% % ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_Motion.txt']
+% % designmat = textread(ratingF);
+% % dm = designmat;
+[x, y, z] = pca(dm); %%Creating the regressions analysis using the PCA components. 
+dm = y;
+
+epochsRsel = mean.epochsRsel;
 % [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
 [B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(5) zeros(5,1)]);
 
@@ -183,7 +189,7 @@ ev_all.evoked.comment = 'Beta coef'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A1; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/beta_regression_1Colour-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/beta_regression_1Colour_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Motion 
@@ -197,7 +203,7 @@ ev_all.evoked.comment = 'Beta coef'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A2; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/beta_regression_2Motion-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/beta_regression_2Motion_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Shape 
@@ -211,7 +217,7 @@ ev_all.evoked.comment = 'Beta coef'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A3; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/beta_regression_3Shape-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/beta_regression_3Shape_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Sound 
@@ -225,7 +231,7 @@ ev_all.evoked.comment = 'Beta coef'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A4; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/beta_regression_4Sound-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/beta_regression_4Sound_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Upper Limb 
@@ -239,7 +245,7 @@ ev_all.evoked.comment = 'Beta coef'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A5; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/beta_regression_5UpperLimb-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/beta_regression_5UpperLimb_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %%
@@ -269,7 +275,7 @@ ev_all.evoked.comment = 't'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A1; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/t_1Colour-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/t_1Colour_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Motion 
@@ -283,7 +289,7 @@ ev_all.evoked.comment = 't'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A2; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/t_2Motion-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/t_2Motion_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Shape 
@@ -297,7 +303,7 @@ ev_all.evoked.comment = 't'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A3; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/t_3Shape-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/t_3Shape_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Sound 
@@ -311,7 +317,7 @@ ev_all.evoked.comment = 't'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A4; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/t_4Sound-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/t_4Sound_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
 
 %Upper Limb 
@@ -325,5 +331,102 @@ ev_all.evoked.comment = 't'; %'single word';
 ev_all.evoked.times = linspace(-0.1, 0.6, 1401);
 ev_all.evoked.epochs = A5; %%Do for A2, A3, A4 A5 etc... 
 ev_all.info = info;
-g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/t_5UpperLimb-ave.fif')
+g_ave_file = strcat('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/t_5UpperLimb_20150525-ave.fif')
 fiff_write_evoked(g_ave_file, ev_all)
+
+%%
+%%
+%% Stats with Words (Beta coef and t stats) Independent ratings  
+epochsMean = ['/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_mean-epochs.mat'] %%Last row is empty for the ones created on Memorial day. so 258=[]
+epochsMean = load(epochsMean);
+epochsR = epochsMean.meanArr;
+epochsR(258,:,:) = []; 
+
+rows2remove = [7 34 39 45 81 85 92 93 97 125 137 153 164 167 210 230 250]
+epochsR(rows2remove,:,:) = [];
+epochsRsel = epochsR;
+save('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat', 'epochsRsel')
+
+%Colour
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
+% ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_Colour.txt']
+% designmat = textread(ratingF);
+% dm = designmat;
+
+%WordLength
+wordlen = ['/home/custine/MEG/scripts/krns_kr3/Info/WordLength_ExclPreposition&2Used.txt']
+wordlen = textread(wordlen);
+dm = wordlen
+
+epochsRsel = mean.epochsRsel;
+% [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
+[B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(1) zeros(1,1)]);
+t = B./sqrt(E);
+t(find(isinf(t))) = zeros;
+t(find(isnan(t))) = zeros;
+A = reshape(t, 1, 325, 1401);
+imagesc(-100:2:600, 1:3:306, squeeze(A(1,1:3:306,:)));caxis([-3 3]);
+print('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/9511_t_1Colour.png', '-dpng')
+
+%Motion
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
+ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_Motion.txt']
+designmat = textread(ratingF);
+dm = designmat;
+epochsRsel = mean.epochsRsel;
+% [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
+[B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(1) zeros(1,1)]);
+t = B./sqrt(E);
+t(find(isinf(t))) = zeros;
+t(find(isnan(t))) = zeros;
+A = reshape(t, 1, 325, 1401);
+imagesc(-100:2:600, 1:3:306, squeeze(A(1,1:3:306,:)));caxis([-3 3]);
+print('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/9511_t_2Motion.png', '-dpng')
+
+%Shape
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
+ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_Shape.txt']
+designmat = textread(ratingF);
+dm = designmat;
+epochsRsel = mean.epochsRsel;
+% [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
+[B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(1) zeros(1,1)]);
+t = B./sqrt(E);
+t(find(isinf(t))) = zeros;
+t(find(isnan(t))) = zeros;
+A = reshape(t, 1, 325, 1401);
+imagesc(-100:2:600, 1:3:306, squeeze(A(1,1:3:306,:)));caxis([-3 3]);
+print('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/9511_t_3Shape.png', '-dpng')
+
+%Sound
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
+ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_Sound.txt']
+designmat = textread(ratingF);
+dm = designmat;
+epochsRsel = mean.epochsRsel;
+% [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
+[B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(1) zeros(1,1)]);
+t = B./sqrt(E);
+t(find(isinf(t))) = zeros;
+t(find(isnan(t))) = zeros;
+A = reshape(t, 1, 325, 1401);
+imagesc(-100:2:600, 1:3:306, squeeze(A(1,1:3:306,:)));caxis([-3 3]);
+print('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/9511_t_4Sound.png', '-dpng')
+
+%UpperLimb
+mean = load('/home/custine/MEG/data/krns_kr3/9511/9511_20150525_filtered_meanSel-epochs.mat')
+ratingF = ['/home/custine/MEG/scripts/krns_kr3/Info/ratingsMATRIX_UpperLimb.txt']
+designmat = textread(ratingF);
+dm = designmat;
+epochsRsel = mean.epochsRsel;
+% [B, E, df] = fmrianalysis_regression(epochsRsel,dm);
+[B, E, df] = fmrianalysis_regression(epochsRsel,[dm ones(240,1)],[eye(1) zeros(1,1)]);
+t = B./sqrt(E);
+t(find(isinf(t))) = zeros;
+t(find(isnan(t))) = zeros;
+A = reshape(t, 1, 325, 1401);
+imagesc(-100:2:600, 1:3:306, squeeze(A(1,1:3:306,:)));caxis([-3 3]);
+print('/home/custine/MEG/data/krns_kr3/9511/BetaRegression/9511_t_5UpperLimb.png', '-dpng')
+
+
+
