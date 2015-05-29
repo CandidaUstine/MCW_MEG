@@ -21,6 +21,7 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     import numpy as np
     from scipy import io
     from readTable import readTable 
+    import os
     
     #######Get Input ##
     print subjID
@@ -37,7 +38,7 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     projVal = True
     avgRefVal = False
     hp_cutoff = 0.7
-    lp_cutoff = 50 
+    lp_cutoff = 25 
     #######Experiment specific parameters 
     ###SessIDs and Runs
     runs = ['run1', 'run2','run3', 'run4', 'run5', 'run6', 'run7', 'run8', 'run9', 'run10', 'run11', 'run12'] #'run1', 'run2'] #
@@ -53,29 +54,38 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
     
     ####################################
     ######Compute averages for each run 
-#    newArr = [0]*257
     evoked=[]
     evokedRuns =[]
     epochsRuns =[]
-    newadd = np.zeros((258,325,1401))
-    meanArr = np.zeros((258,325,1401))
-    sumArr = np.zeros((258,325,1401))
+    newadd = np.zeros((258,102,1401))
+    meanArr = np.zeros((258,102,1401))
+    sumArr = np.zeros((258,102,1401))
     newlenArr = np.zeros((258,))
     
     count = 0
     (ID, word, role) = readTable('/mnt/file1/binder/KRNS/info/krns_word_list.txt')
     ID = [int(i) for i in ID]
-    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_sum-epochs.mat'
-    epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_mean-epochs.mat'
-    epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_len-epochs.mat'
-    print epochs_file
+#    epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_sum-epochs.mat'
+#    epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_mean-epochs.mat'
+#    epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '/' + subjID + '_20150525_filtered_len-epochs.mat'
+#    print epochs_file
     
-    new = np.zeros((257,325,1401)) 
-    newNum = np.zeros(257)
+#    new = np.zeros((257,325,1401)) 
+#    newNum = np.zeros(257)
     
     for sessID in sess:
+        new = np.zeros((257,102,1401)) 
+        newNum = np.zeros(257)
+            
         raw_data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
-        data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID
+        data_path = '/home/custine/MEG/data/krns_kr3/' +subjID+'/'+sessID  
+        
+        newpath = raw_data_path + '/epochs/' 
+        if not os.path.exists(newpath): os.makedirs(newpath)
+            
+        epochs_file = '/home/custine/MEG/data/krns_kr3/' + subjID +'/'+sessID+ '/epochs/' + subjID + '_' + sessID+ '_20150525_filteredMAG_sum-epochs.mat'
+        epochsMean_file = '/home/custine/MEG/data/krns_kr3/' + subjID +'/'+sessID+ '/epochs/' + subjID + '_' + sessID+ '_20150525_filteredMAG_mean-epochs.mat'
+        epochsLen_file = '/home/custine/MEG/data/krns_kr3/' + subjID +'/'+sessID+ '/epochs/' + subjID +'_' + sessID+  '_20150525_filteredMAG_len-epochs.mat'
 #        epochs_sess_file = '/home/custine/MEG/data/krns_kr3/' + subjID + '_'+ sessID + '-epochs.mat'
         for runID in runs:
                 print runID                 
@@ -93,7 +103,7 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                 raw = fiff.Raw(raw_file, preload = True)
                 events = mne.read_events(event_file)
                 
-    #            mne.set_log_file(fname = avgLog_file, overwrite = True)
+#    #            mne.set_log_file(fname = avgLog_file, overwrite = True)
                 ##Filter raw data 
                 fiff.Raw.filter(raw, l_freq = hp_cutoff, h_freq = lp_cutoff)
 ########################################################################                            
@@ -103,12 +113,15 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
 #                print "EventID exists in the run... " 
                 ##Pick all channels 
                 picks = []
-                for i in range(raw.info['nchan']):
-                    picks.append(i)
+                picks = mne.pick_types(raw.info, meg = 'mag') ###Selecting only the MAG 
+#                for i in range(raw.info['nchan']):
+#                    picks.append(i)
+#                    print i
+                    
 ########################################################################                                    
                 ##Create epochs.mat file for specified event ID 
                 print 'Reading Epochs from evoked raw file...'
-                epochs = mne.Epochs(raw, events,ID , tmin, tmax, baseline = (-0.1,0), preload = True,reject=dict(mag=magRej, grad=gradRej))
+                epochs = mne.Epochs(raw, events,ID , tmin, tmax, picks = picks, baseline = (-0.1,0), preload = True,reject=dict(mag=magRej)) #, grad=gradRej))
                 print epochs.__len__
 ##########################################################################                
                 ##Save the epochs data as a array 
@@ -118,35 +131,35 @@ def mnepy_avg_allw(subjID): #, sessID, eve, ssp_type):
                     data = np.asarray(([epochs[str(ev)].get_data()]))
                     data = np.squeeze(data)
                     if len(data) == 0: 
-                        data = np.zeros((1,325,1401)) ##'No epochs for this condition'
-                    elif len(data) == 325:
+                        data = np.zeros((1,102,1401)) ##'No epochs for this condition'
+                    elif len(data) == 102:
                          data = np.expand_dims(data, axis = 0)
                     data = np.sum(data, axis = 0)
                     data = np.expand_dims(data, axis = 0)
-#                    print data.shape ## (1, 325, 1401)
+#                    print data.shape ## (1, 102, 1401)
                     new[j,:,:] = new[j,:,:] + data
-                    print data
+#                    print data
 
                     newNum[j] = newNum[j] + lenNum
-                print new.shape ##(257, 325, 1401) 257 items (used and used same item) 
+                print new.shape ##(257, 102, 1401) 257 items (used and used same item) 
                 print newNum.shape
 
 #                
-#########################################################################                                
-    ##Creating the mean of (individual) epochs across runs(and)sessions. 
-#    print newadd[1,1,1]
-    print count
-    for i in range(0, 257): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
-        newitem = np.divide((new[i,:,:]), float(newNum[i]))
-        meanArr[i] = np.expand_dims(np.array(newitem.astype(float)), axis = 0)
-        print i 
-    print meanArr.shape #(258, 325, 1401) with last row as zeros - can modify... 
-    print meanArr[1,1,1]
+    #########################################################################                                
+        ##Creating the mean of (individual) epochs across runs(and)sessions. 
+    #    print newadd[1,1,1]
+        print count
+        for i in range(0, 257): ##range(0,258):Starts from 0 to 257 - 258 items - same length as new and newadd. Since item93 is repeated twice - as verb and as as adj  (condition - 'used') 
+            newitem = np.divide((new[i,:,:]), float(newNum[i]))
+            meanArr[i] = np.expand_dims(np.array(newitem.astype(float)), axis = 0)
+            print i 
+        print meanArr.shape #(258, 102, 1401) with last row as zeros - can modify... 
+        print meanArr[1,1,1]
          
 ##########################################################################    
-    io.savemat(epochs_file, dict(sumArr = new), oned_as = 'row')
-    io.savemat(epochsLen_file, dict(lenArr = newNum), oned_as = 'row')
-    io.savemat(epochsMean_file, dict(meanArr = meanArr), oned_as = 'row')
+        io.savemat(epochs_file, dict(sumArr = new), oned_as = 'row')
+        io.savemat(epochsLen_file, dict(lenArr = newNum), oned_as = 'row')
+        io.savemat(epochsMean_file, dict(meanArr = meanArr), oned_as = 'row')
 
 
 
